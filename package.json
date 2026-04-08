@@ -12,6 +12,8 @@
     "migrate:sqlite:page-hero": "python scripts/migrate-pages-page-hero-sqlite.py",
     "migrate:sqlite:page-hero-blocks": "python scripts/migrate-page-hero-to-blocks-sqlite.py",
     "migrate:sqlite:page-hero-sync-group": "python scripts/sync-page-hero-block-to-group-sqlite.py",
+    "migrate:sqlite:site-settings-sticky-header": "python scripts/migrate-sqlite-site-settings-sticky-header.py",
+    "migrate:sqlite:homepage-hero-secondary-cta": "python scripts/migrate-sqlite-homepage-hero-secondary-cta.py",
     "postinstall": "patch-package"
   },
   "dependencies": {

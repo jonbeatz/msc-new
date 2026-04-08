@@ -12,6 +12,7 @@ export const SiteSettings: GlobalConfig = {
   },
   access: {
     read: () => true,
+    update: ({ req }) => Boolean(req.user),
   },
   fields: [
     {
@@ -34,6 +35,16 @@ export const SiteSettings: GlobalConfig = {
               type: "textarea",
               admin: {
                 description: "Default meta description (search + social previews).",
+              },
+            },
+            {
+              name: "stickyHeader",
+              label: "Enable Sticky Header",
+              type: "checkbox",
+              defaultValue: true,
+              admin: {
+                description:
+                  "When on, the marketing header stays at the top while scrolling with a glass backdrop. When off, the header scrolls with the page.",
               },
             },
           ],

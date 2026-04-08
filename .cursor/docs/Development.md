@@ -58,7 +58,7 @@ Open **`http://localhost:3000/`**. First-time **Payload:** visit **`http://local
 
 | What | Path |
 |------|------|
-| Marketing document shell (metadata, fonts) | `app/(site)/layout.tsx` |
+| Marketing document shell (metadata, fonts, **ScrollToTop**) | `app/(site)/layout.tsx` |
 | Marketing home sections | `app/(site)/page.tsx` |
 | Payload admin + API route group | `app/(payload)/` |
 | Payload config | `payload.config.ts` |
@@ -72,11 +72,22 @@ Open **`http://localhost:3000/`**. First-time **Payload:** visit **`http://local
 
 ## Page structure (marketing home)
 
-`app/(site)/page.tsx` renders one `<main>` with sections in this order:
+`app/(site)/page.tsx` renders **`Header` as a sibling of `<main>`** (fragment: `<> … </>`), then **`<main>`** wraps all sections + footer. Dynamic pages **`app/(site)/[slug]/page.tsx`** use the same pattern.
 
-1. `Header` through `Footer` (same list as before; see git history if you need the full enumeration).
+- **Why:** Avoids **`overflow-x-clip`** (or `overflow: hidden`) becoming an ancestor of the header, which breaks **`position: sticky`** in Chromium. Horizontal clipping lives on an **inner `<div className="overflow-x-clip">` inside `<main>` only**.
+- **Reorder sections:** edit **`app/(site)/page.tsx`** (components between the inner wrapper’s opening tag and `Footer`).
 
-To **reorder** the home page, edit **`app/(site)/page.tsx`** only.
+---
+
+## Marketing header (sticky + glass)
+
+- **Admin toggle:** **Site settings → General → Enable Sticky Header** (`stickyHeader` in config; SQLite column typically **`sticky_header`**). If the column is missing with **`db.push: false`**, **`/admin/globals/site-settings` can 404** — run **`npm run migrate:sqlite:site-settings-sticky-header`** once (see **`scripts/migrate-sqlite-site-settings-sticky-header.py`** / **`scripts/sql/add-site-settings-sticky-header.sql`**). The field’s admin description is short (glass vs static header only); it does not repeat migration commands.
+- **Data:** **`lib/cms/site-settings.ts`** — `getSiteSettingsCms()` includes **`stickyHeader`**; **`resolveStickyHeaderFromDoc()`** normalizes Payload/SQLite shapes (`sticky_header`, **`0` / `1`**, booleans). Pages pass **`stickyHeaderEnabled`** into **`Header`**, **`HeroSection`**, and **`DemosSection`** (home).
+- **Component:** **`components/header.tsx`** — when on: **`sticky top-0 z-100 bg-black/70 backdrop-blur-md`** ( **`z-100`** clears hero carousel controls at **`z-[60]`** ); when off: **`relative z-50 bg-background`**. In development only, logs **`[MSC] Enable Sticky Header (prop):`** for debugging the toggle.
+- **CSS gotcha (fixed):** **`app/globals.css`** `.msc-section` applied **`position: relative`** to every section, including **`#msc-header`**. Unlayered CSS **won over** Tailwind **`sticky`**, so DevTools showed `sticky` in the class list but **computed `position` was `relative`** and the bar scrolled away. **Fix:** **`.msc-section:not(#msc-header) { position: relative; }`** — header keeps `sticky`.
+- **Default nav (Payload `header` global + `lib/cms/header.ts` `DEFAULT_HEADER_NAV_ITEMS`):** in-page anchors on the home page. **Services** submenu order (page flow): **Own Your Platform** → `#msc-own-platform`, **Packages** → `#msc-packages`, **Requirements** → `#msc-requirements`, **What We Do** → `#msc-creators` (Built for Creators). **Resources** submenu: **Testimonials** → `#msc-testimonials`, **Extras** → `#msc-addons`, **FAQ** → `#msc-faq`. **Demos** → `#msc-demos`. If an existing **`header`** global was saved before defaults changed, reorder or add links in admin to match.
+- **Scrolling:** **`html { scroll-behavior: smooth; }`** in **`globals.css`**. **`#msc-demos`** lives on the **inner** `max-w-7xl` wrapper in **`components/demos-section.tsx`** (not the outer `<section>`) so hash scroll lands on the “Our Work” / “View Demos” header without stacking an extra band of empty space. The section uses **`py-24 lg:py-32`** (padding, not margin-top) so the Demos **`bg-surface-2`** fills the top band — **margin-top** had exposed **`main`’s darker `bg-background`** as a visible “divider.” When sticky header is on, that wrapper uses **`scroll-mt-30`** (~`h-20` + ~40px breathing room under the bar).
+- **Scroll to top:** **`components/scroll-to-top.tsx`** — fixed gold circular control; appears after the user scrolls past **~50%** of the viewport height; **`app/(site)/layout.tsx`** mounts it for all marketing routes using that layout.
 
 ---
 
@@ -84,8 +95,8 @@ To **reorder** the home page, edit **`app/(site)/page.tsx`** only.
 
 Admin sidebar group **Site**:
 
-- **`Homepage`** — Hero carousel: each slide uses an image from **Media** (upload there first), eyebrow, three headline lines, and subcopy. Optional **Hero stats** row; if empty, the site uses the built-in stat copy.
-- **`Site settings`** — **`siteName`** and **`tagline`** feed **`generateMetadata()`** in **`app/(site)/layout.tsx`** (browser title + meta description). Defaults apply until you save once in admin.
+- **`Homepage`** — Hero carousel: each slide uses an image from **Media** (upload there first), eyebrow, three headline lines, subcopy, optional **secondary CTA** label/link, and a per-slide **SEO** group. Optional **Hero stats** row; if empty, the site uses the built-in stat copy. SQLite migration for secondary CTA columns: **`migrate:sqlite:homepage-hero-secondary-cta`** (see **Globals** in *Payload data model*).
+- **`Site settings`** — **`siteName`** and **`tagline`** feed **`generateMetadata()`** in **`app/(site)/layout.tsx`** (browser title + meta description). **General** also has **Enable Sticky Header** (see **Marketing header** below). Defaults apply until you save once in admin.
 
 **Front-end wiring:**
 
@@ -174,11 +185,11 @@ Admin sidebar group **Site**:
 
 **Globals**
 
-- **`homepage`** — hero slides + optional stats (see above). Each slide now includes a per-slide `seo` group (`title`, `description`, `OpenGraph image`) for metadata control directly in the Homepage screen.
-- **`site-settings`** — site name/tagline for SEO metadata, plus centralized notification controls under a dedicated Notifications tab (`enableAdminNotifications`, `notificationEmails`, `adminFallbackEmail`, `systemFromEmail`).
+- **`homepage`** — hero slides + optional stats (see above). Each slide now includes a per-slide `seo` group (`title`, `description`, `OpenGraph image`) for metadata control directly in the Homepage screen, plus per-slide **secondary CTA** label/link fields. With SQLite and **`db.push: false`**, missing columns on **`homepage_hero_slides`** can make **`/admin/globals/homepage` 404** — run **`npm run migrate:sqlite:homepage-hero-secondary-cta`** once (**`scripts/migrate-sqlite-homepage-hero-secondary-cta.py`**). The Homepage global’s admin description points editors at the same script if needed.
+- **`site-settings`** — site name/tagline for SEO metadata; **General** includes **`stickyHeader`** (marketing pinned header). **Notifications** tab: `enableAdminNotifications`, `notificationEmails`, `adminFallbackEmail`, `systemFromEmail`.
 - **`site-settings` branding** — includes `siteLogo`, `favicon`, `ogImage`, and `siteTitleSuffix`; header/footer logo + metadata defaults are wired to these fields.
 - **`projects-home`** — Projects moved to a Site global with draggable row items (`projectItems`) to match Homepage editing UX. Frontend demos now read from this global instead of a collection.
-- **`header`** — nav items support nested submenu rows in admin (collapsed by default), and desktop/mobile header rendering supports dropdown links again.
+- **`header`** — nav items support nested submenu rows in admin (collapsed by default), with desktop/mobile dropdowns. **Default** labels and section anchors are in **`globals/Header.ts`** / **`lib/cms/header.ts`** (see **Marketing header** → default nav); existing saved nav rows are not auto-overwritten.
 
 ---
 
@@ -214,11 +225,14 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **Payload blocks-first convention** — documented default admin pattern: prefer typed **`blocks`** fields (Sections Builder row UI) over long flat field stacks; `array` only for small uniform rows; **`lib/payload-admin-defaults.ts`** + **`.cursor/rules/payload-blocks-first.mdc`** for agents. |
 | 2026-04-08 | **Pages admin React keys** — `pageHero` moved from a second **`blocks`** field to **`collapsible` + `group`** (same schema path `pageHero.*`) because two `blocks` fields on one document duplicate numeric row ids as React keys; data sync via **`npm run migrate:sqlite:page-hero-sync-group`**. |
 | 2026-04-08 | **Payload admin duplicate keys (upstream) — final fix** — Root cause: `@payloadcms/ui` `package.json` `exports` field routes webpack to the **pre-bundled minified** `dist/exports/client/index.js`, bypassing all patches to individual source files. Applied 9 composite-key replacements **directly to the minified bundle** via `patch-package` (`patches/@payloadcms+ui+3.81.0.patch`): `BlocksField` + `ArrayField` DnD ids, `DraggableSortableItem` `id`+`key` props (composite `path-blockType-id` / `path-id`), `BlockRow` `Collapsible` key (row path), `BlockRow` + `ArrayRow` `dragHandleProps.id` (composite). Errors `key: '1'` / `key: '2'` on Pages → MSC1 edit are resolved. |
+| 2026-04-08 | **Sticky marketing header — Site settings + layout/CSS** — Added **`stickyHeader`** to **`globals/SiteSettings.ts`** with SQLite migration (**`migrate:sqlite:site-settings-sticky-header`**). **`Header`** is a **sibling** of **`<main>`**; **`overflow-x-clip`** only on an inner div inside main. **`.msc-section`** no longer sets **`position: relative`** on **`#msc-header`** (that rule had overridden Tailwind **`sticky`**). Header uses **`z-100`** when pinned; hero secondary CTA **View Demos** → **`#msc-demos`** (Demos **`scroll-margin`** and anchor placement refined in the next row). |
+| 2026-04-08 | **Marketing nav + Demos anchor + scroll UX** — Services submenu: **What We Do** → **`#msc-creators`**, **Own Your Platform** → **`#msc-own-platform`**; Resources adds **Extras** → **`#msc-addons`** with **FAQ** after Extras. **`#msc-demos`** on inner Demos wrapper + **`scroll-mt-30`** when sticky; section **padding-top** (not margin) avoids a dark strip from **`main`’s background**. **`ScrollToTop`** on **`(site)` layout**. **Homepage** hero secondary CTA columns: **`migrate:sqlite:homepage-hero-secondary-cta`**. Sticky header field admin copy shortened (no inline SQLite paragraph). |
 
 ---
 
 ## Maintenance tips
 
+- **SQLite migrations (when `db.push: false`):** **`npm run migrate:sqlite:site-settings-sticky-header`**, **`npm run migrate:sqlite:homepage-hero-secondary-cta`**, plus other **`migrate:sqlite:*`** scripts in **`package.json`** — run when a new global/collection field 404s in admin or errors on read.
 - Regenerate types after collection changes: `npx payload generate:types` (optional).
 - For subdirectory hosting later, set `basePath` / `assetPrefix` and update URLs here + Run-Next-JS.
 - Keep this file short; link to **Site-Plans.md** for CMS vs WP tradeoffs.

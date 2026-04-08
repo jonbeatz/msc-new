@@ -150,6 +150,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -286,8 +289,13 @@ html {
 
 /* Section marker class — 1px solid divider between every section */
 .msc-section {
-  position: relative;
   border-top: 1px solid #4c4c4c;
+}
+
+/* Do not set position on #msc-header: it must keep Tailwind sticky/fixed. `position: relative`
+   here was overriding `sticky` / `fixed` in the cascade and the bar scrolled away. */
+.msc-section:not(#msc-header) {
+  position: relative;
 }
 
 /* Hero sits flush at the top of the page — no top border */

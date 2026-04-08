@@ -48,11 +48,16 @@ On first run, create your admin user in Payload.
 - `users` (admin auth)
 - `media` (uploads)
 - `bookings` (schedule requests)
-- `leads` (future marketing signups)
+- `leads` (newsletter signups + verification)
+- `pages` (dynamic routes at `/[slug]`, Sections Builder)
 
 ### Globals
-- `homepage` (hero slides + optional stats)
-- `site-settings` (site name + tagline for metadata)
+- `homepage` (hero slides, optional stats, per-slide SEO + secondary CTA)
+- `site-settings` (site name, tagline, branding, notifications, **Enable Sticky Header**)
+- `header` (marketing nav + submenus; defaults in `lib/cms/header.ts`)
+- `projects-home` (demo projects for the Demos section)
+
+If **`/admin/globals/site-settings`** or **`/admin/globals/homepage`** returns **404** with SQLite and schema push disabled, run the matching script from **`package.json`** (`migrate:sqlite:site-settings-sticky-header`, `migrate:sqlite:homepage-hero-secondary-cta`). Details: **`.cursor/docs/Development.md`**.
 
 ## Homepage hero content workflow
 

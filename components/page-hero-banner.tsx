@@ -96,7 +96,7 @@ export function PageHeroBanner({
             >
               <a href="#msc-demos">
                 <Play className="mr-2 h-5 w-5 fill-current" />
-                View the Demo
+                View Demos
               </a>
             </Button>
           </div>

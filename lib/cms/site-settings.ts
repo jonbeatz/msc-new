@@ -8,6 +8,8 @@ export type SiteSettingsContent = {
   siteLogo: string | null
   favicon: string | null
   ogImage: string | null
+  /** Marketing header: sticky + glass when true (default). */
+  stickyHeader: boolean
 }
 
 function normalizeMediaSrc(pathOrUrl: string): string {
@@ -18,6 +20,15 @@ function normalizeMediaSrc(pathOrUrl: string): string {
     return pathOrUrl
   }
   return pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`
+}
+
+/** Payload SQLite may expose `sticky_header` or 0/1; normalize for the marketing header. */
+export function resolveStickyHeaderFromDoc(
+  doc: Record<string, unknown>,
+): boolean {
+  const raw = doc.stickyHeader ?? doc.sticky_header
+  if (raw === false || raw === 0 || raw === "0") return false
+  return true
 }
 
 function getUploadUrl(value: unknown): string | null {
@@ -37,6 +48,7 @@ export async function getSiteSettingsCms(): Promise<SiteSettingsContent | null> 
     if (!doc || typeof doc.siteName !== "string" || !doc.siteName.trim()) {
       return null
     }
+    const d = doc as Record<string, unknown>
     return {
       siteName: doc.siteName.trim(),
       tagline:
@@ -50,6 +62,7 @@ export async function getSiteSettingsCms(): Promise<SiteSettingsContent | null> 
       siteLogo: getUploadUrl(doc.siteLogo),
       favicon: getUploadUrl(doc.favicon),
       ogImage: getUploadUrl(doc.ogImage),
+      stickyHeader: resolveStickyHeaderFromDoc(d),
     }
   } catch {
     return null

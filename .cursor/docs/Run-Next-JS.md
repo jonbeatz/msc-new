@@ -40,7 +40,7 @@ From the directory with **`package.json`**:
 
 **First visit:** open **`/admin`** and create the first admin user.
 
-**Edit homepage copy/images:** **`/admin`** → **Site** group → **Homepage** (hero slides from **Media**) and **Site settings** (title + meta description). See **Development.md** → *CMS — homepage hero + SEO*.
+**Edit homepage / nav / metadata:** **`/admin`** → **Site** → **Homepage** (hero slides from **Media**; per-slide SEO + secondary CTA), **Site settings** (name, tagline, sticky header, branding, notifications), **Header** (primary nav + submenus). If a global screen **404**s on SQLite with schema push off, see **Development.md** → *Maintenance tips* / *SQLite migrations*.
 
 ---
 

@@ -52,9 +52,15 @@ const defaultStats: HeroStatContent[] = [
 type HeroSectionProps = {
   cmsSlides?: HeroSlideContent[] | null
   cmsStats?: HeroStatContent[] | null
+  /** Match Site settings sticky header (affects hero height math). */
+  stickyHeaderEnabled?: boolean
 }
 
-export function HeroSection({ cmsSlides, cmsStats }: HeroSectionProps) {
+export function HeroSection({
+  cmsSlides,
+  cmsStats,
+  stickyHeaderEnabled = true,
+}: HeroSectionProps) {
   const activeCmsSlides = useMemo(
     () => (cmsSlides ? cmsSlides.filter((s) => s.isActive) : null),
     [cmsSlides],
@@ -101,7 +107,12 @@ export function HeroSection({ cmsSlides, cmsStats }: HeroSectionProps) {
   return (
     <section
       id="msc-hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden msc-section"
+      className={cn(
+        "relative flex items-center justify-center overflow-hidden msc-section",
+        stickyHeaderEnabled
+          ? "min-h-[calc(100dvh-5rem)]"
+          : "min-h-screen",
+      )}
       data-divi-section="hero"
       data-divi-module="fullwidth-header"
     >
@@ -140,7 +151,7 @@ export function HeroSection({ cmsSlides, cmsStats }: HeroSectionProps) {
       />
 
       {/* Content */}
-      <div className="relative z-10 w-full px-6 lg:px-16 pt-20 sm:pt-32 pb-24">
+      <div className="relative z-10 w-full px-6 lg:px-16 pt-6 sm:pt-10 pb-24">
         <div
           className={cn(
             "max-w-3xl mx-auto text-center transition-all duration-500",
@@ -181,9 +192,9 @@ export function HeroSection({ cmsSlides, cmsStats }: HeroSectionProps) {
               className="border-white/20 text-foreground hover:bg-white/10 h-14 px-8 text-base font-medium backdrop-blur-sm"
               asChild
             >
-              <a href="#msc-demos">
+              <a href={slide.secondaryCtaLink || "#msc-demos"}>
                 <Play className="mr-2 h-5 w-5 fill-current" />
-                View the Demo
+                {slide.secondaryCtaLabel?.trim() || "View Demos"}
               </a>
             </Button>
           </div>

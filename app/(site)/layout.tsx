@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "../globals.css"
 import { getSiteSettingsCms } from "@/lib/cms/site-settings"
 import { getHomepageActiveSlideSeo } from "@/lib/cms/homepage"
+import { ScrollToTop } from "@/components/scroll-to-top"
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -71,6 +72,7 @@ export default function SiteRootLayout({
     <html lang="en" className={montserrat.variable} suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
         {children}
+        <ScrollToTop />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>

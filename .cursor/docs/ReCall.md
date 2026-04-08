@@ -69,6 +69,14 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-08 — Marketing home: nav anchors, Demos scroll, scroll-to-top, docs
+
+- **Header defaults (`globals/Header.ts`, `lib/cms/header.ts`):** Services submenu ends with **What We Do** → `#msc-creators`; order above it is Own Your Platform, Packages, Requirements. Resources: Testimonials → **Extras** → `#msc-addons`, then FAQ → `#msc-faq`.
+- **Demos (`components/demos-section.tsx`):** `#msc-demos` on the inner `max-w-7xl` wrapper; **`scroll-mt-30`** when sticky header is on; section uses **`py-*` padding** (not margin-top) so **`bg-surface-2`** covers the top band (no dark “divider” from `main` background).
+- **Scroll to top:** `components/scroll-to-top.tsx` mounted in `app/(site)/layout.tsx` (shows after ~half viewport scroll).
+- **Payload:** Homepage hero secondary CTA columns → `npm run migrate:sqlite:homepage-hero-secondary-cta` if `/admin/globals/homepage` 404s on SQLite without push. Sticky header field admin copy is short (no long SQLite paragraph).
+- **Docs refreshed:** `Development.md`, `README.md`, `.cursor/docs` + `public/` **CURSOR-SETUP-PROMPT.md**, **DIVI-CONVERSION-GUIDE.md** updated to match the above.
+
 ### 2026-04-08 — Final polish closeout: jump links + seeded demo page
 
 - **Jump-link UX finalized:** Kept active-chip detection and auto-centering, but removed sticky behavior so in-page nav scrolls away naturally after passing it.

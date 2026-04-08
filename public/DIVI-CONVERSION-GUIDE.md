@@ -24,7 +24,7 @@ This document maps the React component structure to Divi 4 modules for seamless 
 | `own-platform-section.tsx` | `#msc-own-platform` | Text, Blurb (3 features), Image |
 | `packages-section.tsx` | `#msc-packages` | Pricing Tables (3 columns) |
 | `requirements-section.tsx` | `#msc-requirements` | Text, Blurb (with icons), Image |
-| `demos-section.tsx` | `#msc-demos` | Gallery, Image, Text |
+| `demos-section.tsx` | `#msc-demos` (id on **inner** `max-w-7xl` wrapper in Next; `scroll-mt-30` when sticky header on) | Gallery, Image, Text |
 | `testimonials-section.tsx` | `#msc-testimonials` | Testimonial Slider |
 | `built-for-creators-section.tsx` | `#msc-creators` | Blurb (grid), CTA |
 | `what-you-get-section.tsx` | `#msc-benefits` | Text, Blurb (3-column) |
@@ -181,6 +181,8 @@ Section (msc-surface-0)
 ---
 
 ### 8. Demos Section (`#msc-demos`)
+
+**Next.js implementation:** Hash target is the **inner** content wrapper so the sticky header + **`scroll-margin`** land on the “Our Work” / “View Demos” block cleanly. The section uses **padding** for top/bottom spacing (not **margin-top** on the section) so **`bg-surface-2`** fills the band above the content — otherwise **`main`’s darker background** can read as a horizontal “divider.”
 
 **Divi Modules:** Gallery or Image + Text cards
 

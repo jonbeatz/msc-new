@@ -8,6 +8,9 @@ export type HeroSlideContent = {
   headline: [string, string, string]
   sub: string
   ctaLink?: string
+  /** Outline CTA (play icon row); defaults to View Demos → #msc-demos */
+  secondaryCtaLabel?: string
+  secondaryCtaLink?: string
   seo?: {
     title?: string
     description?: string

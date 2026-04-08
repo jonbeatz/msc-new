@@ -206,13 +206,14 @@ ROW 1 (Full Width):
 │   - Links: 
 │     • About → #msc-about
 │     • Services (dropdown) → 
-│       - What We Do → #msc-services
 │       - Own Your Platform → #msc-own-platform
 │       - Packages → #msc-packages
 │       - Requirements → #msc-requirements
+│       - What We Do → #msc-creators
 │     • Demos → #msc-demos
 │     • Resources (dropdown) →
 │       - Testimonials → #msc-testimonials
+│       - Extras → #msc-addons
 │       - FAQ → #msc-faq
 │     • Contact → #msc-contact
 │
@@ -425,6 +426,8 @@ RIGHT: Large text + CTA
 
 ### SECTION 7: DEMOS (#msc-demos)
 **Divi Modules: Gallery, Image, Text**
+
+**Next.js note (parity):** On the React site, **`#msc-demos`** is on the **inner content wrapper** (not the outer section) for hash-scroll alignment under the sticky header; the section uses **padding** (not margin) for vertical spacing so the section background fills the top band (avoids a dark strip from the page background).
 
 ```
 SECTION SETTINGS:

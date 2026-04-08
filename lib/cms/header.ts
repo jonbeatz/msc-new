@@ -16,10 +16,10 @@ export const DEFAULT_HEADER_NAV_ITEMS: HeaderNavItem[] = [
     label: "Services",
     link: "#msc-services",
     submenu: [
-      { label: "What We Do", link: "#msc-services" },
-      { label: "Own Your Platform", link: "#msc-platform" },
+      { label: "Own Your Platform", link: "#msc-own-platform" },
       { label: "Packages", link: "#msc-packages" },
       { label: "Requirements", link: "#msc-requirements" },
+      { label: "What We Do", link: "#msc-creators" },
     ],
   },
   { label: "Demos", link: "#msc-demos" },
@@ -28,6 +28,7 @@ export const DEFAULT_HEADER_NAV_ITEMS: HeaderNavItem[] = [
     link: "#msc-testimonials",
     submenu: [
       { label: "Testimonials", link: "#msc-testimonials" },
+      { label: "Extras", link: "#msc-addons" },
       { label: "FAQ", link: "#msc-faq" },
     ],
   },

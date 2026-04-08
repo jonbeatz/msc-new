@@ -25,33 +25,47 @@ export default async function HomePage() {
   const navItems = await getHeaderNavItems()
   const demoProjects = await getDemoProjects()
   const settings = await getSiteSettingsCms()
+  const stickyHeaderEnabled = settings?.stickyHeader !== false
 
   return (
-    <main className="min-h-screen bg-background">
+    <>
       <Header
         navItems={navItems}
         logoSrc={settings?.siteLogo}
         siteName={settings?.siteName || "My Studio Channel"}
+        stickyHeader={stickyHeaderEnabled}
       />
-      <HeroSection cmsSlides={heroSlides} cmsStats={heroStats} />
-      <AboutSection />
-      <ServicesSection />
-      <OwnPlatformSection />
-      <PackagesSection />
-      <RequirementsSection />
-      <DemosSection demos={demoProjects} />
-      <TestimonialsSection />
-      <BuiltForCreatorsSection />
-      <WhatYouGetSection />
-      <AddonsSection />
-      <ProcessSection />
-      <FAQSection />
-      <PoliciesSection />
-      <ContactSection />
-      <Footer
-        logoSrc={settings?.siteLogo}
-        siteName={settings?.siteName || "My Studio Channel"}
-      />
-    </main>
+      <main className="min-h-screen bg-background">
+        {/* Horizontal clipping only below the header so it never breaks sticky/fixed stacking */}
+        <div className="overflow-x-clip">
+        <HeroSection
+          cmsSlides={heroSlides}
+          cmsStats={heroStats}
+          stickyHeaderEnabled={stickyHeaderEnabled}
+        />
+        <AboutSection />
+        <ServicesSection />
+        <OwnPlatformSection />
+        <PackagesSection />
+        <RequirementsSection />
+        <DemosSection
+          demos={demoProjects}
+          stickyHeaderEnabled={stickyHeaderEnabled}
+        />
+        <TestimonialsSection />
+        <BuiltForCreatorsSection />
+        <WhatYouGetSection />
+        <AddonsSection />
+        <ProcessSection />
+        <FAQSection />
+        <PoliciesSection />
+        <ContactSection />
+        <Footer
+          logoSrc={settings?.siteLogo}
+          siteName={settings?.siteName || "My Studio Channel"}
+        />
+        </div>
+      </main>
+    </>
   )
 }

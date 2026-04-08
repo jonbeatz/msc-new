@@ -20,21 +20,26 @@ type HeaderProps = {
   navItems: HeaderNavItem[]
   logoSrc?: string | null
   siteName?: string
+  /** From Site settings → Enable Sticky Header (default true). */
+  stickyHeader?: boolean
 }
 
-export function Header({ navItems, logoSrc, siteName = "My Studio Channel" }: HeaderProps) {
-  const [isScrolled, setIsScrolled] = useState(false)
+export function Header({
+  navItems,
+  logoSrc,
+  siteName = "My Studio Channel",
+  stickyHeader = true,
+}: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
   const closeTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console -- verify Site settings → Enable Sticky Header
+      console.log("[MSC] Enable Sticky Header (prop):", stickyHeader)
     }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [stickyHeader])
 
   useEffect(() => {
     return () => {
@@ -48,12 +53,12 @@ export function Header({ navItems, logoSrc, siteName = "My Studio Channel" }: He
     <header
       id="msc-header"
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 msc-section",
-        isScrolled
-          ? "border-b border-white/6"
-          : "bg-transparent"
+        "left-0 right-0 msc-section border-b border-white/10",
+        /* z-[100] stays above hero carousel controls (z-[60]) and section layers */
+        stickyHeader
+          ? "sticky top-0 z-100 bg-black/70 backdrop-blur-md"
+          : "relative z-50 bg-background",
       )}
-      style={isScrolled ? { backgroundColor: "rgba(13,13,15,0.92)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" } : undefined}
       data-divi-section="header"
       data-divi-modules="global-header"
     >
@@ -143,7 +148,7 @@ export function Header({ navItems, logoSrc, siteName = "My Studio Channel" }: He
               className="text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               asChild
             >
-              <a href="#msc-demos">View Demo</a>
+              <a href="#msc-demos">View Demos</a>
             </Button>
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm hover:glow-accent transition-all duration-300" asChild>
               <a href="#msc-contact">
@@ -165,7 +170,12 @@ export function Header({ navItems, logoSrc, siteName = "My Studio Channel" }: He
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-white/6" style={{ backgroundColor: "rgba(13,13,15,0.97)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
+        <div
+          className={cn(
+            "lg:hidden border-t border-white/10",
+            stickyHeader ? "bg-black/70 backdrop-blur-md" : "bg-background",
+          )}
+        >
           <nav className="flex flex-col px-6 py-6 gap-1">
             {navItems.map((item) => (
               <div key={`${item.label}-${item.link}`}>
@@ -198,7 +208,7 @@ export function Header({ navItems, logoSrc, siteName = "My Studio Channel" }: He
                 className="border-border text-foreground hover:bg-secondary w-full justify-center"
                 asChild
               >
-                <a href="#msc-demos" onClick={() => setIsMobileMenuOpen(false)}>View Demo</a>
+                <a href="#msc-demos" onClick={() => setIsMobileMenuOpen(false)}>View Demos</a>
               </Button>
               <Button className="bg-accent text-accent-foreground hover:bg-accent/90 w-full justify-center glow-accent-sm" asChild>
                 <a href="#msc-contact" onClick={() => setIsMobileMenuOpen(false)}>

@@ -27,10 +27,10 @@ export const HeaderGlobal: GlobalConfig = {
           label: "Services",
           link: "#msc-services",
           submenu: [
-            { label: "What We Do", link: "#msc-services" },
-            { label: "Own Your Platform", link: "#msc-platform" },
+            { label: "Own Your Platform", link: "#msc-own-platform" },
             { label: "Packages", link: "#msc-packages" },
             { label: "Requirements", link: "#msc-requirements" },
+            { label: "What We Do", link: "#msc-creators" },
           ],
         },
         { label: "Demos", link: "#msc-demos" },
@@ -39,6 +39,7 @@ export const HeaderGlobal: GlobalConfig = {
           link: "#msc-testimonials",
           submenu: [
             { label: "Testimonials", link: "#msc-testimonials" },
+            { label: "Extras", link: "#msc-addons" },
             { label: "FAQ", link: "#msc-faq" },
           ],
         },

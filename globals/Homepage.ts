@@ -12,7 +12,7 @@ export const Homepage: GlobalConfig = {
   admin: {
     group: "Site",
     description:
-      "Hero carousel and stat row. Use Media to upload/replace images, then select them per slide.",
+      "Hero carousel and stat row. Use Media to upload/replace images, then select them per slide. With SQLite and db.push disabled, if this screen 404s run: npm run migrate:sqlite:homepage-hero-secondary-cta",
   },
   access: {
     read: () => true,
@@ -48,6 +48,25 @@ export const Homepage: GlobalConfig = {
             placeholder: "#msc-contact",
             description:
               "Primary hero CTA URL for this slide. Leave blank to use #msc-contact.",
+          },
+        },
+        {
+          name: "secondaryCtaLabel",
+          label: "Secondary CTA label",
+          type: "text",
+          defaultValue: "View Demos",
+          admin: {
+            description: "Outline button with play icon (e.g. View Demos).",
+          },
+        },
+        {
+          name: "secondaryCtaLink",
+          label: "Secondary CTA link",
+          type: "text",
+          defaultValue: "#msc-demos",
+          admin: {
+            placeholder: "#msc-demos",
+            description: "Usually #msc-demos to jump to the demos section.",
           },
         },
         {

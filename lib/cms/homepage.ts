@@ -90,6 +90,16 @@ export async function getHomepageCmsData(): Promise<{
           typeof row.ctaLink === "string" && row.ctaLink.trim().length > 0
             ? row.ctaLink.trim()
             : undefined,
+        secondaryCtaLabel:
+          typeof row.secondaryCtaLabel === "string" &&
+          row.secondaryCtaLabel.trim().length > 0
+            ? row.secondaryCtaLabel.trim()
+            : undefined,
+        secondaryCtaLink:
+          typeof row.secondaryCtaLink === "string" &&
+          row.secondaryCtaLink.trim().length > 0
+            ? row.secondaryCtaLink.trim()
+            : undefined,
         seo:
           row.seo && typeof row.seo === "object"
             ? {

@@ -9,9 +9,14 @@ import { cn } from "@/lib/utils"
 
 type DemosSectionProps = {
   demos: DemoProject[]
+  /** Offset anchor scroll: `h-20` header + ~40px breathing; off when header is static. */
+  stickyHeaderEnabled?: boolean
 }
 
-export function DemosSection({ demos }: DemosSectionProps) {
+export function DemosSection({
+  demos,
+  stickyHeaderEnabled = true,
+}: DemosSectionProps) {
   const [activeDemoId, setActiveDemoId] = useState<string>(demos[0]?.id ?? "")
   const activeDemo = useMemo(() => {
     return demos.find((demo) => demo.id === activeDemoId) ?? demos[0]
@@ -23,13 +28,19 @@ export function DemosSection({ demos }: DemosSectionProps) {
   if (!featuredDemo) return null
 
   return (
-    <section 
-      id="msc-demos" 
+    <section
       className="py-24 lg:py-32 relative bg-surface-2 msc-section msc-surface-2"
       data-divi-section="demos"
       data-divi-modules="gallery,image,text"
     >
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 pointer-events-auto">
+      {/* Use padding (not margin) for vertical rhythm so this section’s background fills the gap — margin would show `main`’s darker bg as a strip */}
+      <div
+        id="msc-demos"
+        className={cn(
+          "relative z-10 mx-auto max-w-7xl px-6 lg:px-8 pointer-events-auto",
+          stickyHeaderEnabled && "scroll-mt-30",
+        )}
+      >
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
           <div>

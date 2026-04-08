@@ -281,14 +281,18 @@ export default async function DynamicPage({ params }: RouteProps) {
   const heroSub = (ph?.sub && ph.sub.trim()) || description
   const ctaLink = (ph?.ctaLink && ph.ctaLink.trim()) || "#msc-contact"
 
+  const stickyHeaderEnabled = settings?.stickyHeader !== false
+
   return (
-    <main className="min-h-screen bg-background">
+    <>
       <Header
         navItems={navItems}
         logoSrc={settings?.siteLogo}
         siteName={settings?.siteName || "My Studio Channel"}
+        stickyHeader={stickyHeaderEnabled}
       />
-
+      <main className="min-h-screen bg-background">
+        <div className="overflow-x-clip">
       {heroImage ? (
         <PageHeroBanner
           image={heroImage}
@@ -343,11 +347,13 @@ export default async function DynamicPage({ params }: RouteProps) {
         )}
       </section>
 
-      <Footer
-        logoSrc={settings?.siteLogo}
-        siteName={settings?.siteName || "My Studio Channel"}
-      />
-    </main>
+        <Footer
+          logoSrc={settings?.siteLogo}
+          siteName={settings?.siteName || "My Studio Channel"}
+        />
+        </div>
+      </main>
+    </>
   )
 }
 
