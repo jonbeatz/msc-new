@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import Image from "next/image"
 import { getPayload } from "payload"
 import { RichText } from "@payloadcms/richtext-lexical/react"
 import config from "@payload-config"
@@ -8,8 +7,53 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { PageJumpLinks } from "@/components/blocks/PageJumpLinks"
 import { SectionsRenderer } from "@/components/blocks/SectionsRenderer"
+import { PageHeroBanner } from "@/components/page-hero-banner"
 import { getHeaderNavItems } from "@/lib/cms/header"
 import { getSiteSettingsCms } from "@/lib/cms/site-settings"
+
+function normalizeMediaSrc(pathOrUrl: string): string {
+  if (
+    pathOrUrl.startsWith("http://") ||
+    pathOrUrl.startsWith("https://")
+  ) {
+    return pathOrUrl
+  }
+  return pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`
+}
+
+/** `pageHero` is a blocks field (0–1 rows); supports legacy group object shape during DB migration. */
+function resolvePageHeroBlock(
+  record: Record<string, unknown>,
+): Record<string, unknown> | null {
+  const ph = record.pageHero
+  if (Array.isArray(ph) && ph.length > 0) {
+    const first = ph[0]
+    if (first && typeof first === "object") {
+      return first as Record<string, unknown>
+    }
+    return null
+  }
+  if (ph && typeof ph === "object" && !Array.isArray(ph)) {
+    return ph as Record<string, unknown>
+  }
+  return null
+}
+
+type PageHeroDoc = {
+  enabled: boolean
+  image: { url: string; alt: string } | null
+  ctaLink?: string | null
+  eyebrow?: string | null
+  headlineLine1?: string | null
+  headlineLine2?: string | null
+  headlineLine3?: string | null
+  sub?: string | null
+  seo?: {
+    title?: string | null
+    description?: string | null
+    image?: { url: string } | null
+  } | null
+}
 
 type PageDoc = {
   title?: string | null
@@ -20,10 +64,7 @@ type PageDoc = {
     description?: string | null
   } | null
   content?: unknown
-  featuredImage?: {
-    url: string
-    alt: string
-  } | null
+  pageHero?: PageHeroDoc | null
   sections?: unknown[]
 }
 
@@ -54,20 +95,73 @@ async function getPageBySlug(slug: string): Promise<PageDoc | null> {
       record.meta && typeof record.meta === "object"
         ? (record.meta as Record<string, unknown>)
         : null
-    const rawFeaturedImage =
-      record.featuredImage && typeof record.featuredImage === "object"
-        ? (record.featuredImage as Record<string, unknown>)
-        : null
     const rawSections = Array.isArray(record.sections) ? record.sections : []
 
-    const featuredImageUrl =
-      rawFeaturedImage && typeof rawFeaturedImage.url === "string"
-        ? rawFeaturedImage.url
-        : null
-    const featuredImageAlt =
-      rawFeaturedImage && typeof rawFeaturedImage.alt === "string"
-        ? rawFeaturedImage.alt
-        : "Page hero image"
+    let pageHero: PageHeroDoc | null = null
+    const rawHero = resolvePageHeroBlock(record)
+    if (rawHero) {
+      const enabled = rawHero.enabled !== false
+      let image: { url: string; alt: string } | null = null
+      const rawHeroImg = rawHero.image
+      if (rawHeroImg && typeof rawHeroImg === "object") {
+        const urlVal = (rawHeroImg as { url?: string }).url
+        if (typeof urlVal === "string" && urlVal.length > 0) {
+          image = {
+            url: normalizeMediaSrc(urlVal),
+            alt:
+              typeof (rawHeroImg as { alt?: string }).alt === "string"
+                ? (rawHeroImg as { alt: string }).alt
+                : "Hero image",
+          }
+        }
+      }
+      let seo: PageHeroDoc["seo"] = null
+      const rawSeo =
+        rawHero.seo && typeof rawHero.seo === "object"
+          ? (rawHero.seo as Record<string, unknown>)
+          : null
+      if (rawSeo) {
+        let seoImage: { url: string } | null = null
+        const rawSeoImg = rawSeo.image
+        if (rawSeoImg && typeof rawSeoImg === "object" && "url" in rawSeoImg) {
+          const u = (rawSeoImg as { url?: string }).url
+          if (typeof u === "string" && u.length > 0) {
+            seoImage = { url: normalizeMediaSrc(u) }
+          }
+        }
+        seo = {
+          title:
+            typeof rawSeo.title === "string" ? rawSeo.title : null,
+          description:
+            typeof rawSeo.description === "string"
+              ? rawSeo.description
+              : null,
+          image: seoImage,
+        }
+      }
+      pageHero = {
+        enabled,
+        image,
+        ctaLink:
+          typeof rawHero.ctaLink === "string" ? rawHero.ctaLink : null,
+        eyebrow:
+          typeof rawHero.eyebrow === "string" ? rawHero.eyebrow : null,
+        headlineLine1:
+          typeof rawHero.headlineLine1 === "string"
+            ? rawHero.headlineLine1
+            : null,
+        headlineLine2:
+          typeof rawHero.headlineLine2 === "string"
+            ? rawHero.headlineLine2
+            : null,
+        headlineLine3:
+          typeof rawHero.headlineLine3 === "string"
+            ? rawHero.headlineLine3
+            : null,
+        sub: typeof rawHero.sub === "string" ? rawHero.sub : null,
+        seo,
+      }
+    }
 
     return {
       title: typeof record.title === "string" ? record.title : null,
@@ -84,14 +178,7 @@ async function getPageBySlug(slug: string): Promise<PageDoc | null> {
           }
         : null,
       content: record.content,
-      featuredImage: featuredImageUrl
-        ? {
-            url: featuredImageUrl.startsWith("/")
-              ? featuredImageUrl
-              : `/${featuredImageUrl}`,
-            alt: featuredImageAlt,
-          }
-        : null,
+      pageHero,
       sections: rawSections,
     }
   } catch {
@@ -127,7 +214,14 @@ export async function generateMetadata({ params }: RouteProps): Promise<Metadata
     "My Studio Channel"
 
   const title = `${seoTitle} ${titleSuffix}`.trim()
-  const ogImage = settings?.ogImage || undefined
+  const hero = doc.pageHero
+  const heroOg =
+    hero?.seo?.image?.url != null &&
+    typeof hero.seo.image.url === "string" &&
+    hero.seo.image.url.length > 0
+      ? normalizeMediaSrc(hero.seo.image.url)
+      : null
+  const ogImage = heroOg || settings?.ogImage || undefined
 
   return {
     title,
@@ -174,6 +268,19 @@ export default async function DynamicPage({ params }: RouteProps) {
       : settings?.tagline || "Professional creator platform content."
   const richContent = doc.content && typeof doc.content === "object" ? doc.content : null
 
+  const ph = doc.pageHero
+  const heroImage =
+    ph?.enabled !== false && ph?.image?.url ? ph.image : null
+
+  const headlineFallback1 =
+    (ph?.headlineLine1 && ph.headlineLine1.trim()) || title
+  const headline2 = ph?.headlineLine2?.trim() || ""
+  const headline3 = ph?.headlineLine3?.trim() || ""
+  const eyebrow =
+    (ph?.eyebrow && ph.eyebrow.trim()) || "For Creators Who Want More"
+  const heroSub = (ph?.sub && ph.sub.trim()) || description
+  const ctaLink = (ph?.ctaLink && ph.ctaLink.trim()) || "#msc-contact"
+
   return (
     <main className="min-h-screen bg-background">
       <Header
@@ -182,32 +289,31 @@ export default async function DynamicPage({ params }: RouteProps) {
         siteName={settings?.siteName || "My Studio Channel"}
       />
 
-      <section className="relative overflow-hidden border-b border-white/10 pt-32 pb-20">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.14),transparent_55%)]" />
-        <div className="relative mx-auto max-w-5xl px-6 lg:px-8">
-          <p className="mb-4 text-xs uppercase tracking-[0.25em] text-[#D4AF37]">
-            My Studio Channel
-          </p>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            {title}
-          </h1>
-          <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            {description}
-          </p>
-          {doc.featuredImage ? (
-            <div className="mt-8 overflow-hidden rounded-2xl border border-[#D4AF37]/50 bg-[#0f1014] p-2">
-              <div className="relative aspect-video w-full overflow-hidden rounded-xl">
-                <Image
-                  src={doc.featuredImage.url}
-                  alt={doc.featuredImage.alt}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          ) : null}
-        </div>
-      </section>
+      {heroImage ? (
+        <PageHeroBanner
+          image={heroImage}
+          eyebrow={eyebrow}
+          headline={[headlineFallback1, headline2, headline3]}
+          sub={heroSub}
+          ctaLink={ctaLink}
+          overline="My Studio Channel"
+        />
+      ) : (
+        <section className="relative overflow-hidden border-b border-white/10 pt-32 pb-20">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.14),transparent_55%)]" />
+          <div className="relative mx-auto max-w-5xl px-6 lg:px-8">
+            <p className="mb-4 text-xs uppercase tracking-[0.25em] text-[#D4AF37]">
+              My Studio Channel
+            </p>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              {title}
+            </h1>
+            <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {description}
+            </p>
+          </div>
+        </section>
+      )}
 
       <section className="mx-auto max-w-5xl px-6 lg:px-8 py-16">
         {Array.isArray(doc.sections) && doc.sections.length > 0 ? (

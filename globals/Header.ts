@@ -1,5 +1,7 @@
 import type { GlobalConfig } from "payload"
 
+import { adminRowsStartCollapsed } from "@/lib/payload-admin-defaults"
+
 export const HeaderGlobal: GlobalConfig = {
   slug: "header",
   label: "Header",
@@ -17,7 +19,7 @@ export const HeaderGlobal: GlobalConfig = {
       type: "array",
       minRows: 1,
       admin: {
-        initCollapsed: true,
+        ...adminRowsStartCollapsed,
       },
       defaultValue: [
         { label: "About", link: "#msc-about" },
@@ -61,7 +63,7 @@ export const HeaderGlobal: GlobalConfig = {
           label: "Submenu items",
           type: "array",
           admin: {
-            initCollapsed: true,
+            ...adminRowsStartCollapsed,
           },
           fields: [
             {

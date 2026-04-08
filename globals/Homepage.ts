@@ -1,5 +1,7 @@
 import type { GlobalConfig } from "payload"
 
+import { adminRowsStartCollapsed } from "@/lib/payload-admin-defaults"
+
 /**
  * Editable homepage hero: upload images in Media, then pick them on each slide.
  * If no slides are saved, the site keeps built-in hero copy and /public images.
@@ -23,7 +25,7 @@ export const Homepage: GlobalConfig = {
       maxRows: 8,
       labels: { singular: "Hero slide", plural: "Hero slides" },
       admin: {
-        initCollapsed: true,
+        ...adminRowsStartCollapsed,
       },
       fields: [
         {
@@ -118,7 +120,7 @@ export const Homepage: GlobalConfig = {
       maxRows: 6,
       labels: { singular: "Stat", plural: "Hero stats" },
       admin: {
-        initCollapsed: true,
+        ...adminRowsStartCollapsed,
         description: "Optional. Leave empty to use the default stat row on the site.",
       },
       fields: [

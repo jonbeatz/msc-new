@@ -1,6 +1,86 @@
-import type { Access, CollectionConfig } from "payload"
+import type { Access, CollectionConfig, Field } from "payload"
+
+import { adminRowsStartCollapsed } from "@/lib/payload-admin-defaults"
 
 const adminOnly: Access = ({ req: { user } }) => Boolean(user)
+
+/**
+ * Hero fields stored under `pageHero` group.
+ * Not a second `blocks` field: Payload admin reuses numeric row ids across block
+ * tables, so two `blocks` fields on one document causes duplicate React keys.
+ */
+const pageHeroGroupFields: Field[] = [
+  {
+    name: "enabled",
+    type: "checkbox",
+    label: "Show hero",
+    defaultValue: true,
+  },
+  {
+    name: "image",
+    type: "upload",
+    relationTo: "media",
+    label: "Hero image",
+    admin: {
+      description: "Background for the full-width hero (upload in Media first).",
+    },
+  },
+  {
+    name: "ctaLink",
+    label: "CTA link",
+    type: "text",
+    admin: {
+      placeholder: "#msc-contact",
+      description:
+        "Primary hero button target. Leave blank to use #msc-contact.",
+    },
+  },
+  {
+    name: "eyebrow",
+    type: "text",
+  },
+  {
+    name: "headlineLine1",
+    type: "text",
+  },
+  {
+    name: "headlineLine2",
+    type: "text",
+  },
+  {
+    name: "headlineLine3",
+    type: "text",
+  },
+  {
+    name: "sub",
+    type: "textarea",
+  },
+  {
+    name: "seo",
+    label: "Hero SEO",
+    type: "group",
+    admin: {
+      description:
+        "Optional. Used when this hero is the primary visual context (same idea as per-slide SEO on Homepage).",
+    },
+    fields: [
+      {
+        name: "title",
+        type: "text",
+      },
+      {
+        name: "description",
+        type: "textarea",
+      },
+      {
+        name: "image",
+        label: "OpenGraph image",
+        type: "upload",
+        relationTo: "media",
+      },
+    ],
+  },
+]
 
 export const Pages: CollectionConfig = {
   slug: "pages",
@@ -50,20 +130,30 @@ export const Pages: CollectionConfig = {
           label: "Content Builder",
           fields: [
             {
-              name: "featuredImage",
-              type: "upload",
-              relationTo: "media",
-              label: "Hero Image",
+              type: "collapsible",
+              label: "Page hero",
               admin: {
+                initCollapsed: true,
                 description:
-                  "Page banner image displayed near the top of the slug page.",
+                  "Full-width hero (same fields as Homepage slides). Shown as a collapsible panel so only **Sections Builder** uses block rows — two blocks fields on one page hit a Payload admin React key collision.",
               },
+              fields: [
+                {
+                  name: "pageHero",
+                  type: "group",
+                  label: "",
+                  fields: [...pageHeroGroupFields],
+                },
+              ],
             },
             {
               name: "sections",
               type: "blocks",
               label: "Sections Builder",
               admin: {
+                ...adminRowsStartCollapsed,
+                disableListColumn: true,
+                disableListFilter: true,
                 description:
                   "Compose page sections with anchor IDs for deep-link navigation.",
               },
@@ -88,7 +178,11 @@ export const Pages: CollectionConfig = {
                     {
                       name: "content",
                       type: "richText",
-                      required: true,
+                      required: false,
+                      admin: {
+                        description:
+                          "Optional for draft saves. Add body copy before publishing.",
+                      },
                     },
                   ],
                 },
@@ -115,6 +209,9 @@ export const Pages: CollectionConfig = {
                       labels: {
                         singular: "Feature Item",
                         plural: "Feature Items",
+                      },
+                      admin: {
+                        ...adminRowsStartCollapsed,
                       },
                       fields: [
                         {
@@ -157,7 +254,7 @@ export const Pages: CollectionConfig = {
                       type: "text",
                       admin: {
                         description:
-                          "Paste YouTube or Vimeo URL. Optional if using local video media.",
+                          "Paste YouTube or Vimeo URL. Optional if you use a local media file instead.",
                       },
                     },
                     {
@@ -166,7 +263,7 @@ export const Pages: CollectionConfig = {
                       relationTo: "media",
                       admin: {
                         description:
-                          "Optional local media file upload to use instead of a hosted URL.",
+                          "Optional local media upload. Add a file or a URL (or both).",
                       },
                     },
                   ],

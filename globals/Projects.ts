@@ -1,5 +1,7 @@
 import type { GlobalConfig } from "payload"
 
+import { adminRowsStartCollapsed } from "@/lib/payload-admin-defaults"
+
 export const ProjectsGlobal: GlobalConfig = {
   slug: "projects-home",
   label: "Projects",
@@ -20,7 +22,7 @@ export const ProjectsGlobal: GlobalConfig = {
       maxRows: 30,
       labels: { singular: "Project", plural: "Projects" },
       admin: {
-        initCollapsed: true,
+        ...adminRowsStartCollapsed,
       },
       fields: [
         {

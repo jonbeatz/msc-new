@@ -23,6 +23,20 @@ type SiteSettingsData = {
   tagline?: string | null
 }
 
+function pageHeroDataFromDoc(doc: Record<string, unknown> | null | undefined) {
+  if (!doc) return null
+  const ph = doc.pageHero
+  if (Array.isArray(ph) && ph.length > 0) {
+    const row = ph[0]
+    if (row && typeof row === "object") return row as Record<string, unknown>
+    return null
+  }
+  if (ph && typeof ph === "object" && !Array.isArray(ph)) {
+    return ph as Record<string, unknown>
+  }
+  return null
+}
+
 async function getSiteSettingsFallback(req: Parameters<NonNullable<Parameters<typeof seoPlugin>[0]["generateTitle"]>>[0]["req"]): Promise<SiteSettingsData> {
   try {
     return (await req.payload.findGlobal({
@@ -81,17 +95,29 @@ export default buildConfig({
       generateTitle: async ({ doc, req }) => {
         const fallback = await getSiteSettingsFallback(req)
         const siteName = fallback.siteName || "My Studio Channel"
+        const d =
+          doc && typeof doc === "object"
+            ? (doc as Record<string, unknown>)
+            : null
+        const hero = pageHeroDataFromDoc(d)
         const pageTitle =
-          (typeof doc?.title === "string" && doc.title) ||
-          (typeof doc?.headlineLine1 === "string" && doc.headlineLine1) ||
+          (d && typeof d.title === "string" && d.title) ||
+          (hero &&
+            typeof hero.headlineLine1 === "string" &&
+            hero.headlineLine1) ||
           siteName
         return `${pageTitle} | ${siteName}`
       },
       generateDescription: async ({ doc, req }) => {
         const fallback = await getSiteSettingsFallback(req)
+        const d =
+          doc && typeof doc === "object"
+            ? (doc as Record<string, unknown>)
+            : null
+        const hero = pageHeroDataFromDoc(d)
         return (
-          (typeof doc?.description === "string" && doc.description) ||
-          (typeof doc?.sub === "string" && doc.sub) ||
+          (d && typeof d.description === "string" && d.description) ||
+          (hero && typeof hero.sub === "string" && hero.sub) ||
           fallback.tagline ||
           "My Studio Channel"
         )

@@ -115,6 +115,38 @@ Admin sidebar group **Site**:
 
 ---
 
+## Payload admin authoring (blocks-first)
+
+**Default pattern for new CMS surfaces:** use **`type: "blocks"`** with explicit **block types** (and `labels`) so editors get the same **row UI** as **Sections Builder** — drag handle, row number, block-type badge, per-row collapse, and **Collapse All / Show All** — instead of long stretches of always-visible fields.
+
+- **When to use `blocks`:** multi-part sections, heroes, CTAs, rich+media combos, or anything that would read as “rows and rows of fields” as a flat `group` or giant tab.
+- **When `array` is still OK:** tiny uniform rows (notification email list, simple label+link, hero stats value+label).
+- **Collapsed by default:** spread **`adminRowsStartCollapsed`** from **`lib/payload-admin-defaults.ts`** on **`blocks`** and **`array`** fields.
+- **Singleton block regions:** e.g. Page hero — `minRows: 0`, `maxRows: 1`, one `slug`.
+- **SQLite:** with **`db.push: false`**, new block slugs need new `*_blocks_*` tables + a migration script (see **`scripts/migrate-*.py`**).
+- **Cursor:** agents editing **`collections/*.ts`** / **`globals/*.ts`** should follow **`.cursor/rules/payload-blocks-first.mdc`**.
+
+**Troubleshooting — duplicate React keys in `/admin`:**
+- **List view:** do not add **`blocks`** fields as **table columns** (e.g. `pageHero.enabled`). Set **`admin.disableListColumn: true`** (and usually **`disableListFilter: true`**) on **`blocks`** fields; clear `columns[]` from the URL if needed.
+- **Document edit — root cause:** With SQL adapters, each block type uses its own table with **auto-increment `id`**, so `id: 1` can exist on a Rich Text row *and* a Video row simultaneously. Payload 3.81 `BlocksField` / `ArrayField` used raw `row.id` as React keys and **dnd-kit** ids → duplicate key warnings (console shows `key: '1'`, `key: '2'`). Nested arrays (e.g. Feature Grid `items`) hit the same collision.
+- **⚠ Critical — patches must target the pre-bundled file:** `@payloadcms/ui`'s `package.json` `exports` field maps the package entry point to `dist/exports/client/index.js` (a **pre-built minified bundle**). Webpack and Next.js resolve the package through this file, **completely bypassing** any patches applied to the individual `dist/fields/Blocks/index.js` or `dist/forms/` source files. If you only patch those source files the errors will persist even after a full cache clear and hard refresh. **Always patch `dist/exports/client/index.js` directly.**
+- **Fix in this repo:** `patch-package` → **`patches/@payloadcms+ui+3.81.0.patch`** patches **`dist/exports/client/index.js`** (the minified bundle) with 9 targeted string replacements:
+  1. `BlocksField` DND ids → `` `${path}-${blockType}-${id}` ``
+  2. `BlocksField` `DraggableSortableItem` `id` prop → composite
+  3. `BlocksField` `DraggableSortableItem` React `key` → composite
+  4. `ArrayField` DND ids → `` `${path}-${id}` ``
+  5. `ArrayField` `DraggableSortableItem` `id` prop → composite
+  6. `ArrayField` `DraggableSortableItem` React `key` → composite
+  7. `BlockRow` `Collapsible` React `key` → row `path` (not `row.id`)
+  8. `BlockRow` `dragHandleProps.id` → `` `${parentPath}-${blockType}-${id}` ``
+  9. `ArrayRow` `dragHandleProps.id` → `` `${parentPath}-${id}` ``
+  Run **`npm install`** after clone (triggers `postinstall: patch-package`).
+- **If errors return after `npm install`:** run `npx patch-package @payloadcms/ui` to regenerate the patch from the current state of `node_modules`, then commit `patches/@payloadcms+ui+3.81.0.patch`.
+- **Mega list URL (`?columns=…`):** Payload encodes the column picker in the query string. Use **`/admin/collections/pages`** with **no** query params, or reset **Columns** in the list UI, after hiding nested fields via **`disableListColumn`** (`pages` already sets **`defaultColumns`**).
+- **Two `blocks` fields** on one document can still be awkward; **Pages → Page hero** uses **`collapsible` + `group`**. Use **`scripts/sync-*.py`** when migrating field shapes.
+
+---
+
 ## Payload admin (theme, logout, hydration)
 
 - **`admin.theme: 'dark'`** in `payload.config.ts` keeps the panel dark (login + dashboard).
@@ -179,6 +211,9 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **Pages Content Builder expanded** — added `featuredImage`, Lexical `content`, and `sections` blocks (`richText`, `featureGrid`, `videoPlayer`) each with required `Anchor ID`; dynamic page now renders sections + rich content. |
 | 2026-04-08 | **In-page anchor navigation** — added sticky `PageJumpLinks` with smooth-scroll, active-section highlighting, mobile chip scroller UI, and auto-centering of the active chip while scrolling. |
 | 2026-04-08 | **In-page nav final polish + demo fill** — updated jump-link bar to non-sticky behavior per UX preference, tightened section card spacing, and hid the legacy "Page Content Coming Soon" card whenever sections exist. Seeded `msc1` with 5 high-fidelity demo blocks for full scroll-flow validation. |
+| 2026-04-08 | **Payload blocks-first convention** — documented default admin pattern: prefer typed **`blocks`** fields (Sections Builder row UI) over long flat field stacks; `array` only for small uniform rows; **`lib/payload-admin-defaults.ts`** + **`.cursor/rules/payload-blocks-first.mdc`** for agents. |
+| 2026-04-08 | **Pages admin React keys** — `pageHero` moved from a second **`blocks`** field to **`collapsible` + `group`** (same schema path `pageHero.*`) because two `blocks` fields on one document duplicate numeric row ids as React keys; data sync via **`npm run migrate:sqlite:page-hero-sync-group`**. |
+| 2026-04-08 | **Payload admin duplicate keys (upstream) — final fix** — Root cause: `@payloadcms/ui` `package.json` `exports` field routes webpack to the **pre-bundled minified** `dist/exports/client/index.js`, bypassing all patches to individual source files. Applied 9 composite-key replacements **directly to the minified bundle** via `patch-package` (`patches/@payloadcms+ui+3.81.0.patch`): `BlocksField` + `ArrayField` DnD ids, `DraggableSortableItem` `id`+`key` props (composite `path-blockType-id` / `path-id`), `BlockRow` `Collapsible` key (row path), `BlockRow` + `ArrayRow` `dragHandleProps.id` (composite). Errors `key: '1'` / `key: '2'` on Pages → MSC1 edit are resolved. |
 
 ---
 

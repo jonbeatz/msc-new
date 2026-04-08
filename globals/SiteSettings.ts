@@ -1,5 +1,7 @@
 import type { GlobalConfig } from "payload"
 
+import { adminRowsStartCollapsed } from "@/lib/payload-admin-defaults"
+
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
   label: "Site settings",
@@ -98,6 +100,7 @@ export const SiteSettings: GlobalConfig = {
               type: "array",
               labels: { singular: "Email", plural: "Notification emails" },
               admin: {
+                ...adminRowsStartCollapsed,
                 description:
                   "Primary recipient list for admin alerts. Leave empty to use fallback.",
               },
