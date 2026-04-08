@@ -77,6 +77,17 @@ Create a new restore branch from the current clean state:
 - **Seed script:** Added `scripts/seed-demo-page.ts` and npm alias `seed:demo-page`; local execution via Payload CLI still has alias-resolution limitations in this environment, so equivalent demo content was seeded directly into SQLite for this session.
 - **Build status:** `npm run build` passes after final polish.
 
+### 2026-04-08 — Closeout checkpoint for tomorrow resume
+
+- **Pinned restore branch:** `msc-new-payload-polished-v2`
+- **Latest pushed commit:** `98c51c0` (`Finalize pages polish and demo flow closeout.`)
+- **Resume sequence (low risk):**
+  1. `git checkout msc-new-payload-polished-v2`
+  2. `git pull`
+  3. `npm run dev:payload`
+  4. Verify `http://localhost:3000/msc1` and `/admin` load cleanly.
+- **Known environment note:** `npm run seed:demo-page` is currently blocked by local Payload alias resolution in this machine runtime; `msc1` demo data is already seeded in local SQLite for this checkpoint.
+
 ### 2026-04-08 — Dynamic Pages + Sections Builder + jump links
 
 - **Branding controls:** Added `Site settings -> Branding` tab (`siteLogo`, `favicon`, `ogImage`, `siteTitleSuffix`) and wired logo into Header/Footer plus metadata favicon/OG/title suffix defaults.
