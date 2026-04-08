@@ -69,6 +69,14 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-08 — Final polish closeout: jump links + seeded demo page
+
+- **Jump-link UX finalized:** Kept active-chip detection and auto-centering, but removed sticky behavior so in-page nav scrolls away naturally after passing it.
+- **Page flow cleanup:** Dynamic slug pages now suppress the "Page Content Coming Soon" card when sections exist; spacing between sections tightened for smoother premium rhythm.
+- **Demo validation content:** `msc1` now includes a full 5-block narrative flow (`The Studio`, `Virtual Tour`, `Our Solutions`, `Case Study`, `Get Started`) to test anchor progress and visual pacing.
+- **Seed script:** Added `scripts/seed-demo-page.ts` and npm alias `seed:demo-page`; local execution via Payload CLI still has alias-resolution limitations in this environment, so equivalent demo content was seeded directly into SQLite for this session.
+- **Build status:** `npm run build` passes after final polish.
+
 ### 2026-04-08 — Dynamic Pages + Sections Builder + jump links
 
 - **Branding controls:** Added `Site settings -> Branding` tab (`siteLogo`, `favicon`, `ogImage`, `siteTitleSuffix`) and wired logo into Header/Footer plus metadata favicon/OG/title suffix defaults.

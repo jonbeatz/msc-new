@@ -3,6 +3,7 @@ import { RichText } from "@payloadcms/richtext-lexical/react"
 type RichTextSection = {
   blockType: "richText"
   sectionId?: string | null
+  title?: string | null
   content?: unknown
 }
 
@@ -60,7 +61,7 @@ export function SectionsRenderer({ sections }: { sections: PageSection[] }) {
   if (!Array.isArray(sections) || sections.length === 0) return null
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {sections.map((block, index) => {
         const fallbackSectionId = `section-${index + 1}`
         const sectionId =
@@ -77,6 +78,11 @@ export function SectionsRenderer({ sections }: { sections: PageSection[] }) {
               key={`${block.blockType}-${sectionId}-${index}`}
               className="rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10"
             >
+              {block.title ? (
+                <h2 className="mb-5 text-2xl font-semibold tracking-tight text-foreground">
+                  {block.title}
+                </h2>
+              ) : null}
               <RichText
                 className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-[#D4AF37] prose-a:no-underline hover:prose-a:text-[#e4c46b]"
                 data={content as never}

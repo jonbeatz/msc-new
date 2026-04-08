@@ -178,6 +178,7 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **Dynamic Pages engine live** — added `app/(site)/[slug]/page.tsx` with Payload slug lookup, SEO metadata fallback from page/meta + Site settings suffix, and premium dark/gold rendering. |
 | 2026-04-08 | **Pages Content Builder expanded** — added `featuredImage`, Lexical `content`, and `sections` blocks (`richText`, `featureGrid`, `videoPlayer`) each with required `Anchor ID`; dynamic page now renders sections + rich content. |
 | 2026-04-08 | **In-page anchor navigation** — added sticky `PageJumpLinks` with smooth-scroll, active-section highlighting, mobile chip scroller UI, and auto-centering of the active chip while scrolling. |
+| 2026-04-08 | **In-page nav final polish + demo fill** — updated jump-link bar to non-sticky behavior per UX preference, tightened section card spacing, and hid the legacy "Page Content Coming Soon" card whenever sections exist. Seeded `msc1` with 5 high-fidelity demo blocks for full scroll-flow validation. |
 
 ---
 

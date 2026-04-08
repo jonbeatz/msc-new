@@ -219,14 +219,14 @@ export default async function DynamicPage({ params }: RouteProps) {
         ) : null}
 
         {richContent ? (
-          <article className="mt-10 rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10">
+          <article className="mt-8 rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10">
             <RichText
               className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-[#D4AF37] prose-a:no-underline hover:prose-a:text-[#e4c46b]"
               data={richContent as never}
             />
           </article>
-        ) : (
-          <div className="mt-10 rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10">
+        ) : Array.isArray(doc.sections) && doc.sections.length > 0 ? null : (
+          <div className="mt-8 rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10">
             <h2 className="text-xl font-semibold text-foreground">Page Content Coming Soon</h2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Add content in the Pages collection Rich Text editor for

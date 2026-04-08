@@ -82,6 +82,10 @@ export const Pages: CollectionConfig = {
                       required: true,
                     },
                     {
+                      name: "title",
+                      type: "text",
+                    },
+                    {
                       name: "content",
                       type: "richText",
                       required: true,

@@ -86,7 +86,7 @@ export function PageJumpLinks({ sections }: { sections: SectionLike[] }) {
   if (links.length === 0) return null
 
   return (
-    <nav className="sticky top-20 z-40 mb-8 rounded-xl border border-[#D4AF37]/25 bg-[#0f1014]/95 px-3 py-3 sm:px-4 backdrop-blur-md">
+    <nav className="mb-8 rounded-xl border border-[#D4AF37]/25 bg-[#0f1014]/95 px-3 py-3 sm:px-4 backdrop-blur-md">
       <ul
         ref={navListRef}
         className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-sm sm:gap-3"
