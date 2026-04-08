@@ -11,9 +11,9 @@ import { Media } from "./collections/Media"
 import { Bookings } from "./collections/Bookings"
 import { Leads } from "./collections/Leads"
 import { Pages } from "./collections/Pages"
-import { HeroSlides } from "./collections/HeroSlides"
 import { Homepage } from "./globals/Homepage"
 import { HeaderGlobal } from "./globals/Header"
+import { ProjectsGlobal } from "./globals/Projects"
 import { SiteSettings } from "./globals/SiteSettings"
 
 const sqliteUrl = process.env.DATABASE_URL || "file:./payload.sqlite"
@@ -21,55 +21,6 @@ const sqliteUrl = process.env.DATABASE_URL || "file:./payload.sqlite"
 type SiteSettingsData = {
   siteName?: string | null
   tagline?: string | null
-}
-
-async function backfillHeroSlidesSEO(payload: {
-  find: Function
-  update: Function
-}): Promise<void> {
-  const result = await payload.find({
-    collection: "hero-slides",
-    depth: 0,
-    limit: 200,
-    pagination: false,
-  })
-
-  const docs = Array.isArray(result?.docs) ? result.docs : []
-  for (const doc of docs) {
-    const meta =
-      doc && typeof doc.meta === "object" && doc.meta !== null
-        ? (doc.meta as Record<string, unknown>)
-        : {}
-
-    const titlePresent =
-      typeof meta.title === "string" && meta.title.trim().length > 0
-    const descriptionPresent =
-      typeof meta.description === "string" && meta.description.trim().length > 0
-    const imagePresent = meta.image !== null && meta.image !== undefined
-
-    if (titlePresent && descriptionPresent && imagePresent) continue
-
-    await payload.update({
-      collection: "hero-slides",
-      id: doc.id,
-      depth: 0,
-      data: {
-        meta: {
-          title: titlePresent
-            ? meta.title
-            : typeof doc.headlineLine1 === "string"
-              ? doc.headlineLine1
-              : "",
-          description: descriptionPresent
-            ? meta.description
-            : typeof doc.sub === "string"
-              ? doc.sub
-              : "",
-          image: imagePresent ? meta.image : doc.image ?? undefined,
-        },
-      },
-    })
-  }
 }
 
 async function getSiteSettingsFallback(req: Parameters<NonNullable<Parameters<typeof seoPlugin>[0]["generateTitle"]>>[0]["req"]): Promise<SiteSettingsData> {
@@ -98,14 +49,15 @@ export default buildConfig({
     // Stops false hydration mismatch warnings in dev.
     suppressHydrationWarning: true,
     components: {
+      beforeNavLinks: ["@/components/msc-payload-nav-dashboard#MscPayloadNavDashboard"],
       afterNavLinks: ["@/components/msc-payload-nav-logout#MscPayloadNavLogout"],
     },
     importMap: {
       baseDir: path.resolve(process.cwd()),
     },
   },
-  collections: [Users, Media, Bookings, Leads, Pages, HeroSlides],
-  globals: [Homepage, HeaderGlobal, SiteSettings],
+  collections: [Users, Media, Bookings, Leads, Pages],
+  globals: [Homepage, HeaderGlobal, ProjectsGlobal, SiteSettings],
   editor: lexicalEditor(),
   // Must be set in production via PAYLOAD_SECRET (.env.local).
   secret: process.env.PAYLOAD_SECRET || "dev-only-change-me-in-env",
@@ -123,7 +75,7 @@ export default buildConfig({
   sharp,
   plugins: [
     seoPlugin({
-      collections: ["pages", "hero-slides"],
+      collections: ["pages"],
       uploadsCollection: "media",
       tabbedUI: true,
       generateTitle: async ({ doc, req }) => {
@@ -146,15 +98,4 @@ export default buildConfig({
       },
     }),
   ],
-  onInit: async (payload) => {
-    try {
-      await backfillHeroSlidesSEO(payload)
-    } catch (error) {
-      payload.logger.warn(
-        `[seo-backfill] hero-slides metadata initialization skipped: ${
-          error instanceof Error ? error.message : "unknown error"
-        }`
-      )
-    }
-  },
 })

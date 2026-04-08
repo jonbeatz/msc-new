@@ -1,20 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ChevronRight } from "lucide-react"
+import { Menu, X, ChevronDown, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 export type HeaderNavItem = {
   label: string
   link: string
+  submenu?: Array<{
+    label: string
+    link: string
+  }>
 }
 
 export function Header({ navItems }: { navItems: HeaderNavItem[] }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  const closeTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +28,14 @@ export function Header({ navItems }: { navItems: HeaderNavItem[] }) {
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current)
+      }
+    }
   }, [])
 
   return (
@@ -57,13 +71,62 @@ export function Header({ navItems }: { navItems: HeaderNavItem[] }) {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
-              <Link
+              <div
                 key={`${item.label}-${item.link}`}
-                href={item.link}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/50"
+                className="relative"
+                onMouseEnter={() => {
+                  if (closeTimerRef.current) {
+                    window.clearTimeout(closeTimerRef.current)
+                    closeTimerRef.current = null
+                  }
+                  if (item.submenu && item.submenu.length > 0) {
+                    setOpenSubmenu(item.label)
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (item.submenu && item.submenu.length > 0) {
+                    closeTimerRef.current = window.setTimeout(() => {
+                      setOpenSubmenu((current) => (current === item.label ? null : current))
+                    }, 160)
+                  }
+                }}
               >
-                {item.label}
-              </Link>
+                {item.submenu && item.submenu.length > 0 ? (
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 px-4 py-2 text-sm text-muted-foreground transition-colors rounded-lg hover:bg-secondary/50 hover:text-foreground"
+                  >
+                    {item.label}
+                    <ChevronDown
+                      className={cn(
+                        "h-3.5 w-3.5 transition-transform duration-200",
+                        openSubmenu === item.label ? "rotate-180" : "rotate-0"
+                      )}
+                    />
+                  </button>
+                ) : (
+                  <Link
+                    href={item.link}
+                    className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/50"
+                  >
+                    {item.label}
+                  </Link>
+                )}
+
+                {item.submenu && item.submenu.length > 0 && openSubmenu === item.label && (
+                  <div className="absolute left-0 top-full mt-2 min-w-[220px] rounded-xl border border-white/10 bg-[#111216]/95 p-2 shadow-xl backdrop-blur-md animate-in fade-in-0 zoom-in-95 duration-150">
+                    {item.submenu.map((subItem) => (
+                      <Link
+                        key={`${item.label}-${subItem.label}-${subItem.link}`}
+                        href={subItem.link}
+                        className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
+                      >
+                        {subItem.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -99,14 +162,29 @@ export function Header({ navItems }: { navItems: HeaderNavItem[] }) {
         <div className="lg:hidden border-t border-white/6" style={{ backgroundColor: "rgba(13,13,15,0.97)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
           <nav className="flex flex-col px-6 py-6 gap-1">
             {navItems.map((item) => (
-              <Link
-                key={`${item.label}-${item.link}`}
-                href={item.link}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-3 px-4 rounded-lg hover:bg-secondary/50"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
+              <div key={`${item.label}-${item.link}`}>
+                <Link
+                  href={item.link}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors py-3 px-4 rounded-lg hover:bg-secondary/50 block"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+                {item.submenu && item.submenu.length > 0 && (
+                  <div className="pl-4 pb-2">
+                    {item.submenu.map((subItem) => (
+                      <Link
+                        key={`${item.label}-${subItem.label}-${subItem.link}`}
+                        href={subItem.link}
+                        className="text-xs text-muted-foreground/90 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-secondary/40 block"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {subItem.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             <div className="flex flex-col gap-3 pt-6 mt-4 border-t border-border/50">
               <Button

@@ -1,49 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import type { DemoProject } from "@/lib/cms/projects"
 import { cn } from "@/lib/utils"
 
-const demos = [
-  {
-    id: 0,
-    title: "Talk Show Studio",
-    category: "Interview Format",
-    description: "Professional talk show layout with guest management, episode scheduling, and live audience interaction features.",
-    image: "/images/demo-talkshow.jpg",
-    features: ["Guest Profiles", "Episode Archive"],
-  },
-  {
-    id: 1,
-    title: "Culinary Channel",
-    category: "Cooking Show",
-    description: "Recipe-driven content platform with ingredient lists, step-by-step guides, and meal planning integration.",
-    image: "/images/demo-cooking.jpg",
-    features: ["Recipe Database", "Shopping Lists"],
-  },
-  {
-    id: 2,
-    title: "Audio Network",
-    category: "Podcast Platform",
-    description: "Audio-first streaming experience with playlist support, transcriptions, and subscriber management.",
-    image: "/images/demo-podcast.jpg",
-    features: ["Playlist Builder", "Transcripts"],
-  },
-  {
-    id: 3,
-    title: "Film Studio",
-    category: "Documentary Series",
-    description: "Cinematic storytelling platform with chapter navigation, behind-the-scenes content, and filmmaker profiles.",
-    image: "/images/demo-documentary.jpg",
-    features: ["Chapter Navigation", "BTS Content"],
-  },
-]
+type DemosSectionProps = {
+  demos: DemoProject[]
+}
 
-export function DemosSection() {
-  const [activeDemo, setActiveDemo] = useState(0)
-  const selectedDemo = demos[activeDemo]
+export function DemosSection({ demos }: DemosSectionProps) {
+  const [activeDemoId, setActiveDemoId] = useState<string>(demos[0]?.id ?? "")
+  const activeDemo = useMemo(() => {
+    return demos.find((demo) => demo.id === activeDemoId) ?? demos[0]
+  }, [activeDemoId, demos])
+
+  const listDemos = demos
+  const featuredDemo = activeDemo
+  const hasScrollableRail = listDemos.length > 4
+  if (!featuredDemo) return null
 
   return (
     <section 
@@ -81,16 +58,9 @@ export function DemosSection() {
         {/* MOBILE: single-column stacked cards (hidden on lg+) */}
         <div className="flex flex-col gap-4 lg:hidden">
           {demos.map((demo, index) => (
-            <button
+            <article
               key={demo.id}
-              type="button"
-              onClick={() => setActiveDemo(index)}
-              className={cn(
-                "bento-card group rounded-2xl border overflow-hidden relative cursor-pointer transition-all duration-300 aspect-[5/4] w-full text-left p-0 appearance-none bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-2",
-                activeDemo === index
-                  ? "border-accent/50 ring-1 ring-accent/20"
-                  : "border-border/50 hover:border-border"
-              )}
+              className="bento-card group relative aspect-5/4 w-full overflow-hidden rounded-2xl border border-border/50 bg-transparent p-0 text-left transition-all duration-300"
             >
               {/* Image Background */}
               <div className="absolute inset-0 pointer-events-none">
@@ -101,145 +71,118 @@ export function DemosSection() {
                   className="object-cover select-none"
                   draggable={false}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-black/20" />
               </div>
 
               {/* Content */}
               <div className="absolute inset-0 z-10 p-5 flex flex-col justify-between pointer-events-none">
                 {/* Category */}
                 <div className="flex items-center gap-2">
-                  <span className={cn(
-                    "text-xs font-medium uppercase tracking-wider transition-colors",
-                    activeDemo === index ? "text-accent" : "text-gray-300"
-                  )}>
+                  <span className="text-xs font-medium uppercase tracking-wider text-gray-300">
                     {demo.category}
                   </span>
-                  {activeDemo === index && (
+                  {index === 0 && (
                     <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
                   )}
                 </div>
 
-                {/* Title, Description, Features, CTA */}
+                {/* Title, Description, CTA */}
                 <div>
-                  <h3 className={cn(
-                    "text-xl font-bold transition-colors drop-shadow-md",
-                    activeDemo === index ? "text-accent" : "text-white group-hover:text-accent"
-                  )}>
+                  <h3 className="text-xl font-bold text-white transition-colors drop-shadow-md group-hover:text-accent">
                     {demo.title}
                   </h3>
                   <p className="mt-2 text-sm text-gray-200 line-clamp-2 drop-shadow-sm">
-                    {demo.description}
+                    {demo.subtitle}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {demo.features.map((feature) => (
-                      <span
-                        key={feature}
-                        className="inline-flex text-xs font-medium px-2.5 py-1 rounded bg-black/40 text-white border border-white/30 backdrop-blur-sm"
-                      >
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                  <div className={cn(
-                    "mt-3 inline-flex items-center gap-1 text-xs font-medium transition-all",
-                    activeDemo === index
-                      ? "text-accent opacity-100"
-                      : "text-accent opacity-0 group-hover:opacity-100"
-                  )}>
-                    {activeDemo === index ? "Currently Viewing" : "View Demo"}
-                    <ArrowUpRight className="h-3 w-3" />
+                  <div className="mt-3">
+                    <a
+                      href={demo.demoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="pointer-events-auto inline-flex items-center gap-1 text-xs font-semibold text-[#D4AF37] no-underline transition-opacity hover:opacity-90"
+                    >
+                      View Live Demo
+                      <ArrowUpRight className="h-3 w-3" />
+                    </a>
                   </div>
                 </div>
               </div>
-            </button>
+            </article>
           ))}
         </div>
 
-        {/* DESKTOP: original 7+5 featured + sidebar selector (hidden below lg) */}
+        {/* DESKTOP: featured left + right-hand grid */}
         <div className="hidden lg:grid lg:grid-cols-12 gap-6 lg:items-stretch">
-
           {/* Large Featured Card - left 7 columns */}
           <div className="lg:col-span-7 bento-card group rounded-3xl border border-border/50 overflow-hidden relative">
             <div className="aspect-video lg:aspect-auto lg:absolute lg:inset-0 relative">
-              {/* Crossfading images */}
               <div className="absolute inset-0 pointer-events-none">
-                {demos.map((demo) => (
-                  <div
-                    key={demo.id}
-                    className={cn(
-                      "absolute inset-0 transition-opacity duration-500 pointer-events-none",
-                      activeDemo === demo.id ? "opacity-100" : "opacity-0"
-                    )}
-                  >
-                    <Image
-                      src={demo.image}
-                      alt={demo.title}
-                      fill
-                      className="object-cover select-none"
-                      priority={demo.id === 0}
-                      draggable={false}
-                    />
-                  </div>
-                ))}
+                <Image
+                  src={featuredDemo.image}
+                  alt={featuredDemo.title}
+                  fill
+                  className="object-cover select-none"
+                  priority
+                  draggable={false}
+                />
               </div>
 
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
 
               {/* Content */}
               <div className="absolute bottom-0 left-0 right-0 z-10 p-8 pointer-events-auto">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-xs font-medium uppercase tracking-wider text-accent">
-                    {selectedDemo.category}
+                    {featuredDemo.category}
                   </span>
                   <span className="h-1 w-1 rounded-full bg-border" />
                   <span className="text-xs text-gray-400">
-                    Demo {activeDemo + 1} of {demos.length}
+                    Featured Project
                   </span>
                 </div>
                 <h3 className="text-3xl font-bold text-white">
-                  {selectedDemo.title}
+                  {featuredDemo.title}
                 </h3>
                 <p className="mt-2 text-sm text-gray-200 leading-relaxed max-w-lg">
-                  {selectedDemo.description}
+                  {featuredDemo.subtitle}
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {selectedDemo.features.map((feature) => (
-                    <span
-                      key={feature}
-                      className="inline-flex items-center rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm px-3 py-1.5 text-sm font-medium text-white"
-                    >
-                      {feature}
-                    </span>
-                  ))}
-                </div>
                 <div className="mt-5 flex items-center gap-4">
-                  <Button
-                    type="button"
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground glow-accent"
-                    data-demo-link={selectedDemo.id}
+                  <a
+                    href={featuredDemo.demoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center rounded-xl border border-[#D4AF37]/55 bg-[#D4AF37]/14 px-4 py-2 text-sm font-semibold text-[#D4AF37] no-underline transition-all hover:bg-[#D4AF37]/20"
                   >
                     View Live Demo
                     <ArrowUpRight className="ml-2 h-4 w-4" />
-                  </Button>
-                  <span className="text-sm text-gray-400">Use the list to switch demos</span>
+                  </a>
+                  <span className="text-sm text-gray-400">Featured placement from CMS toggle</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Sidebar Selector - right 5 columns */}
-          <div className="lg:col-span-5 flex flex-col gap-3">
-            {demos.map((demo, index) => (
+          {/* Right-hand project list with scrollbar */}
+          <div
+            className={cn(
+              "lg:col-span-5 flex flex-col gap-3 pr-3",
+              hasScrollableRail
+                ? "h-[560px] overflow-y-auto [scrollbar-color:#6F5A1B_rgba(0,0,0,0.45)] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#6F5A1B] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-black/45 [&::-webkit-scrollbar]:w-2"
+                : "overflow-visible"
+            )}
+            style={{ scrollbarWidth: "thin" }}
+          >
+            {listDemos.map((demo) => (
               <button
                 key={demo.id}
                 type="button"
-                onClick={() => setActiveDemo(index)}
+                onClick={() => setActiveDemoId(demo.id)}
                 className={cn(
-                  "bento-card group rounded-2xl border overflow-hidden cursor-pointer transition-all duration-300 flex-1 w-full text-left p-0 appearance-none bg-card/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-2",
-                  activeDemo === index
-                    ? "border-accent/50 bg-accent/5 ring-1 ring-accent/20"
-                    : "border-border/50 hover:border-border"
+                  "bento-card group min-h-[112px] shrink-0 overflow-hidden rounded-2xl border bg-card/30 text-left transition-all duration-300 cursor-pointer",
+                  demo.id === featuredDemo.id
+                    ? "border-accent/55 ring-1 ring-accent/30"
+                    : "border-border/50 hover:border-accent/35"
                 )}
               >
                 <div className="flex h-full">
@@ -252,66 +195,51 @@ export function DemosSection() {
                       className="object-cover select-none"
                       draggable={false}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card/80" />
-                    {activeDemo === index && (
-                      <div className="absolute inset-0 bg-accent/10" />
-                    )}
+                    <div className="absolute inset-0 bg-linear-to-r from-transparent to-card/80" />
                   </div>
 
                   {/* Text */}
                   <div className="flex-1 p-4 bg-card/50 flex flex-col justify-center">
                     <div className="flex items-center gap-2">
-                      <span className={cn(
-                        "text-[10px] font-medium uppercase tracking-wider transition-colors",
-                        activeDemo === index ? "text-accent" : "text-muted-foreground"
-                      )}>
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                         {demo.category}
                       </span>
-                      {activeDemo === index && (
-                        <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-                      )}
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                          demo.id === featuredDemo.id
+                            ? "border border-accent/45 bg-accent/18 text-accent"
+                            : "border border-[#D4AF37]/40 bg-[#D4AF37]/12 text-[#D4AF37]"
+                        )}
+                      >
+                        {demo.id === featuredDemo.id ? "Featured" : "Visible"}
+                      </span>
                     </div>
                     <h3 className={cn(
-                      "mt-1.5 text-base font-semibold transition-colors",
-                      activeDemo === index ? "text-accent" : "text-foreground group-hover:text-accent"
+                      "mt-1.5 text-base font-semibold transition-colors group-hover:text-accent",
+                      demo.id === featuredDemo.id ? "text-accent" : "text-foreground"
                     )}>
                       {demo.title}
                     </h3>
                     <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                      {demo.description}
+                      {demo.subtitle}
                     </p>
-                    <div className={cn(
-                      "mt-2 inline-flex items-center gap-1 text-xs font-medium transition-all",
-                      activeDemo === index
-                        ? "text-accent opacity-100"
-                        : "text-accent opacity-0 group-hover:opacity-100"
-                    )}>
-                      {activeDemo === index ? "Currently Viewing" : "View Demo"}
-                      <ArrowUpRight className="h-3 w-3" />
+                    <div className="mt-2">
+                      <a
+                        href={demo.demoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4AF37] no-underline transition-opacity hover:opacity-90"
+                      >
+                        View Live Demo
+                        <ArrowUpRight className="h-3 w-3" />
+                      </a>
                     </div>
                   </div>
                 </div>
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Progress dots - desktop only */}
-        <div className="hidden lg:flex items-center justify-center gap-2 mt-8">
-          {demos.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => setActiveDemo(index)}
-              className={cn(
-                "h-2.5 rounded-full transition-all duration-300 cursor-pointer",
-                activeDemo === index
-                  ? "w-8 bg-accent"
-                  : "w-2.5 bg-border hover:bg-muted-foreground"
-              )}
-              aria-label={`View demo ${index + 1}`}
-            />
-          ))}
         </div>
       </div>
     </section>

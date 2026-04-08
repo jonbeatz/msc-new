@@ -16,10 +16,30 @@ export const HeaderGlobal: GlobalConfig = {
       label: "Navigation items",
       type: "array",
       minRows: 1,
+      admin: {
+        initCollapsed: true,
+      },
       defaultValue: [
         { label: "About", link: "#msc-about" },
-        { label: "Services", link: "#msc-services" },
+        {
+          label: "Services",
+          link: "#msc-services",
+          submenu: [
+            { label: "What We Do", link: "#msc-services" },
+            { label: "Own Your Platform", link: "#msc-platform" },
+            { label: "Packages", link: "#msc-packages" },
+            { label: "Requirements", link: "#msc-requirements" },
+          ],
+        },
         { label: "Demos", link: "#msc-demos" },
+        {
+          label: "Resources",
+          link: "#msc-testimonials",
+          submenu: [
+            { label: "Testimonials", link: "#msc-testimonials" },
+            { label: "FAQ", link: "#msc-faq" },
+          ],
+        },
         { label: "Contact", link: "#msc-contact" },
       ],
       fields: [
@@ -35,6 +55,26 @@ export const HeaderGlobal: GlobalConfig = {
           admin: {
             description: "Use section anchors (e.g. #msc-contact) or full URLs.",
           },
+        },
+        {
+          name: "submenu",
+          label: "Submenu items",
+          type: "array",
+          admin: {
+            initCollapsed: true,
+          },
+          fields: [
+            {
+              name: "label",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "link",
+              type: "text",
+              required: true,
+            },
+          ],
         },
       ],
     },

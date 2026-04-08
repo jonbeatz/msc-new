@@ -22,6 +22,9 @@ export const Homepage: GlobalConfig = {
       minRows: 0,
       maxRows: 8,
       labels: { singular: "Hero slide", plural: "Hero slides" },
+      admin: {
+        initCollapsed: true,
+      },
       fields: [
         {
           name: "isActive",
@@ -36,29 +39,39 @@ export const Homepage: GlobalConfig = {
           required: true,
         },
         {
+          name: "ctaLink",
+          label: "CTA link",
+          type: "text",
+          admin: {
+            placeholder: "#msc-contact",
+            description:
+              "Primary hero CTA URL for this slide. Leave blank to use #msc-contact.",
+          },
+        },
+        {
           name: "eyebrow",
           type: "text",
-          required: true,
+          required: false,
         },
         {
           name: "headlineLine1",
           type: "text",
-          required: true,
+          required: false,
         },
         {
           name: "headlineLine2",
           type: "text",
-          required: true,
+          required: false,
         },
         {
           name: "headlineLine3",
           type: "text",
-          required: true,
+          required: false,
         },
         {
           name: "sub",
           type: "textarea",
-          required: true,
+          required: false,
         },
         {
           name: "seo",
@@ -105,6 +118,7 @@ export const Homepage: GlobalConfig = {
       maxRows: 6,
       labels: { singular: "Stat", plural: "Hero stats" },
       admin: {
+        initCollapsed: true,
         description: "Optional. Leave empty to use the default stat row on the site.",
       },
       fields: [

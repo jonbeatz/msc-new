@@ -7,6 +7,7 @@ export type HeroSlideContent = {
   eyebrow: string
   headline: [string, string, string]
   sub: string
+  ctaLink?: string
   seo?: {
     title?: string
     description?: string

@@ -53,6 +53,15 @@ Quick variants:
 
 ## Recent changes (latest first)
 
+### 2026-04-08 — Admin UX + navigation consolidation polish
+
+- **Projects editor UX:** moved from collection-document editing to `projects-home` global array so projects are managed in one draggable/toggle list like Homepage hero rows.
+- **Demos frontend stability:** right rail now keeps fixed card heights, uses conditional scrolling only when needed, supports click-to-preview in left feature area, and applies darker gold-accent scrollbar styling.
+- **Visibility controls:** added `isVisible` project toggle and frontend filtering so hidden projects do not render publicly.
+- **Header submenu restore:** Header global now has nested submenu rows (collapsed by default), with restored desktop dropdowns, mobile nested links, chevron rotation animation, and delayed-close hover behavior.
+- **Admin sidebar/account polish:** nav group labels switched to gold, Dashboard quick link added near the top, and custom logout moved off sidebar into account-page context.
+- **Preferences note:** Payload remembers row open/close state per-user in `payload_preferences`; clearing/resetting preferences may be needed after changing `initCollapsed`.
+
 ### 2026-04-08 — Command Center finalize: routing, sidebar grouping, email branding
 
 - **Site Settings 404 fix:** Root cause was schema drift (not slug routing): missing `site_settings_notification_emails` table and missing `site_settings` notification columns in local SQLite with `db.push: false`. Patched DB schema and confirmed `/api/globals/site-settings` + `/admin/globals/site-settings` return 200.

@@ -170,7 +170,7 @@ export function HeroSection({ cmsSlides, cmsStats }: HeroSectionProps) {
               className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300"
               asChild
             >
-              <a href="#msc-contact">
+              <a href={slide.ctaLink || "#msc-contact"}>
                 Start With a Consultation
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>

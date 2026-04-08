@@ -49,9 +49,14 @@ export async function getHomepageCmsData(): Promise<{
         typeof (img as { alt?: string }).alt === "string"
           ? (img as { alt: string }).alt
           : "Hero image"
-      const h1 = row.headlineLine1
-      const h2 = row.headlineLine2
-      const h3 = row.headlineLine3
+      const h1 =
+        typeof row.headlineLine1 === "string"
+          ? row.headlineLine1
+          : ""
+      const h2 =
+        typeof row.headlineLine2 === "string" ? row.headlineLine2 : ""
+      const h3 =
+        typeof row.headlineLine3 === "string" ? row.headlineLine3 : ""
       if (
         typeof h1 !== "string" ||
         typeof h2 !== "string" ||
@@ -76,9 +81,15 @@ export async function getHomepageCmsData(): Promise<{
         alt,
         isActive: row.isActive !== false,
         eyebrow:
-          typeof row.eyebrow === "string" ? row.eyebrow : "",
+          typeof row.eyebrow === "string" && row.eyebrow.length > 0
+            ? row.eyebrow
+            : "Featured Slide",
         headline: [h1, h2, h3],
         sub: typeof row.sub === "string" ? row.sub : "",
+        ctaLink:
+          typeof row.ctaLink === "string" && row.ctaLink.trim().length > 0
+            ? row.ctaLink.trim()
+            : undefined,
         seo:
           row.seo && typeof row.seo === "object"
             ? {

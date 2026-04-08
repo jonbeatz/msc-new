@@ -2,6 +2,7 @@ import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
 import { getHomepageCmsData } from "@/lib/cms/homepage"
 import { getHeaderNavItems } from "@/lib/cms/header"
+import { getDemoProjects } from "@/lib/cms/projects"
 import { AboutSection } from "@/components/about-section"
 import { ServicesSection } from "@/components/services-section"
 import { OwnPlatformSection } from "@/components/own-platform-section"
@@ -21,6 +22,7 @@ import { Footer } from "@/components/footer"
 export default async function HomePage() {
   const { heroSlides, heroStats } = await getHomepageCmsData()
   const navItems = await getHeaderNavItems()
+  const demoProjects = await getDemoProjects()
 
   return (
     <main className="min-h-screen bg-background">
@@ -31,7 +33,7 @@ export default async function HomePage() {
       <OwnPlatformSection />
       <PackagesSection />
       <RequirementsSection />
-      <DemosSection />
+      <DemosSection demos={demoProjects} />
       <TestimonialsSection />
       <BuiltForCreatorsSection />
       <WhatYouGetSection />
