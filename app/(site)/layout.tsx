@@ -24,26 +24,39 @@ export async function generateMetadata(): Promise<Metadata> {
   ])
 
   const siteName = settings?.siteName || "My Studio Channel"
+  const titleSuffix =
+    settings?.siteTitleSuffix && settings.siteTitleSuffix.trim().length > 0
+      ? settings.siteTitleSuffix.trim()
+      : `| ${siteName}`
+  const homeFallbackTitle = `${siteName} | Professional Creator Platforms`
   const titleFromSlide = slideSeo?.title
-    ? `${slideSeo.title} | ${siteName}`
-    : `${siteName} | Professional Creator Platforms`
+    ? `${slideSeo.title} ${titleSuffix}`.trim()
+    : homeFallbackTitle
   const descriptionFromSlide =
     slideSeo?.description || settings?.tagline || defaultDescription
+  const defaultOgImage = settings?.ogImage || slideSeo?.image || undefined
 
   return {
     metadataBase: new URL(metadataBaseURL),
     title: titleFromSlide,
     description: descriptionFromSlide,
+    icons: settings?.favicon
+      ? {
+          icon: settings.favicon,
+          shortcut: settings.favicon,
+          apple: settings.favicon,
+        }
+      : undefined,
     openGraph: {
       title: titleFromSlide,
       description: descriptionFromSlide,
-      images: slideSeo?.image ? [slideSeo.image] : undefined,
+      images: defaultOgImage ? [defaultOgImage] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: titleFromSlide,
       description: descriptionFromSlide,
-      images: slideSeo?.image ? [slideSeo.image] : undefined,
+      images: defaultOgImage ? [defaultOgImage] : undefined,
     },
     generator: "v0.app",
   }

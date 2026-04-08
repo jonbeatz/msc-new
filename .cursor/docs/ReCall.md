@@ -53,6 +53,16 @@ Quick variants:
 
 ## Recent changes (latest first)
 
+### 2026-04-08 — Dynamic Pages + Sections Builder + jump links
+
+- **Branding controls:** Added `Site settings -> Branding` tab (`siteLogo`, `favicon`, `ogImage`, `siteTitleSuffix`) and wired logo into Header/Footer plus metadata favicon/OG/title suffix defaults.
+- **Dynamic route engine:** Added `app/(site)/[slug]/page.tsx` with slug-based `pages` lookup, SEO metadata generation, and dark/gold page presentation.
+- **Pages content model:** Upgraded `pages` with `Content Builder` tab including `featuredImage`, Lexical `content`, and `sections` blocks (`richText`, `featureGrid`, `videoPlayer`) where every block requires `sectionId` (Anchor ID).
+- **Block rendering:** Added `components/blocks/SectionsRenderer.tsx` to map each block type into frontend UI and wrap each block as `<section id={sectionId}>`.
+- **Sticky in-page nav:** Added `components/blocks/PageJumpLinks.tsx` (gold-on-dark chip navigation) with active-section detection, smooth-scroll, and auto-centering active chip behavior on scroll.
+- **SQLite drift fixes:** Patched local DB with new `pages` columns and block tables to resolve runtime 500/404 issues (`pages.content`, `pages.featured_image_id`, and `pages_blocks_*` tables).
+- **Status:** Build green after each phase (`npm run build` passes).
+
 ### 2026-04-08 — Admin UX + navigation consolidation polish
 
 - **Projects editor UX:** moved from collection-document editing to `projects-home` global array so projects are managed in one draggable/toggle list like Homepage hero rows.

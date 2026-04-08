@@ -138,11 +138,13 @@ Admin sidebar group **Site**:
 - **`bookings`** — Two-step schedule-call submissions (`POST /api/bookings`) with schema: `name` (required), `email` (required), `phone` (required), `appointmentDate` (required date/time), `message`.
 - **`leads`** — newsletter signups from the homepage modal (`POST /api/leads`, public **create**; admin **read** when logged in). Email verification is enabled and email is visible in admin list columns.
 - **Verification route note** — browser click-through uses a custom GET endpoint at **`/api/leads/verify/:token`** (also accepts `?token=` fallback), then redirects to **`/?verified=success`** or **`/?verified=error`**.
+- **`pages`** — dynamic slug engine (`/[slug]`) now supports Lexical rich content and a Sections Builder (blocks) with per-section anchor IDs (`sectionId`) for in-page navigation.
 
 **Globals**
 
 - **`homepage`** — hero slides + optional stats (see above). Each slide now includes a per-slide `seo` group (`title`, `description`, `OpenGraph image`) for metadata control directly in the Homepage screen.
 - **`site-settings`** — site name/tagline for SEO metadata, plus centralized notification controls under a dedicated Notifications tab (`enableAdminNotifications`, `notificationEmails`, `adminFallbackEmail`, `systemFromEmail`).
+- **`site-settings` branding** — includes `siteLogo`, `favicon`, `ogImage`, and `siteTitleSuffix`; header/footer logo + metadata defaults are wired to these fields.
 - **`projects-home`** — Projects moved to a Site global with draggable row items (`projectItems`) to match Homepage editing UX. Frontend demos now read from this global instead of a collection.
 - **`header`** — nav items support nested submenu rows in admin (collapsed by default), and desktop/mobile header rendering supports dropdown links again.
 
@@ -172,6 +174,10 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **Projects admin reworked to Homepage-style rows** — migrated Projects from collection docs to `projects-home` global array (`projectItems`) for drag-and-toggle editing on one screen; restored right-rail demos behavior (fixed card height, conditional scrollbar, gold scrollbar styling, click-to-preview, `Featured/Visible` badge hierarchy, visibility toggle filtering). |
 | 2026-04-08 | **Header navigation submenu restore** — Header global now supports nested submenu items (collapsed rows by default); frontend desktop dropdown + mobile nested links restored with chevron rotate and delayed close for smoother hover behavior. |
 | 2026-04-08 | **Admin nav polish** — sidebar category labels use gold accent, Dashboard quick link added at top, and custom Log out moved from sidebar into account-page context with inline placement behavior. |
+| 2026-04-08 | **Site branding controls + wiring** — added `Site settings -> Branding` tab (`siteLogo`, `favicon`, `ogImage`, `siteTitleSuffix`), wired logo into Header/Footer, and applied favicon/OG/site title suffix defaults in site metadata generation. |
+| 2026-04-08 | **Dynamic Pages engine live** — added `app/(site)/[slug]/page.tsx` with Payload slug lookup, SEO metadata fallback from page/meta + Site settings suffix, and premium dark/gold rendering. |
+| 2026-04-08 | **Pages Content Builder expanded** — added `featuredImage`, Lexical `content`, and `sections` blocks (`richText`, `featureGrid`, `videoPlayer`) each with required `Anchor ID`; dynamic page now renders sections + rich content. |
+| 2026-04-08 | **In-page anchor navigation** — added sticky `PageJumpLinks` with smooth-scroll, active-section highlighting, mobile chip scroller UI, and auto-centering of the active chip while scrolling. |
 
 ---
 

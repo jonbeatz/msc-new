@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/hero-section"
 import { getHomepageCmsData } from "@/lib/cms/homepage"
 import { getHeaderNavItems } from "@/lib/cms/header"
 import { getDemoProjects } from "@/lib/cms/projects"
+import { getSiteSettingsCms } from "@/lib/cms/site-settings"
 import { AboutSection } from "@/components/about-section"
 import { ServicesSection } from "@/components/services-section"
 import { OwnPlatformSection } from "@/components/own-platform-section"
@@ -23,10 +24,15 @@ export default async function HomePage() {
   const { heroSlides, heroStats } = await getHomepageCmsData()
   const navItems = await getHeaderNavItems()
   const demoProjects = await getDemoProjects()
+  const settings = await getSiteSettingsCms()
 
   return (
     <main className="min-h-screen bg-background">
-      <Header navItems={navItems} />
+      <Header
+        navItems={navItems}
+        logoSrc={settings?.siteLogo}
+        siteName={settings?.siteName || "My Studio Channel"}
+      />
       <HeroSection cmsSlides={heroSlides} cmsStats={heroStats} />
       <AboutSection />
       <ServicesSection />
@@ -42,7 +48,10 @@ export default async function HomePage() {
       <FAQSection />
       <PoliciesSection />
       <ContactSection />
-      <Footer />
+      <Footer
+        logoSrc={settings?.siteLogo}
+        siteName={settings?.siteName || "My Studio Channel"}
+      />
     </main>
   )
 }

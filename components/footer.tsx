@@ -20,7 +20,12 @@ const footerLinks = {
   ],
 }
 
-export function Footer() {
+type FooterProps = {
+  logoSrc?: string | null
+  siteName?: string
+}
+
+export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps) {
   return (
     <footer 
       id="msc-footer" 
@@ -33,12 +38,12 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-6 group">
-              <div className="relative h-10 w-10 flex-shrink-0">
-                <Image src="/images/msc-icon.png" alt="MSC Logo" fill className="object-contain group-hover:drop-shadow-lg transition-all duration-300" />
+              <div className="relative h-10 w-10 shrink-0">
+                <Image src={logoSrc || "/images/msc-icon.png"} alt={`${siteName} logo`} fill className="object-contain group-hover:drop-shadow-lg transition-all duration-300" />
               </div>
               <div>
                 <span className="block text-base font-semibold tracking-tight text-foreground">
-                  My Studio Channel
+                  {siteName}
                 </span>
                 <span className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
                   Creator Platforms
@@ -105,7 +110,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-border/50">
           <p className="text-sm text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} My Studio Channel. All rights reserved.
+            &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
           </p>
         </div>
       </div>
@@ -113,7 +118,7 @@ export function Footer() {
       {/* Large Brand Text */}
       <div className="border-t border-border/30 py-12 overflow-hidden">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="text-5xl sm:text-7xl lg:text-8xl font-bold text-foreground/[0.03] tracking-tighter select-none whitespace-nowrap text-center">
+          <div className="text-5xl sm:text-7xl lg:text-8xl font-bold text-foreground/3 tracking-tighter select-none whitespace-nowrap text-center">
             MY STUDIO CHANNEL
           </div>
         </div>

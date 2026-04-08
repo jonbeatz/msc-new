@@ -37,6 +37,50 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: "Branding",
+          fields: [
+            {
+              name: "siteLogo",
+              type: "upload",
+              relationTo: "media",
+              label: "Site Logo",
+              admin: {
+                description:
+                  "Primary logo used in Header and Footer. Prefer a transparent PNG or SVG-style mark.",
+              },
+            },
+            {
+              name: "favicon",
+              type: "upload",
+              relationTo: "media",
+              label: "Favicon",
+              admin: {
+                description: "Recommended size 32x32px (.ico or .png).",
+              },
+            },
+            {
+              name: "ogImage",
+              type: "upload",
+              relationTo: "media",
+              label: "Open Graph Image",
+              admin: {
+                description:
+                  "Default social share image when a page does not define a custom OG image.",
+              },
+            },
+            {
+              name: "siteTitleSuffix",
+              type: "text",
+              defaultValue: "| My Studio Channel",
+              label: "Site Title Suffix",
+              admin: {
+                description:
+                  "Appended to page titles (example: \"Page Title | My Studio Channel\").",
+              },
+            },
+          ],
+        },
+        {
           label: "Notifications",
           fields: [
             {
