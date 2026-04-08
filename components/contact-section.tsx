@@ -63,10 +63,22 @@ function generateTempPassword(): string {
   return `msc_${Math.random().toString(36).slice(2, 10)}_${Date.now()}`
 }
 
+function formatPhoneInput(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 10)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+}
+
+function isValidUSPhone(value: string): boolean {
+  return value.replace(/\D/g, "").length === 10
+}
+
 
 export function ContactSection() {
+  const goldPrimary = "#D4AF37"
   const goldNoticeClass =
-    "rounded-xl border border-[#F5B841]/45 bg-[#F5B841]/18 px-4 py-3 text-sm font-medium text-[#FFE5A3] shadow-[0_0_0_1px_rgba(245,184,65,0.18),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+    "rounded-xl border border-[#D4AF37]/45 bg-[#D4AF37]/18 px-4 py-3 text-sm font-medium text-[#FCEFC8] shadow-[0_0_0_1px_rgba(212,175,55,0.18),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
 
   const [isOpen, setIsOpen] = useState(false)
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false)
@@ -77,9 +89,14 @@ export function ContactSection() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [preferredTime, setPreferredTime] = useState<string>("")
   const [timeDropdownOpen, setTimeDropdownOpen] = useState(false)
+  const [scheduleStep, setScheduleStep] = useState<1 | 2>(1)
+  const [bookingName, setBookingName] = useState("")
+  const [bookingEmail, setBookingEmail] = useState("")
+  const [bookingPhone, setBookingPhone] = useState("")
+  const [bookingMessage, setBookingMessage] = useState("")
   const [scheduleError, setScheduleError] = useState<string | null>(null)
-  const [scheduleSuccess, setScheduleSuccess] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [bookingToast, setBookingToast] = useState<string | null>(null)
   const [verificationToast, setVerificationToast] = useState<{
     tone: "success" | "error"
     message: string
@@ -92,8 +109,14 @@ export function ContactSection() {
 
   function closeModal() {
     setIsOpen(false)
+    setScheduleStep(1)
     setSelectedDate(undefined)
     setPreferredTime("")
+    setBookingName("")
+    setBookingEmail("")
+    setBookingPhone("")
+    setBookingMessage("")
+    setTimeDropdownOpen(false)
     setScheduleError(null)
   }
 
@@ -214,40 +237,59 @@ export function ContactSection() {
   const availableTimes = CALL_TIME_SLOTS.filter((t) => !unavailableTimes.has(t))
   const bookedCount = CALL_TIME_SLOTS.length - availableTimes.length
 
-  async function handleContinue() {
+  async function handleBookingSubmit() {
     if (!selectedDate) {
-      setScheduleError("Please select a preferred date to continue.")
+      setScheduleError("Please select a preferred date.")
       return
     }
     if (!preferredTime) {
-      setScheduleError("Please choose a preferred time of day.")
+      setScheduleError("Please choose a preferred time.")
       return
     }
-    if (selectedDateKey && BOOKED_SLOT_KEYS.has(`${selectedDateKey}|${preferredTime}`)) {
-      setScheduleError("That slot is already booked. Please choose another time.")
+    if (!bookingName.trim()) {
+      setScheduleError("Please enter your name.")
+      return
+    }
+    if (!bookingEmail.trim()) {
+      setScheduleError("Please enter your email.")
+      return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bookingEmail.trim())) {
+      setScheduleError("Please enter a valid email.")
+      return
+    }
+    if (!bookingPhone.trim()) {
+      setScheduleError("Please enter your phone number.")
+      return
+    }
+    if (!isValidUSPhone(bookingPhone)) {
+      setScheduleError("Please enter a valid 10-digit phone number.")
       return
     }
     setIsSubmitting(true)
     setScheduleError(null)
     try {
-      const tz =
-        typeof Intl !== "undefined"
-          ? Intl.DateTimeFormat().resolvedOptions().timeZone
-          : null
+      const appointmentDate = new Date(selectedDate)
+      const [time, meridiem] = preferredTime.split(" ")
+      const [hoursRaw, minutesRaw] = time.split(":").map((v) => Number(v))
+      let hours24 = hoursRaw % 12
+      if (meridiem === "PM") hours24 += 12
+      appointmentDate.setHours(hours24, minutesRaw, 0, 0)
+
       const result = await submitBookingRequest({
-        source: "schedule-call-dialog",
-        email: null,
-        name: null,
-        preferredTimeLocal: preferredTime,
-        preferredDateLocal: toLocalDateKey(selectedDate),
-        timeZone: tz,
+        name: bookingName.trim(),
+        email: bookingEmail.trim().toLowerCase(),
+        phone: bookingPhone.trim() || null,
+        message: bookingMessage.trim() || null,
+        appointmentDate: appointmentDate.toISOString(),
       })
       if (!result.ok) {
         setScheduleError(result.message || "Something went wrong. Please try again.")
         return
       }
-      setScheduleSuccess("Request received! We will be in touch shortly.")
       closeModal()
+      setBookingToast("Booking confirmed. We sent your confirmation email.")
+      setTimeout(() => setBookingToast(null), 4500)
     } catch {
       setScheduleError("Something went wrong. Please try again.")
     } finally {
@@ -272,7 +314,7 @@ export function ContactSection() {
                 <span className="text-xs font-medium uppercase tracking-wider text-accent">Contact</span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground sm:text-4xl leading-tight">
+              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
                 Ready to Get Started?
               </h2>
               <p className="mt-4 text-muted-foreground leading-relaxed">
@@ -288,7 +330,7 @@ export function ContactSection() {
                     href={item.href}
                     className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-secondary/30 border border-border/50 hover:border-accent/30 transition-all duration-300 group"
                   >
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-secondary/50 border border-border/50 flex items-center justify-center group-hover:bg-accent/10 group-hover:border-accent/30 transition-all duration-300 flex-shrink-0">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-secondary/50 border border-border/50 flex shrink-0 items-center justify-center transition-all duration-300 group-hover:border-accent/30 group-hover:bg-accent/10">
                       <item.icon className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground group-hover:text-accent transition-colors" />
                     </div>
                     <div className="min-w-0">
@@ -318,11 +360,6 @@ export function ContactSection() {
                 <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
 
-              {scheduleSuccess && (
-                <p className="mt-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-xs text-accent">
-                  {scheduleSuccess}
-                </p>
-              )}
               {newsletterSuccess && (
                 <p className={`mt-3 text-center ${goldNoticeClass}`}>
                   {newsletterSuccess}
@@ -382,7 +419,9 @@ export function ContactSection() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
               <div>
                 <h2 style={{ color: "#f5f5f5", fontWeight: 700, fontSize: "1.1rem", margin: 0 }}>Pick Your Call Window</h2>
-                <p style={{ color: "#888", fontSize: "0.8rem", marginTop: "0.25rem" }}>Mock booking — WordPress API connection next.</p>
+                <p style={{ color: "#888", fontSize: "0.8rem", marginTop: "0.25rem" }}>
+                  Step {scheduleStep} of 2 - Select time, then confirm details.
+                </p>
               </div>
               <button
                 type="button"
@@ -393,19 +432,21 @@ export function ContactSection() {
               </button>
             </div>
 
-            {/* Calendar */}
-            <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.75rem", overflow: "hidden", marginBottom: "1rem" }}>
-              <ScheduleCalendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => { setSelectedDate(date); setPreferredTime(""); setTimeDropdownOpen(false) }}
-                numberOfMonths={1}
-                className="w-full"
-              />
-            </div>
+            {scheduleStep === 1 && (
+              <>
+                {/* Calendar */}
+                <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.75rem", overflow: "hidden", marginBottom: "1rem" }}>
+                  <ScheduleCalendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => { setSelectedDate(date); setPreferredTime(""); setTimeDropdownOpen(false); setScheduleStep(1) }}
+                    numberOfMonths={1}
+                    className="w-full"
+                  />
+                </div>
 
-            {/* Time picker */}
-            <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.75rem", padding: "1rem", marginBottom: "1rem", position: "relative" }}>
+                {/* Time picker */}
+                <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.75rem", padding: "1rem", marginBottom: "1rem", position: "relative" }}>
               <label style={{ display: "block", color: "#f5f5f5", fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.5rem" }}>
                 Preferred call time
               </label>
@@ -420,12 +461,12 @@ export function ContactSection() {
                   padding: "0.6rem 0.9rem",
                   borderRadius: "0.6rem",
                   border: timeDropdownOpen
-                    ? "1px solid rgba(245,184,65,0.6)"
+                    ? "1px solid rgba(212,175,55,0.6)"
                     : preferredTime
-                    ? "1px solid rgba(245,184,65,0.35)"
+                    ? "1px solid rgba(212,175,55,0.35)"
                     : "1px solid rgba(255,255,255,0.12)",
-                  background: preferredTime ? "rgba(245,184,65,0.08)" : "#0f0f12",
-                  color: preferredTime ? "#F5B841" : "#666",
+                  background: preferredTime ? "rgba(212,175,55,0.08)" : "#0f0f12",
+                  color: preferredTime ? goldPrimary : "#666",
                   fontSize: "0.9rem",
                   fontWeight: preferredTime ? 600 : 400,
                   cursor: !selectedDate ? "not-allowed" : "pointer",
@@ -459,7 +500,7 @@ export function ContactSection() {
                     right: "1rem",
                     zIndex: 10,
                     background: "#13131a",
-                    border: "1px solid rgba(245,184,65,0.25)",
+                    border: "1px solid rgba(212,175,55,0.25)",
                     borderRadius: "0.6rem",
                     overflow: "hidden",
                     boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
@@ -471,13 +512,13 @@ export function ContactSection() {
                     <button
                       key={time}
                       type="button"
-                      onClick={() => { setPreferredTime(time); setTimeDropdownOpen(false) }}
+                      onClick={() => { setPreferredTime(time); setTimeDropdownOpen(false); setScheduleStep(2); setScheduleError(null) }}
                       style={{
                         width: "100%",
                         padding: "0.55rem 0.9rem",
                         textAlign: "left",
-                        background: preferredTime === time ? "rgba(245,184,65,0.15)" : "transparent",
-                        color: preferredTime === time ? "#F5B841" : "#ccc",
+                        background: preferredTime === time ? "rgba(212,175,55,0.15)" : "transparent",
+                        color: preferredTime === time ? goldPrimary : "#ccc",
                         fontWeight: preferredTime === time ? 600 : 400,
                         fontSize: "0.875rem",
                         border: "none",
@@ -485,8 +526,8 @@ export function ContactSection() {
                         cursor: "pointer",
                         transition: "background 0.1s",
                       }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(245,184,65,0.1)"; (e.currentTarget as HTMLButtonElement).style.color = "#F5B841" }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = preferredTime === time ? "rgba(245,184,65,0.15)" : "transparent"; (e.currentTarget as HTMLButtonElement).style.color = preferredTime === time ? "#F5B841" : "#ccc" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(212,175,55,0.1)"; (e.currentTarget as HTMLButtonElement).style.color = goldPrimary }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = preferredTime === time ? "rgba(212,175,55,0.15)" : "transparent"; (e.currentTarget as HTMLButtonElement).style.color = preferredTime === time ? goldPrimary : "#ccc" }}
                     >
                       {time}
                     </button>
@@ -500,6 +541,22 @@ export function ContactSection() {
                 </p>
               )}
             </div>
+              </>
+            )}
+
+            {scheduleStep === 2 && (
+              <div style={{ border: "1px solid rgba(212,175,55,0.35)", borderRadius: "0.75rem", padding: "1rem", marginBottom: "1rem", background: "rgba(212,175,55,0.06)" }}>
+                <p style={{ color: goldPrimary, fontSize: "0.8rem", marginBottom: "0.8rem", fontWeight: 700 }}>
+                  {selectedDate ? `${selectedDate.toDateString()} at ${preferredTime}` : "Selected slot"}
+                </p>
+                <div style={{ display: "grid", gap: "0.75rem" }}>
+                  <input value={bookingName} onChange={(e) => setBookingName(e.target.value)} placeholder="Name *" style={{ width: "100%", padding: "0.65rem 0.9rem", borderRadius: "0.6rem", border: "1px solid rgba(212,175,55,0.35)", background: "#101015", color: "#f5f5f5", fontSize: "0.9rem" }} />
+                  <input value={bookingEmail} onChange={(e) => setBookingEmail(e.target.value)} placeholder="Email *" type="email" style={{ width: "100%", padding: "0.65rem 0.9rem", borderRadius: "0.6rem", border: "1px solid rgba(212,175,55,0.35)", background: "#101015", color: "#f5f5f5", fontSize: "0.9rem" }} />
+                  <input value={bookingPhone} onChange={(e) => setBookingPhone(formatPhoneInput(e.target.value))} placeholder="Phone *" inputMode="tel" style={{ width: "100%", padding: "0.65rem 0.9rem", borderRadius: "0.6rem", border: "1px solid rgba(212,175,55,0.35)", background: "#101015", color: "#f5f5f5", fontSize: "0.9rem" }} />
+                  <textarea value={bookingMessage} onChange={(e) => setBookingMessage(e.target.value)} placeholder="Message (optional)" rows={4} style={{ width: "100%", padding: "0.65rem 0.9rem", borderRadius: "0.6rem", border: "1px solid rgba(212,175,55,0.35)", background: "#101015", color: "#f5f5f5", fontSize: "0.9rem", resize: "vertical" }} />
+                </div>
+              </div>
+            )}
 
             {/* Error */}
             {scheduleError && (
@@ -517,14 +574,33 @@ export function ContactSection() {
               >
                 Cancel
               </button>
-              <button
-                type="button"
-                onClick={handleContinue}
-                disabled={isSubmitting}
-                style={{ padding: "0.6rem 1.5rem", borderRadius: "0.6rem", border: "none", background: "#F5B841", color: "#111", fontSize: "0.9rem", fontWeight: 700, cursor: isSubmitting ? "wait" : "pointer", opacity: isSubmitting ? 0.7 : 1 }}
-              >
-                {isSubmitting ? "Saving..." : "Continue"}
-              </button>
+              {scheduleStep === 2 ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setScheduleStep(1)}
+                    style={{ padding: "0.6rem 1.25rem", borderRadius: "0.6rem", border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "#aaa", fontSize: "0.9rem", cursor: "pointer" }}
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBookingSubmit}
+                    disabled={isSubmitting}
+                    style={{ padding: "0.6rem 1.5rem", borderRadius: "0.6rem", border: "none", background: goldPrimary, color: "#111", fontSize: "0.9rem", fontWeight: 700, cursor: isSubmitting ? "wait" : "pointer", opacity: isSubmitting ? 0.7 : 1 }}
+                  >
+                    {isSubmitting ? "Saving..." : "Confirm Booking"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  style={{ padding: "0.6rem 1.5rem", borderRadius: "0.6rem", border: "none", background: goldPrimary, color: "#111", fontSize: "0.9rem", fontWeight: 700, opacity: 0.35 }}
+                >
+                  Select a time first
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -596,7 +672,7 @@ export function ContactSection() {
                 type="button"
                 onClick={handleNewsletterSubmit}
                 disabled={isNewsletterSubmitting}
-                style={{ padding: "0.6rem 1.5rem", borderRadius: "0.6rem", border: "none", background: "#F5B841", color: "#111", fontSize: "0.9rem", fontWeight: 700, cursor: isNewsletterSubmitting ? "wait" : "pointer", opacity: isNewsletterSubmitting ? 0.7 : 1 }}
+                style={{ padding: "0.6rem 1.5rem", borderRadius: "0.6rem", border: "none", background: goldPrimary, color: "#111", fontSize: "0.9rem", fontWeight: 700, cursor: isNewsletterSubmitting ? "wait" : "pointer", opacity: isNewsletterSubmitting ? 0.7 : 1 }}
               >
                 {isNewsletterSubmitting ? "Saving..." : "Subscribe"}
               </button>
@@ -609,6 +685,14 @@ export function ContactSection() {
         <div className="fixed left-1/2 top-5 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 md:left-auto md:right-5 md:top-auto md:bottom-5 md:w-auto md:translate-x-0">
           <div className={goldNoticeClass}>
             {verificationToast.message}
+          </div>
+        </div>
+      )}
+
+      {bookingToast && (
+        <div className="fixed left-1/2 top-5 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 md:left-auto md:right-5 md:top-auto md:bottom-5 md:w-auto md:translate-x-0">
+          <div className={goldNoticeClass}>
+            {bookingToast}
           </div>
         </div>
       )}

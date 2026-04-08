@@ -53,6 +53,14 @@ Quick variants:
 
 ## Recent changes (latest first)
 
+### 2026-04-08 — Command Center finalize: routing, sidebar grouping, email branding
+
+- **Site Settings 404 fix:** Root cause was schema drift (not slug routing): missing `site_settings_notification_emails` table and missing `site_settings` notification columns in local SQLite with `db.push: false`. Patched DB schema and confirmed `/api/globals/site-settings` + `/admin/globals/site-settings` return 200.
+- **Admin UX:** Added live Notifications preview field in Site Settings (`Effective Recipient List`) so admin can see array recipients vs fallback before save; clarified `systemFromEmail` label to **Sender Address**.
+- **Sidebar structure:** `bookings` moved under `admin.group: "Marketing"` and aligned with `leads`.
+- **Email templates:** Added global anchor style overrides (`#D4AF37`, `text-decoration:none`, `!important`) in Leads + Bookings templates; Lead admin alert now includes only lead email; booking admin alert requester email is a gold-styled mailto link.
+- **Verification notes:** `npm run build` passes after changes. Live booking API create succeeded (`/api/bookings` 201). Lead test is constrained by Resend sandbox/duplicate checks in local environment.
+
 ### 2026-04-07 — Dev URL at root (no `basePath`)
 
 - Removed **`basePath`** and **`assetPrefix`** from `next.config.mjs` — app runs at **`http://localhost:3000/`**.

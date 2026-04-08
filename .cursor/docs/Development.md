@@ -135,14 +135,14 @@ Admin sidebar group **Site**:
 
 - **`users`** — admin auth (Payload default).
 - **`media`** — uploads (`sharp`); hero and future sections pick files here.
-- **`bookings`** — Schedule-a-call rows (`POST /api/bookings` when env points at Payload).
+- **`bookings`** — Two-step schedule-call submissions (`POST /api/bookings`) with schema: `name` (required), `email` (required), `phone` (required), `appointmentDate` (required date/time), `message`.
 - **`leads`** — newsletter signups from the homepage modal (`POST /api/leads`, public **create**; admin **read** when logged in). Email verification is enabled and email is visible in admin list columns.
 - **Verification route note** — browser click-through uses a custom GET endpoint at **`/api/leads/verify/:token`** (also accepts `?token=` fallback), then redirects to **`/?verified=success`** or **`/?verified=error`**.
 
 **Globals**
 
 - **`homepage`** — hero slides + optional stats (see above). Each slide now includes a per-slide `seo` group (`title`, `description`, `OpenGraph image`) for metadata control directly in the Homepage screen.
-- **`site-settings`** — site name + tagline for SEO metadata.
+- **`site-settings`** — site name/tagline for SEO metadata, plus centralized notification controls under a dedicated Notifications tab (`enableAdminNotifications`, `notificationEmails`, `adminFallbackEmail`, `systemFromEmail`).
 
 ---
 
@@ -162,6 +162,11 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **Newsletter engine final polish** — unified newsletter success pill + verify toast to the same gold token set for visual consistency; ensured CTA hover states show pointer cursor for `Schedule a Call` and `Stay in the Loop`. |
 | 2026-04-08 | **Duplicate signup UX fix** — newsletter modal now handles Payload duplicate-email validation gracefully and shows a friendly “already subscribed” message instead of raw JSON error payloads. |
 | 2026-04-08 | **Homepage slide SEO wiring** — added per-slide SEO group in `Homepage.heroSlides`; `generateMetadata` now reads the active slide’s SEO title/description/image (with fallback to slide content + Site settings), and outputs OpenGraph/Twitter metadata automatically. |
+| 2026-04-08 | **Two-Step Booking Engine** — schedule modal now runs Step 1 (date/time) -> Step 2 (name/email/phone/message), saves to Payload `bookings`, resets state on success, and shows the gold success toast (mobile top-center / desktop bottom-right). Booking create hook sends branded confirmation email to user + alert email to admin via Resend adapter. |
+| 2026-04-08 | **Centralized Command Center** — booking/lead hooks now resolve admin toggles, recipient list/fallback, and sender email from `Site settings -> Notifications` (no hardcoded recipients). User confirmation and admin alerts are isolated in independent try/catch paths so one delivery failure does not block the other or persistence. |
+| 2026-04-08 | **Site Settings 404 resolved + admin live preview** — fixed runtime 404 caused by missing SQLite notification table/columns (`site_settings_notification_emails` + new `site_settings` columns), added live “Effective Recipient List” preview UI field in Notifications tab, and clarified `systemFromEmail` label as **Sender Address**. |
+| 2026-04-08 | **Admin sidebar grouping polish** — moved `bookings` into `admin.group: "Marketing"` and confirmed `leads` in the same group for high-intent data clustering. |
+| 2026-04-08 | **Email template branding pass** — forced anchor styles to gold (`#D4AF37`) and no underline for verification + admin alerts, streamlined “New Lead Alert” to email-only content, and styled booking alert email link with matching gold `mailto` presentation. |
 
 ---
 

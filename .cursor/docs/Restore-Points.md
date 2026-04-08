@@ -25,6 +25,9 @@ Human-named checkpoints so you can roll back mentally or on disk if a change goe
 | **RP-2026-04-08-hero-media-relinked** | 2026-04-08 | **Hero migration finalized:** Homepage global now contains **5 slides** (the original 4 defaults + current custom slide). The 4 original slides were mapped to real `Media` entries sourced from `public/images` (`tv-wall.jpg`, `show-cards.jpg`, `on-air.jpg`, `creator-solo.jpg`) via a one-time local migration script, then script removed. |
 | **RP-2026-04-08-working-resend-email** | 2026-04-08 | **Resend verification flow fully working:** Added browser-safe verify endpoint in `collections/Leads.ts` (`/api/leads/verify/:token`, with `?token=` fallback), confirmation redirect to `/?verified=success|error`, and homepage verification toast with NovaMira gold styling + mobile top-center placement in `components/contact-section.tsx`. Removed direct-booking helper text from contact card and centered newsletter success confirmation. Synced docs in Development + ReCall. |
 | **RP-2026-04-08-seo-setup** | 2026-04-08 | **SEO setup completed:** official `@payloadcms/plugin-seo` installed/configured; SEO tab enabled for `pages` + `hero-slides`; `Homepage.heroSlides` rows now include inline `seo` group fields; homepage `generateMetadata` follows active slide SEO title/description/image with fallbacks to slide content and Site Settings; OG/Twitter metadata now mirrors active slide SEO. |
+| **RP-2026-04-08-two-step-booking-engine** | 2026-04-08 | **Professional two-step booking flow live:** `bookings` schema updated to `name/email/phone/appointmentDate/message`; contact modal refactored to Step 1 (time select) then Step 2 (details), with Payload API save + gold success toast. `bookings` afterChange hook now sends branded confirmation email to user and admin alert via Resend on create. |
+| **RP-2026-04-08-command-center-integration** | 2026-04-08 | **Centralized Command Center integrated:** Added `Site settings -> Notifications` tab (`enableAdminNotifications`, `notificationEmails`, `adminFallbackEmail`, `systemFromEmail`) and refactored `bookings` + `leads` notification hooks to read all recipients/toggles/from-address from global settings with resilient, isolated email send error handling. Booking/newsletter UI now uses unified gold tokens and confirms success toast only after complete booking submission. |
+| **RP-2026-04-08-command-center-polish-and-email-branding** | 2026-04-08 | **Final polish + reliability pass:** fixed Site Settings admin 404 caused by local SQLite schema drift (`site_settings_notification_emails` table + Site Settings notification columns), added live “Effective Recipient List” admin preview + Sender Address labeling, grouped `bookings` and `leads` under Marketing, and updated Leads/Bookings email templates to enforce gold no-underline links while streamlining New Lead Alert to email-only content. |
 
 ### Files worth diffing from this checkpoint
 
@@ -35,8 +38,11 @@ Human-named checkpoints so you can roll back mentally or on disk if a change goe
 - `globals/Header.ts`
 - `globals/Homepage.ts`
 - `collections/Pages.ts`, `collections/HeroSlides.ts`
+- `collections/Bookings.ts`
 - `lib/cms/*`
+- `lib/booking.ts`
 - `app/(site)/page.tsx`, `app/(site)/layout.tsx`
+- `components/contact-section.tsx`
 - `components/hero-section.tsx`
 - `next.config.mjs` (image `remotePatterns` for localhost)
 

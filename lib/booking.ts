@@ -1,22 +1,22 @@
 export type BookingRequestPayload = {
-  source: "schedule-call-dialog"
-  email: string | null
-  name?: string | null
-  preferredTimeLocal: string | null
-  preferredDateLocal: string | null
-  timeZone?: string | null
+  name: string
+  email: string
+  phone?: string | null
+  appointmentDate: string
+  message?: string | null
 }
 
 /**
  * WordPress example: /wp-json/msc/v1/booking-request
- * Payload: set NEXT_PUBLIC_MSC_BOOKING_URL=payload to POST to /api/bookings
+ * Payload: default target is /api/bookings unless NEXT_PUBLIC_MSC_BOOKING_URL points elsewhere
  */
 export const BOOKING_API_URL = process.env.NEXT_PUBLIC_MSC_BOOKING_URL ?? ""
 
 function bookingTarget(): "mock" | "payload" | "wordpress" {
   const url = BOOKING_API_URL.trim().toLowerCase()
-  if (!url) return "mock"
+  if (!url) return "payload"
   if (url === "payload") return "payload"
+  if (url === "mock") return "mock"
   return "wordpress"
 }
 
@@ -48,12 +48,11 @@ export async function submitBookingRequest(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        source: payload.source,
-        email: payload.email || undefined,
-        name: payload.name || undefined,
-        preferredDateLocal: payload.preferredDateLocal || undefined,
-        preferredTimeLocal: payload.preferredTimeLocal || undefined,
-        timeZone: payload.timeZone || undefined,
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone || undefined,
+        appointmentDate: payload.appointmentDate,
+        message: payload.message || undefined,
       }),
     })
     if (!res.ok) {
