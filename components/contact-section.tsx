@@ -170,7 +170,31 @@ export function ContactSection() {
 
       if (!res.ok) {
         const text = await res.text().catch(() => "")
-        setNewsletterError(text || "Signup failed. Please try again.")
+        const normalized = text.toLowerCase()
+        if (
+          normalized.includes("already registered") ||
+          normalized.includes("already exists") ||
+          normalized.includes("duplicate") ||
+          normalized.includes("email")
+        ) {
+          setNewsletterError(
+            "This email is already subscribed. Please check your inbox for your verification email."
+          )
+          return
+        }
+
+        try {
+          const json = JSON.parse(text) as {
+            errors?: Array<{ message?: string }>
+            message?: string
+          }
+          const firstError = json.errors?.[0]?.message
+          setNewsletterError(
+            firstError || json.message || "Signup failed. Please try again."
+          )
+        } catch {
+          setNewsletterError("Signup failed. Please try again.")
+        }
         return
       }
 

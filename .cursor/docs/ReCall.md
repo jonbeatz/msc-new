@@ -304,3 +304,9 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Affordance:** added `cursor-pointer` hover state on `Schedule a Call` and `Stay in the Loop` buttons for clearer clickability.
 - **Status:** newsletter verification loop considered complete for current local scope.
 
+### 2026-04-08 — Duplicate lead signup handling polished
+
+- **Fix:** newsletter submit now detects duplicate-email responses from Payload and shows a clean user-facing message instead of raw JSON.
+- **Behavior:** parses API error payload safely, falls back to generic error text when needed.
+- **File:** `components/contact-section.tsx`.
+
