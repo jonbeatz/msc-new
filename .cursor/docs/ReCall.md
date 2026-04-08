@@ -33,6 +33,22 @@ Quick variants:
 - **Backend phase:** `Continue from ReCall and wire WordPress backend phase 1.`
 - **UI polish phase:** `Continue from ReCall and finish UI polish pass for <section>.`
 
+## Git Quick Reference (checkpoint + restore branch)
+
+Use this mini-flow any time you want a safe checkpoint:
+
+1. `git status -sb`
+2. `git diff -- .`
+3. `git add -A`
+4. `git commit -m "clear outcome message"`
+5. `git push`
+
+Create a new restore branch from the current clean state:
+
+1. `git checkout -b <branch-name>`
+2. `git push -u origin <branch-name>`
+3. `git status -sb` (confirm tracking branch)
+
 ---
 
 ## How to use this file

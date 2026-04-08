@@ -186,3 +186,43 @@ Admin sidebar group **Site**:
 - Regenerate types after collection changes: `npx payload generate:types` (optional).
 - For subdirectory hosting later, set `basePath` / `assetPrefix` and update URLs here + Run-Next-JS.
 - Keep this file short; link to **Site-Plans.md** for CMS vs WP tradeoffs.
+
+---
+
+## Git checkpoint workflow (recommended)
+
+Use this exact flow whenever you want a clean restore point.
+
+1. **Check current branch + changes**
+   - `git status -sb`
+2. **Review what will be saved**
+   - `git diff -- .`
+3. **Commit all intended work**
+   - `git add -A`
+   - `git commit -m "clear message about why this checkpoint matters"`
+4. **Push your commit**
+   - `git push`
+
+### Create a new restore branch from current state
+
+When you want to "freeze" a working state before more changes:
+
+1. `git checkout -b <new-branch-name>`
+2. `git push -u origin <new-branch-name>`
+3. Verify:
+   - `git status -sb` should show your new branch tracking origin.
+
+### Naming conventions used in this project
+
+- Working feature branches:
+  - `msc-new-payload-polished`
+  - `msc-new-payload-polished-v2`
+- Good commit style:
+  - `Add dynamic pages builder, anchors, and branding wiring.`
+  - Keep commit message focused on the **outcome**, not every file detail.
+
+### Fast safety checklist before each push
+
+- `npm run build` passes
+- No unexpected `git status --short` output
+- Branch name matches the checkpoint intent
