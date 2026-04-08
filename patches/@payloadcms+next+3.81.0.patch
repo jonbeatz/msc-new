@@ -1,0 +1,20 @@
+diff --git a/node_modules/@payloadcms/next/dist/layouts/Root/index.js b/node_modules/@payloadcms/next/dist/layouts/Root/index.js
+index 7cd705c..de468f4 100644
+--- a/node_modules/@payloadcms/next/dist/layouts/Root/index.js
++++ b/node_modules/@payloadcms/next/dist/layouts/Root/index.js
+@@ -101,13 +101,14 @@ const RootLayoutContent = async ({
+     "data-theme": theme,
+     dir: dir,
+     lang: languageCode,
+-    suppressHydrationWarning: config?.admin?.suppressHydrationWarning ?? false,
+     ...htmlProps,
++    suppressHydrationWarning: config?.admin?.suppressHydrationWarning ?? false,
+     children: [/*#__PURE__*/_jsx("head", {
+       children: /*#__PURE__*/_jsx("style", {
+         children: `@layer payload-default, payload;`
+       })
+     }), /*#__PURE__*/_jsxs("body", {
++      suppressHydrationWarning: config?.admin?.suppressHydrationWarning ?? false,
+       children: [/*#__PURE__*/_jsxs(RootProvider, {
+         config: clientConfig,
+         dateFNSKey: req.i18n.dateFNSKey,

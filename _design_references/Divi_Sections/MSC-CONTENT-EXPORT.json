@@ -1,0 +1,358 @@
+{
+  "siteName": "My Studio Channel",
+  "tagline": "Creator Platforms",
+  "primaryColor": "#F5B841",
+  "fontFamily": "Montserrat",
+  
+  "sections": {
+    "hero": {
+      "id": "msc-hero",
+      "slides": [
+        {
+          "eyebrow": "For Creators Who Want More",
+          "headline": ["Your Content.", "Your Channel.", "Your Studio."],
+          "description": "We build studio-style websites that give creators the look and structure of a major network — powered by a custom plugin, built once and owned by you.",
+          "image": "tv-wall.jpg"
+        },
+        {
+          "eyebrow": "Look Like a Real Network",
+          "headline": ["Your Shows.", "Your Brand.", "Your Network."],
+          "description": "Your platform can be organized like a professional streaming network — with structured shows, episodes, and categories that rival any major broadcaster.",
+          "image": "show-cards.jpg"
+        },
+        {
+          "eyebrow": "Podcasters & Talk Show Hosts",
+          "headline": ["Your Voice.", "Your Platform.", "Your Audience."],
+          "description": "Launch your podcast or talk show with a professional-grade platform that rivals any major network — without monthly platform fees or subscriber charges.",
+          "image": "on-air.jpg"
+        },
+        {
+          "eyebrow": "Built for Every Creator",
+          "headline": ["Your Vision.", "Your Platform.", "Your Legacy."],
+          "description": "Showcase your productions on a cinema-quality platform built to present your work exactly the way you intend it to be experienced.",
+          "image": "creator-solo.jpg"
+        }
+      ],
+      "stats": [
+        { "value": "20+", "label": "Years Experience" },
+        { "value": "100%", "label": "Platform Ownership" },
+        { "value": "24/7", "label": "Creator Support" },
+        { "value": "$0", "label": "Monthly Platform Fees" }
+      ],
+      "cta": {
+        "primary": { "text": "Start With a Consultation", "link": "#msc-contact" },
+        "secondary": { "text": "View the Demo", "link": "#msc-demos" }
+      }
+    },
+    
+    "about": {
+      "id": "msc-about",
+      "badge": "What We Do",
+      "title": "About My Studio Channel",
+      "content": [
+        "My Studio Channel helps creators launch their own television-style platforms online. From talk shows and cooking shows to podcasts and documentaries, we design clean, organized websites that showcase programming the way a real network would.",
+        "Because we're creators too, we understand what it takes to present your work professionally. Every platform includes a custom built-in plugin with step-by-step tutorials, plus access to our creator community for continued learning and support."
+      ],
+      "features": [
+        { "title": "Network-Style Layouts", "description": "Present your content like a professional streaming network with structured shows and episodes." },
+        { "title": "Creator Community", "description": "Access our exclusive creator community for continued learning and support as your channel grows." },
+        { "title": "Built-In Tutorials", "description": "Custom plugin with step-by-step tutorials so you never feel left figuring things out alone." },
+        { "title": "Ongoing Support", "description": "Direct communication with the team building your site, plus guided walkthrough after launch." }
+      ],
+      "image": "what-we-do.jpg"
+    },
+    
+    "services": {
+      "id": "msc-services",
+      "badge": "Designed for Every Genre",
+      "title": "Programming Styles We Support",
+      "description": "Whether you're launching a talk show, cooking show, podcast, or full series, your channel can be organized and presented like a professional network.",
+      "styles": [
+        "Interview Talk Show",
+        "Daytime Talk Show",
+        "Panel Talk Show",
+        "Late-Night Show",
+        "Lifestyle Show",
+        "DIY Creative",
+        "Cooking Show",
+        "Drama Series"
+      ],
+      "platformFeatures": [
+        "Network-style layout that organizes your shows like a professional channel",
+        "Custom video players designed for a polished viewing experience",
+        "Structured programming layout that makes it easy for viewers to explore",
+        "Scalable platform design that can grow with your channel"
+      ]
+    },
+    
+    "ownPlatform": {
+      "id": "msc-own-platform",
+      "badge": "Full Ownership",
+      "title": "Own Your Platform, Not Just a Page",
+      "description": "My Studio Channel isn't a hosted service — it's your platform, built for you, on your own domain, with no recurring platform fees. You keep full control.",
+      "features": [
+        { "title": "No Platform Lock-in", "description": "Your platform is built for you to own and operate independently. No monthly subscriptions, no per-subscriber fees." },
+        { "title": "You Control Everything", "description": "You control the content. You control your audience. You control how it grows." },
+        { "title": "Built With You", "description": "Every project is built with you involved in the process. You will meet with us, see the progress, and understand how your platform works before it launches." }
+      ],
+      "image": "own-platform.jpg"
+    },
+    
+    "packages": {
+      "id": "msc-packages",
+      "badge": "Packages",
+      "title": "Channel Packages",
+      "description": "Choose the package that fits your vision. Every package includes a professionally designed platform with our custom Studio Channel plugin.",
+      "tiers": [
+        {
+          "name": "Creator Launch",
+          "price": "$5,800",
+          "description": "Professional streaming-style website using YouTube video hosting.",
+          "bestFor": "Creators who already host videos on YouTube and want a premium presentation layer.",
+          "featured": false,
+          "features": [
+            "Cinematic network-style website design",
+            "Custom YouTube video player layout",
+            "YouTube videos embedded without suggested videos",
+            "Streaming-style layout (like Netflix rows)",
+            "Mobile optimized",
+            "Brand colors & typography setup",
+            "Revision rounds included",
+            "Built on WordPress + Divi",
+            "Tutorial walkthrough after launch"
+          ]
+        },
+        {
+          "name": "Studio Pro",
+          "price": "$10,800",
+          "description": "Professional video platform with your own hosted player.",
+          "bestFor": "Creators who want their own professional streaming environment without relying on YouTube.",
+          "featured": true,
+          "features": [
+            "Everything in Creator Launch plus",
+            "Custom Video Player",
+            "Video hosting via Bunny.net",
+            "Video delivery powered by Presto Player",
+            "No ads or platform branding",
+            "Faster streaming performance",
+            "Advanced video playback controls"
+          ]
+        },
+        {
+          "name": "Network Platform",
+          "price": "$18,800",
+          "description": "A full content platform with private member access.",
+          "bestFor": "Creators launching their own streaming platform, academy, or subscription content network.",
+          "featured": false,
+          "features": [
+            "Everything in Studio Pro plus",
+            "Custom Membership Website",
+            "Private login portal",
+            "Subscriber management system",
+            "Content access controls",
+            "Member-only content areas"
+          ]
+        }
+      ]
+    },
+    
+    "requirements": {
+      "id": "msc-requirements",
+      "badge": "Before You Start",
+      "title": "What You'll Need to Get Started",
+      "items": [
+        { "title": "Images & Show Artwork", "description": "High-resolution logos, professional headshots, and any specific branding graphics (layered .PSD or .AI files are preferred if available)." },
+        { "title": "Thumbnails", "description": "Eye-catching, high-contrast images (1920 x 1080px) that clearly represent your episodes or categories at a glance." },
+        { "title": "Video and/or Audio Files", "description": "Direct download links (Dropbox/Drive) or hosted URLs (YouTube/Vimeo) for the primary media content you want featured on the site." },
+        { "title": "Domain Name", "description": "The registered web address (URL) you intend to use, along with the login credentials for your registrar (e.g., SiteGround or Spaceship)." },
+        { "title": "Hosting Account Access", "description": "Login credentials for your hosting provider (e.g., SiteGround, Cloudways). We recommend managed WordPress hosting for optimal performance." }
+      ],
+      "image": "podcast.jpg"
+    },
+    
+    "testimonials": {
+      "id": "msc-testimonials",
+      "badge": "Testimonials",
+      "title": "What Creators Are Saying",
+      "description": "Real results from creators we've worked with.",
+      "items": [
+        {
+          "quote": "I am thrilled to share my experience working with Yolando Brown. Her passion for her work shines through in everything she does. Her extensive knowledge and expertise in web development were invaluable, ensuring that our websites were not only visually stunning but also highly functional and user-friendly.",
+          "author": "Tige",
+          "role": "Non-Profit Founder",
+          "rating": 5
+        },
+        {
+          "quote": "I am incredibly grateful for the invaluable assistance in creating and developing my website. Their expertise not only helped me build a stunning online presence but also provided exceptional business coaching. The insightful tips and practical tools shared were instrumental in launching my beauty business successfully.",
+          "author": "Melanie",
+          "role": "Makeup Artist/Stylist",
+          "rating": 5
+        },
+        {
+          "quote": "My experience has been nothing but extraordinary. I needed help with my website that I couldn't put the finishing touches on. She was ready to take on the job, and fix my mess that I had created. She made my website and logo exactly how I imagined them. 5 stars isn't enough.",
+          "author": "Mrs. Hart",
+          "role": "Laundry Services Founder",
+          "rating": 5
+        },
+        {
+          "quote": "The team was very professional and personable. The business is top-tier and she's a superstar. A very dedicated individual. I will continue to use her services for many years to come and will continue recommending the business to many friends and family!",
+          "author": "Kristina",
+          "role": "Client",
+          "rating": 5
+        }
+      ]
+    },
+    
+    "builtForCreators": {
+      "id": "msc-creators",
+      "badge": "For You",
+      "title": "Built for Creators Like You",
+      "description": "Whether you're just starting or ready to grow, this platform is designed for creators who want more control. Creators come to My Studio Channel at different stages, but they all have one thing in common — they want a platform they can own, control, and grow.",
+      "types": [
+        { "title": "Podcasters", "description": "Ready to organize and showcase their content" },
+        { "title": "Content Creators", "description": "Tired of relying on social platforms" },
+        { "title": "Coaches", "description": "Building a media presence" },
+        { "title": "First-Time Launchers", "description": "Creators launching their first platform" },
+        { "title": "Network Builders", "description": "Want a professional, network-style presentation" }
+      ]
+    },
+    
+    "whatYouGet": {
+      "id": "msc-benefits",
+      "badge": "Deliverables",
+      "title": "What You Get with My Studio Channel",
+      "description": "Launch your own professional media website with everything you need to look like a network.",
+      "benefits": [
+        { "title": "Consulting & Revisions", "description": "Guided consulting calls and included revisions to ensure your site is built correctly, efficiently, and ready for launch." },
+        { "title": "Studio-Style Website Layout", "description": "A professionally designed homepage and show pages that present your content with a clean, network-inspired structure." },
+        { "title": "Custom Plugin & Media Setup", "description": "Includes installation and setup of our proprietary Studio Channel plugin, developed in house to support studio style layouts, content presentation, and professional video and audio embedding." }
+      ],
+      "backgroundImage": "msc-background.jpg"
+    },
+    
+    "addons": {
+      "id": "msc-addons",
+      "badge": "Extras",
+      "title": "Add-Ons & Recommendations",
+      "description": "Enhance your platform with additional tools and services that help your channel look polished and launch successfully.",
+      "items": [
+        {
+          "title": "Thumbnails & Show Artwork",
+          "price": "Starting at our rates per show",
+          "description": "Includes custom video thumbnails, show artwork, episode artwork, and featured images designed for your platform.",
+          "note": "Thumbnails are strongly recommended to achieve the intended studio-style layout. Without thumbnails, the visual presentation may be simplified."
+        },
+        {
+          "title": "Social Media Graphics Package",
+          "price": "Starting at industry standard rates",
+          "description": "Includes professionally designed website headers, profile images, cover images, and promotional graphics so your brand looks consistent across platforms."
+        }
+      ],
+      "recommendations": ["Domain name", "Hosting", "Video hosting", "Professional video player", "Audio setup"]
+    },
+    
+    "process": {
+      "id": "msc-process",
+      "badge": "How It Works",
+      "title": "A Simple, Guided Process",
+      "description": "Get your platform built and ready to launch in four straightforward steps.",
+      "steps": [
+        { "number": "01", "title": "Book Your Consultation", "description": "We start with a call to understand your goals and determine the right setup for your platform." },
+        { "number": "02", "title": "Submit Your Materials", "description": "Provide your content, links, and assets so we can begin building your platform." },
+        { "number": "03", "title": "Build & Review", "description": "We build your site with you, review it together, and make revisions based on your package." },
+        { "number": "04", "title": "Launch Your Platform", "description": "Your site is finalized, delivered, and ready for you to manage and grow." }
+      ]
+    },
+    
+    "experience": {
+      "id": "msc-experience",
+      "badge": "Our Background",
+      "title": "Built on Experience, Not Guesswork",
+      "content": [
+        "We've been creating content and working with creators for over two decades. From early content production with Every Way Woman to building platforms through Inavizion Media and My Creative Space, our work has always centered around helping creators bring their ideas to life.",
+        "Since 2000, we've designed and built websites for clients across industries, with a focus on creators, entrepreneurs, and media-based businesses. Today, My Studio Channel brings that experience together — helping creators launch their own platform with structure, clarity, and real support."
+      ],
+      "whoWeWorkedWith": [
+        "Creators and entrepreneurs through My Creative Space",
+        "Content creators, filmmakers, and brands through Inavizion Media",
+        "Clients from website builds, content capture, and coaching programs",
+        "Ongoing work with creators launching platforms through My Studio Channel"
+      ],
+      "images": ["creator-in-mind.jpg", "camera-crew.jpg"]
+    },
+    
+    "faq": {
+      "id": "msc-faq",
+      "badge": "FAQ",
+      "title": "Common Inquiries",
+      "description": "Find answers to the most frequently asked questions about our services and processes.",
+      "items": [
+        { "question": "Why does pricing start at $5,800?", "answer": "This includes professional video setup, custom plugin installation, consulting, and studio-style layout work. Each platform is built with care to ensure it meets professional network standards." },
+        { "question": "Do I own my website and content?", "answer": "Yes. You fully own your site and all content. Unlike platforms that charge monthly fees and hold your content hostage, your platform is built for you to own and operate independently forever." },
+        { "question": "Do you provide hosting or domains?", "answer": "No, but we assist with setup and provide recommendations for reliable hosting providers. This keeps you in control of your infrastructure and costs." },
+        { "question": "Do you host videos?", "answer": "No, we connect your videos using professional players or platforms like Bunny.net. This gives you flexibility and control over your video hosting costs and performance." },
+        { "question": "What if I don't have thumbnails or artwork?", "answer": "Thumbnail and artwork creation is available as an add-on service. We can create professional thumbnails, show artwork, and promotional graphics that match your brand." },
+        { "question": "What do I need for consulting calls?", "answer": "Consulting calls must be attended on a desktop or laptop browser for optimal screen sharing. Mobile devices and tablets are not supported for these sessions." }
+      ]
+    },
+    
+    "policies": {
+      "id": "msc-policies",
+      "badge": "Policies",
+      "title": "Policies & Requirements",
+      "description": "To begin your Studio Channel project, please review the following policies. Understanding these ensures a smooth, on-schedule build from start to launch.",
+      "items": [
+        { "title": "Signed Agreement Required", "description": "A signed agreement is required before project commencement. This protects both you and our team and ensures all terms are clearly understood before work begins." },
+        { "title": "Payment via PayPal Only", "description": "Payment is accepted via PayPal only. A 50% non-refundable deposit is required to begin work. The remaining balance is paid in two installments: 25% mid-project and 25% prior to launch." },
+        { "title": "Materials Submitted Before Work Begins", "description": "All required content, assets, and materials must be submitted before your project can begin. Delays in submission may impact your project timeline." },
+        { "title": "Client Responsibility for Accuracy", "description": "Clients are responsible for providing accurate and complete materials, including text, images, video links, and branding elements." },
+        { "title": "Revisions Are Package-Based", "description": "Revisions are limited to the terms of the selected package. Additional revisions beyond what is included may require an additional fee." },
+        { "title": "Consulting Calls on Desktop Only", "description": "Consulting calls must be attended on a desktop or laptop using a web browser. Mobile devices and tablets are not supported for screen sharing sessions." },
+        { "title": "72-Hour Response Window", "description": "All communication and approvals must be completed within 72 hours to keep the project on schedule. Delays in response may result in adjustments to the project timeline.", "highlighted": true }
+      ]
+    },
+    
+    "contact": {
+      "id": "msc-contact",
+      "badge": "Contact",
+      "title": "Ready to Get Started?",
+      "description": "Schedule a consultation or reach out with questions — we'll walk you through the process step by step.",
+      "info": [
+        { "type": "phone", "label": "Phone", "value": "(336) 303-1658" },
+        { "type": "email", "label": "Email", "value": "Admin@MyStudioChannel.com" },
+        { "type": "calendar", "label": "Schedule", "value": "Book a consultation call" }
+      ],
+      "formFields": ["firstName", "lastName", "email", "subject", "message"]
+    },
+    
+    "footer": {
+      "id": "msc-footer",
+      "tagline": "Build a platform you own, control, and grow — without relying on social media platforms.",
+      "links": {
+        "company": ["About", "Services", "Packages", "Demos"],
+        "resources": ["FAQ", "Testimonials", "Contact"],
+        "legal": ["Privacy Policy", "Terms of Service"]
+      },
+      "copyright": "My Studio Channel. All rights reserved."
+    }
+  },
+  
+  "images": [
+    "msc-icon.png",
+    "tv-wall.jpg",
+    "show-cards.jpg",
+    "on-air.jpg",
+    "creator-solo.jpg",
+    "what-we-do.jpg",
+    "own-platform.jpg",
+    "podcast.jpg",
+    "msc-background.jpg",
+    "on-air-bg.jpg",
+    "creator-in-mind.jpg",
+    "camera-crew.jpg",
+    "demo-talkshow.jpg",
+    "demo-cooking.jpg",
+    "demo-podcast.jpg",
+    "demo-documentary.jpg"
+  ]
+}

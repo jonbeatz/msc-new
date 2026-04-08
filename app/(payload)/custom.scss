@@ -1,0 +1,23 @@
+/* Optional: Payload admin theme overrides */
+
+.msc-payload-nav-logout {
+  margin: 0.75rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--theme-elevation-150);
+}
+
+.msc-payload-nav-logout__link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--theme-text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.msc-payload-nav-logout__link:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}

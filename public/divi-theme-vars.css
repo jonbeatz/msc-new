@@ -1,0 +1,378 @@
+/**
+ * MY STUDIO CHANNEL - Divi 4 Theme Variables
+ * ==========================================
+ * 
+ * Copy these CSS custom properties into your Divi Theme Options > Custom CSS
+ * or create a child theme and include this file.
+ * 
+ * These variables use standard hex/rgba colors for full WordPress compatibility.
+ */
+
+:root {
+  /* ===== BRAND COLORS ===== */
+  --msc-gold: #F5B841;
+  --msc-gold-hover: #D9A438;
+  --msc-gold-light: rgba(245, 184, 65, 0.2);
+  --msc-gold-glow: rgba(245, 184, 65, 0.35);
+  
+  /* ===== BACKGROUND SURFACES ===== */
+  --msc-bg-darkest: #191919;      /* Body background */
+  --msc-bg-dark: #1F1F1F;         /* Section backgrounds */
+  --msc-bg-card: #262626;         /* Card backgrounds */
+  --msc-bg-elevated: #2D2D2D;     /* Elevated elements */
+  --msc-bg-input: #2D2D2D;        /* Form inputs */
+  
+  /* ===== TEXT COLORS ===== */
+  --msc-text-primary: #F2F2F2;    /* Main headings, body text */
+  --msc-text-secondary: #A3A3A3;  /* Muted text, descriptions */
+  --msc-text-accent: #F5B841;     /* Gold accent text */
+  --msc-text-dark: #191919;       /* Text on light backgrounds */
+  
+  /* ===== BORDER COLORS ===== */
+  --msc-border: rgba(64, 64, 64, 0.5);
+  --msc-border-accent: rgba(245, 184, 65, 0.3);
+  --msc-border-hover: rgba(80, 80, 80, 1);
+  
+  /* ===== GRADIENTS ===== */
+  --msc-gradient-section: linear-gradient(180deg, #191919 0%, #1F1F1F 100%);
+  --msc-gradient-card: linear-gradient(145deg, #262626 0%, #1F1F1F 100%);
+  --msc-gradient-hero: linear-gradient(135deg, #191919 0%, #262626 50%, #191919 100%);
+  --msc-gradient-gold: linear-gradient(135deg, #F5B841 0%, #D9A438 100%);
+  
+  /* ===== SHADOWS ===== */
+  --msc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --msc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --msc-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --msc-shadow-glow: 0 0 20px rgba(245, 184, 65, 0.35), 0 0 40px rgba(245, 184, 65, 0.12);
+  
+  /* ===== TYPOGRAPHY ===== */
+  --msc-font-primary: 'Montserrat', sans-serif;
+  --msc-font-size-xs: 0.75rem;    /* 12px */
+  --msc-font-size-sm: 0.875rem;   /* 14px */
+  --msc-font-size-base: 1rem;     /* 16px */
+  --msc-font-size-lg: 1.125rem;   /* 18px */
+  --msc-font-size-xl: 1.25rem;    /* 20px */
+  --msc-font-size-2xl: 1.5rem;    /* 24px */
+  --msc-font-size-3xl: 1.875rem;  /* 30px */
+  --msc-font-size-4xl: 2.25rem;   /* 36px */
+  --msc-font-size-5xl: 3rem;      /* 48px */
+  --msc-font-size-6xl: 3.75rem;   /* 60px */
+  
+  /* ===== SPACING ===== */
+  --msc-section-padding-y: 6rem;
+  --msc-section-padding-x: 1.5rem;
+  --msc-container-max: 1280px;
+  --msc-gap-sm: 1rem;
+  --msc-gap-md: 1.5rem;
+  --msc-gap-lg: 2rem;
+  --msc-gap-xl: 3rem;
+  
+  /* ===== BORDER RADIUS ===== */
+  --msc-radius-sm: 0.375rem;      /* 6px */
+  --msc-radius-md: 0.5rem;        /* 8px */
+  --msc-radius-lg: 0.75rem;       /* 12px */
+  --msc-radius-xl: 1rem;          /* 16px */
+  --msc-radius-2xl: 1.5rem;       /* 24px */
+  --msc-radius-full: 9999px;
+  
+  /* ===== TRANSITIONS ===== */
+  --msc-transition-fast: 150ms ease;
+  --msc-transition-base: 300ms ease;
+  --msc-transition-slow: 500ms ease;
+}
+
+/* ===== DIVI MODULE OVERRIDES ===== */
+
+/* Body Background */
+body,
+#page-container {
+  background-color: var(--msc-bg-darkest) !important;
+  color: var(--msc-text-primary) !important;
+  font-family: var(--msc-font-primary) !important;
+}
+
+/* Sections */
+.et_pb_section {
+  background-color: var(--msc-bg-dark);
+  padding: var(--msc-section-padding-y) var(--msc-section-padding-x);
+}
+
+.et_pb_section.msc-surface-0 { background-color: var(--msc-bg-darkest); }
+.et_pb_section.msc-surface-1 { background-color: var(--msc-bg-dark); }
+.et_pb_section.msc-surface-2 { background-color: var(--msc-bg-card); }
+
+/* Rows */
+.et_pb_row {
+  max-width: var(--msc-container-max);
+  padding: 0;
+}
+
+/* Text Modules */
+.et_pb_text h1,
+.et_pb_text h2,
+.et_pb_text h3,
+.et_pb_text h4,
+.et_pb_text h5,
+.et_pb_text h6 {
+  color: var(--msc-text-primary) !important;
+  font-family: var(--msc-font-primary) !important;
+}
+
+.et_pb_text p,
+.et_pb_text li {
+  color: var(--msc-text-secondary) !important;
+}
+
+/* Blurbs */
+.et_pb_blurb_container h4 {
+  color: var(--msc-text-primary) !important;
+}
+
+.et_pb_blurb_container p {
+  color: var(--msc-text-secondary) !important;
+}
+
+/* Buttons */
+.et_pb_button {
+  background-color: var(--msc-gold) !important;
+  color: var(--msc-text-dark) !important;
+  border: none !important;
+  border-radius: var(--msc-radius-lg) !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: var(--msc-transition-base) !important;
+}
+
+.et_pb_button:hover {
+  background-color: var(--msc-gold-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--msc-shadow-glow);
+}
+
+/* Secondary/Outline Buttons */
+.et_pb_button.msc-btn-outline {
+  background-color: transparent !important;
+  border: 1px solid var(--msc-border) !important;
+  color: var(--msc-text-primary) !important;
+}
+
+.et_pb_button.msc-btn-outline:hover {
+  border-color: var(--msc-text-primary) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Cards / Glass Effect */
+.msc-glass-card {
+  background: rgba(38, 38, 38, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--msc-border);
+  border-radius: var(--msc-radius-xl);
+  padding: var(--msc-gap-lg);
+  transition: var(--msc-transition-base);
+}
+
+.msc-glass-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--msc-border-hover);
+}
+
+/* Bento Grid Cards */
+.msc-bento-card {
+  background: var(--msc-bg-card);
+  border: 1px solid var(--msc-border);
+  border-radius: var(--msc-radius-2xl);
+  overflow: hidden;
+  transition: var(--msc-transition-base);
+}
+
+.msc-bento-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--msc-border-hover);
+}
+
+/* Accent Badge */
+.msc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--msc-gold-light);
+  border: 1px solid var(--msc-border-accent);
+  border-radius: var(--msc-radius-full);
+  color: var(--msc-gold);
+  font-size: var(--msc-font-size-sm);
+  font-weight: 500;
+}
+
+/* Accent Text */
+.msc-text-accent {
+  color: var(--msc-gold) !important;
+}
+
+/* Glow Effect */
+.msc-glow {
+  box-shadow: var(--msc-shadow-glow);
+}
+
+/* Image Overlays */
+.msc-image-overlay {
+  position: relative;
+}
+
+.msc-image-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(25, 25, 25, 0.8) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Forms */
+.et_pb_contact_form input,
+.et_pb_contact_form textarea,
+.et_pb_newsletter_form input {
+  background-color: var(--msc-bg-input) !important;
+  border: 1px solid var(--msc-border) !important;
+  border-radius: var(--msc-radius-lg) !important;
+  color: var(--msc-text-primary) !important;
+  padding: 1rem !important;
+}
+
+.et_pb_contact_form input:focus,
+.et_pb_contact_form textarea:focus {
+  border-color: var(--msc-gold) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--msc-gold-light) !important;
+}
+
+/* Accordions */
+.et_pb_accordion .et_pb_toggle_title {
+  color: var(--msc-text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.et_pb_accordion .et_pb_toggle_content {
+  color: var(--msc-text-secondary) !important;
+}
+
+.et_pb_accordion .et_pb_toggle {
+  background: var(--msc-bg-card) !important;
+  border: 1px solid var(--msc-border) !important;
+  border-radius: var(--msc-radius-lg) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Testimonials */
+.et_pb_testimonial {
+  background: var(--msc-bg-card) !important;
+  border: 1px solid var(--msc-border) !important;
+  border-radius: var(--msc-radius-xl) !important;
+}
+
+.et_pb_testimonial_description p {
+  color: var(--msc-text-secondary) !important;
+}
+
+.et_pb_testimonial_author {
+  color: var(--msc-text-primary) !important;
+}
+
+/* Pricing Tables */
+.et_pb_pricing_table {
+  background: var(--msc-bg-card) !important;
+  border: 1px solid var(--msc-border) !important;
+  border-radius: var(--msc-radius-xl) !important;
+}
+
+.et_pb_pricing_heading h2 {
+  color: var(--msc-text-primary) !important;
+}
+
+.et_pb_pricing_table .et_pb_sum {
+  color: var(--msc-gold) !important;
+}
+
+.et_pb_pricing_table.msc-featured {
+  border-color: var(--msc-gold) !important;
+  box-shadow: var(--msc-shadow-glow);
+}
+
+/* Dividers */
+.et_pb_divider::before {
+  border-color: var(--msc-border) !important;
+}
+
+/* Footer */
+#main-footer {
+  background-color: var(--msc-bg-darkest) !important;
+  border-top: 1px solid var(--msc-border);
+}
+
+#footer-widgets .footer-widget h4 {
+  color: var(--msc-text-primary) !important;
+}
+
+#footer-widgets .footer-widget a {
+  color: var(--msc-text-secondary) !important;
+}
+
+#footer-widgets .footer-widget a:hover {
+  color: var(--msc-gold) !important;
+}
+
+/* Header */
+#main-header {
+  background: rgba(25, 25, 25, 0.95) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--msc-border);
+}
+
+#et-top-navigation a {
+  color: var(--msc-text-primary) !important;
+}
+
+#et-top-navigation a:hover {
+  color: var(--msc-gold) !important;
+}
+
+/* Scroll Animations */
+@keyframes msc-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.msc-animate-fade-up {
+  animation: msc-fade-up 0.6s ease forwards;
+}
+
+/* Selection Color */
+::selection {
+  background: var(--msc-gold-light);
+  color: var(--msc-text-dark);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--msc-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--msc-border-hover);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--msc-text-secondary);
+}
