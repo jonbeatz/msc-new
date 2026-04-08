@@ -56,6 +56,7 @@ export async function getHomepageCmsData(): Promise<{
       heroSlides.push({
         image: normalizeMediaSrc(url),
         alt,
+        isActive: row.isActive !== false,
         eyebrow:
           typeof row.eyebrow === "string" ? row.eyebrow : "",
         headline: [h1, h2, h3],

@@ -11,6 +11,7 @@ const defaultSlides: HeroSlideContent[] = [
   {
     image: "/images/tv-wall.jpg",
     alt: "Professional multi-screen TV studio wall",
+    isActive: true,
     eyebrow: "For Creators Who Want More",
     headline: ["Your Content.", "Your Channel.", "Your Studio."],
     sub: "We build studio-style websites that give creators the look and structure of a major network — powered by a custom plugin, built once and owned by you.",
@@ -18,6 +19,7 @@ const defaultSlides: HeroSlideContent[] = [
   {
     image: "/images/show-cards.jpg",
     alt: "Netflix-style show cards",
+    isActive: true,
     eyebrow: "Look Like a Real Network",
     headline: ["Your Shows.", "Your Brand.", "Your Network."],
     sub: "Your platform can be organized like a professional streaming network — with structured shows, episodes, and categories that rival any major broadcaster.",
@@ -25,6 +27,7 @@ const defaultSlides: HeroSlideContent[] = [
   {
     image: "/images/on-air.jpg",
     alt: "Creator on air",
+    isActive: true,
     eyebrow: "Podcasters & Talk Show Hosts",
     headline: ["Your Voice.", "Your Platform.", "Your Audience."],
     sub: "Launch your podcast or talk show with a professional-grade platform that rivals any major network — without monthly platform fees or subscriber charges.",
@@ -32,6 +35,7 @@ const defaultSlides: HeroSlideContent[] = [
   {
     image: "/images/creator-solo.jpg",
     alt: "Creator with professional cinema camera in studio",
+    isActive: true,
     eyebrow: "Built for Every Creator",
     headline: ["Your Vision.", "Your Platform.", "Your Legacy."],
     sub: "Showcase your productions on a cinema-quality platform built to present your work exactly the way you intend it to be experienced.",
@@ -51,10 +55,13 @@ type HeroSectionProps = {
 }
 
 export function HeroSection({ cmsSlides, cmsStats }: HeroSectionProps) {
-  const slides = useMemo(
-    () =>
-      cmsSlides && cmsSlides.length > 0 ? cmsSlides : defaultSlides,
+  const activeCmsSlides = useMemo(
+    () => (cmsSlides ? cmsSlides.filter((s) => s.isActive) : null),
     [cmsSlides],
+  )
+  const slides = useMemo(
+    () => (cmsSlides ? activeCmsSlides ?? [] : defaultSlides),
+    [activeCmsSlides, cmsSlides],
   )
   const stats = useMemo(
     () =>
@@ -84,6 +91,10 @@ export function HeroSection({ cmsSlides, cmsStats }: HeroSectionProps) {
   const next = useCallback(() => {
     goTo((current + 1) % slides.length)
   }, [current, goTo, slides.length])
+
+  if (slides.length === 0) {
+    return null
+  }
 
   const slide = slides[current]
 

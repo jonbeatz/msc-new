@@ -3,6 +3,7 @@
 export type HeroSlideContent = {
   image: string
   alt: string
+  isActive: boolean
   eyebrow: string
   headline: [string, string, string]
   sub: string

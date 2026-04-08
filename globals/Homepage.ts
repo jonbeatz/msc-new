@@ -24,6 +24,12 @@ export const Homepage: GlobalConfig = {
       labels: { singular: "Hero slide", plural: "Hero slides" },
       fields: [
         {
+          name: "isActive",
+          label: "Active",
+          type: "checkbox",
+          defaultValue: true,
+        },
+        {
           name: "image",
           type: "upload",
           relationTo: "media",
