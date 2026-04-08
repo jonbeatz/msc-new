@@ -1,7 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ArrowRight, Mail, Phone, Calendar, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -59,21 +59,32 @@ function toLocalDateKey(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
 }
 
+function generateTempPassword(): string {
+  return `msc_${Math.random().toString(36).slice(2, 10)}_${Date.now()}`
+}
+
 
 export function ContactSection() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false)
+  const [newsletterEmail, setNewsletterEmail] = useState("")
+  const [newsletterError, setNewsletterError] = useState<string | null>(null)
+  const [newsletterSuccess, setNewsletterSuccess] = useState<string | null>(null)
+  const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [preferredTime, setPreferredTime] = useState<string>("")
   const [timeDropdownOpen, setTimeDropdownOpen] = useState(false)
   const [scheduleError, setScheduleError] = useState<string | null>(null)
   const [scheduleSuccess, setScheduleSuccess] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [verificationToast, setVerificationToast] = useState<{
+    tone: "success" | "error"
+    message: string
+  } | null>(null)
 
   function openModal() {
     setScheduleError(null)
     setIsOpen(true)
-    // prevent page scroll while modal open
-    document.body.style.overflow = "hidden"
   }
 
   function closeModal() {
@@ -81,7 +92,92 @@ export function ContactSection() {
     setSelectedDate(undefined)
     setPreferredTime("")
     setScheduleError(null)
-    document.body.style.overflow = ""
+  }
+
+  function openNewsletterModal() {
+    setNewsletterError(null)
+    setNewsletterSuccess(null)
+    setIsNewsletterOpen(true)
+  }
+
+  function closeNewsletterModal() {
+    setIsNewsletterOpen(false)
+    setNewsletterError(null)
+    setNewsletterEmail("")
+  }
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen || isNewsletterOpen ? "hidden" : ""
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [isOpen, isNewsletterOpen])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const currentURL = new URL(window.location.href)
+    const verified = currentURL.searchParams.get("verified")
+    if (verified !== "success" && verified !== "error") return
+
+    setVerificationToast({
+      tone: verified,
+      message:
+        verified === "success"
+          ? "Email verified successfully. You are all set."
+          : "Verification link is invalid or expired. Please sign up again.",
+    })
+
+    currentURL.searchParams.delete("verified")
+    const nextURL = `${currentURL.pathname}${currentURL.search}${currentURL.hash}`
+    window.history.replaceState({}, "", nextURL)
+
+    const timeout = setTimeout(() => setVerificationToast(null), 4500)
+    return () => clearTimeout(timeout)
+  }, [])
+
+  async function handleNewsletterSubmit() {
+    const email = newsletterEmail.trim().toLowerCase()
+    if (!email) {
+      setNewsletterError("Please enter your email address.")
+      return
+    }
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    if (!isValid) {
+      setNewsletterError("Please enter a valid email address.")
+      return
+    }
+
+    setNewsletterError(null)
+    setIsNewsletterSubmitting(true)
+    try {
+      const base =
+        typeof window !== "undefined"
+          ? ""
+          : process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
+      const res = await fetch(`${base}/api/leads`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password: generateTempPassword(),
+          source: "homepage",
+        }),
+      })
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "")
+        setNewsletterError(text || "Signup failed. Please try again.")
+        return
+      }
+
+      setNewsletterSuccess("Check your inbox to verify your email!")
+      closeNewsletterModal()
+    } catch {
+      setNewsletterError("Something went wrong. Please try again.")
+    } finally {
+      setIsNewsletterSubmitting(false)
+    }
   }
 
   const selectedDateKey = selectedDate ? toLocalDateKey(selectedDate) : null
@@ -186,16 +282,23 @@ export function ContactSection() {
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
 
-              <p className="mt-3 text-xs text-muted-foreground">
-                Need direct booking?{" "}
-                <a href={SCHEDULE_CALL_URL} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                  Open external link
-                </a>
-              </p>
+              <button
+                type="button"
+                onClick={openNewsletterModal}
+                className="mt-3 w-full bg-secondary/50 text-foreground hover:bg-secondary/80 border border-border/50 h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                Stay in the Loop
+                <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
 
               {scheduleSuccess && (
                 <p className="mt-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-xs text-accent">
                   {scheduleSuccess}
+                </p>
+              )}
+              {newsletterSuccess && (
+                <p className="mt-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-center text-xs text-accent">
+                  {newsletterSuccess}
                 </p>
               )}
             </div>
@@ -396,6 +499,95 @@ export function ContactSection() {
                 {isSubmitting ? "Saving..." : "Continue"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== NEWSLETTER LIGHTBOX (matches scheduler styling) ===== */}
+      {isNewsletterOpen && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 9999, backgroundColor: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}
+          onClick={(e) => { if (e.target === e.currentTarget) closeNewsletterModal() }}
+        >
+          <div
+            style={{ background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "1rem", padding: "1.5rem", width: "100%", maxWidth: "520px", maxHeight: "90vh", overflowY: "auto", position: "relative" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+              <div>
+                <h2 style={{ color: "#f5f5f5", fontWeight: 700, fontSize: "1.1rem", margin: 0 }}>Stay in the Loop</h2>
+              </div>
+              <button
+                type="button"
+                onClick={closeNewsletterModal}
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "0.5rem", padding: "0.4rem", cursor: "pointer", display: "flex", alignItems: "center", color: "#aaa" }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.75rem", padding: "1rem", marginBottom: "1rem" }}>
+              <label
+                htmlFor="newsletter-email"
+                style={{ display: "block", color: "#f5f5f5", fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.5rem" }}
+              >
+                Email address
+              </label>
+              <input
+                id="newsletter-email"
+                type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="you@example.com"
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.9rem",
+                  borderRadius: "0.6rem",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: "#0f0f12",
+                  color: "#f5f5f5",
+                  fontSize: "0.9rem",
+                }}
+              />
+            </div>
+
+            {newsletterError && (
+              <p style={{ color: "#f87171", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "0.5rem", padding: "0.6rem 0.75rem", fontSize: "0.85rem", marginBottom: "1rem" }}>
+                {newsletterError}
+              </p>
+            )}
+
+            <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={closeNewsletterModal}
+                style={{ padding: "0.6rem 1.25rem", borderRadius: "0.6rem", border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "#aaa", fontSize: "0.9rem", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleNewsletterSubmit}
+                disabled={isNewsletterSubmitting}
+                style={{ padding: "0.6rem 1.5rem", borderRadius: "0.6rem", border: "none", background: "#F5B841", color: "#111", fontSize: "0.9rem", fontWeight: 700, cursor: isNewsletterSubmitting ? "wait" : "pointer", opacity: isNewsletterSubmitting ? 0.7 : 1 }}
+              >
+                {isNewsletterSubmitting ? "Saving..." : "Subscribe"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {verificationToast && (
+        <div className="fixed left-1/2 top-5 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 md:left-auto md:right-5 md:top-auto md:bottom-5 md:w-auto md:translate-x-0">
+          <div
+            className={
+              verificationToast.tone === "success"
+                ? "rounded-xl border border-[#F5B841]/45 bg-[#F5B841]/18 px-4 py-3 text-sm font-medium text-[#FFE5A3] shadow-[0_0_0_1px_rgba(245,184,65,0.18),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+                : "rounded-xl border border-[#F5B841]/30 bg-[#2A2314]/95 px-4 py-3 text-sm font-medium text-[#FFD58A] shadow-[0_0_0_1px_rgba(245,184,65,0.12),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+            }
+          >
+            {verificationToast.message}
           </div>
         </div>
       )}

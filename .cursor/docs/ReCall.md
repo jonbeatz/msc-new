@@ -291,3 +291,10 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Migration details:** One-time temp scripts seeded/relinked the 4 original hero slides and preserved the existing custom slide; temp scripts deleted after run.
 - **Note:** Source images are in `public/images` (`tv-wall.jpg`, `show-cards.jpg`, `on-air.jpg`, `creator-solo.jpg`) and now represented in `Media`.
 
+### 2026-04-08 — Resend verify flow: route + UX confirmed working
+
+- **Backend:** `collections/Leads.ts` now includes GET endpoint `leads /verify/:token` to support browser click-through from email links (with `?token=` fallback).
+- **Email:** verification HTML uses `http://localhost:3000/api/leads/verify/${token}`; token generation + send confirmed via Resend adapter in `payload.config.ts`.
+- **Frontend UX:** Added verify status toast on homepage via `?verified=success|error`, styled in site gold accent, auto-clears URL param, and appears top-center on mobile / bottom-right on desktop.
+- **Contact cleanup:** removed “Need direct booking? Open external link” helper text from the contact card; centered newsletter success text.
+

@@ -1,6 +1,7 @@
 import path from "path"
 import { buildConfig } from "payload"
 import { sqliteAdapter } from "@payloadcms/db-sqlite"
+import { resendAdapter } from "@payloadcms/email-resend"
 import { lexicalEditor } from "@payloadcms/richtext-lexical"
 import sharp from "sharp"
 
@@ -14,6 +15,11 @@ import { SiteSettings } from "./globals/SiteSettings"
 const sqliteUrl = process.env.DATABASE_URL || "file:./payload.sqlite"
 
 export default buildConfig({
+  email: resendAdapter({
+    apiKey: process.env.RESEND_API_KEY || "",
+    defaultFromAddress: "onboarding@resend.dev",
+    defaultFromName: "My Studio Channel",
+  }),
   admin: {
     user: Users.slug,
     // Lock admin to dark UI (no light / system toggle).

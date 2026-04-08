@@ -136,7 +136,8 @@ Admin sidebar group **Site**:
 - **`users`** — admin auth (Payload default).
 - **`media`** — uploads (`sharp`); hero and future sections pick files here.
 - **`bookings`** — Schedule-a-call rows (`POST /api/bookings` when env points at Payload).
-- **`leads`** — email/name captures for future newsletter or landing forms (`POST /api/leads`, public **create**; admin **read** when logged in). No front-end form wired yet.
+- **`leads`** — newsletter signups from the homepage modal (`POST /api/leads`, public **create**; admin **read** when logged in). Email verification is enabled and email is visible in admin list columns.
+- **Verification route note** — browser click-through uses a custom GET endpoint at **`/api/leads/verify/:token`** (also accepts `?token=` fallback), then redirects to **`/?verified=success`** or **`/?verified=error`**.
 
 **Globals**
 
@@ -156,6 +157,8 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **Dual document shells** — marketing shell in `app/(site)/layout.tsx`; Payload `RootLayout` for `/admin`; **passthrough** `app/layout.tsx` (`return children`) required or dev returns 500 on `/` and `/admin`. |
 | 2026-04-08 | **Payload admin UX + hydration** — `afterNavLinks` “Log out” link (`msc-payload-nav-logout.tsx`); `patch-package` on `@payloadcms/next` so `suppressHydrationWarning` applies to `<html>` (after `htmlProps`) and `<body>`; extensions on `localhost` documented as common false-positive source. |
 | 2026-04-08 | **CMS globals + Leads** — `Homepage` + `Site settings` globals; hero + metadata wired from Payload; **`leads`** collection; restore checkpoint **RP-2026-04-08-cms-globals** in [Restore-Points.md](./Restore-Points.md). |
+| 2026-04-08 | **Leads verify click-through fix** — added GET endpoint `leads /verify/:token` for browser email links and redirect to `/?verified=success|error`; keeps verification URL aligned with real route behavior. |
+| 2026-04-08 | **Newsletter verification UX polish** — homepage now shows a gold-themed verify status toast (`?verified=success|error`) with top-center placement on mobile; removed “Need direct booking? Open external link” line from the contact card for cleaner CTA focus. |
 
 ---
 
