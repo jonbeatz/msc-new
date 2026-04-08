@@ -65,6 +65,9 @@ function generateTempPassword(): string {
 
 
 export function ContactSection() {
+  const goldNoticeClass =
+    "rounded-xl border border-[#F5B841]/45 bg-[#F5B841]/18 px-4 py-3 text-sm font-medium text-[#FFE5A3] shadow-[0_0_0_1px_rgba(245,184,65,0.18),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+
   const [isOpen, setIsOpen] = useState(false)
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false)
   const [newsletterEmail, setNewsletterEmail] = useState("")
@@ -276,7 +279,7 @@ export function ContactSection() {
               <button
                 type="button"
                 onClick={openModal}
-                className="mt-6 sm:mt-8 w-full bg-accent text-black hover:opacity-90 h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 glow-accent-sm"
+                className="mt-6 sm:mt-8 w-full cursor-pointer bg-accent text-black hover:opacity-90 h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 glow-accent-sm"
               >
                 Schedule a Call
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -285,7 +288,7 @@ export function ContactSection() {
               <button
                 type="button"
                 onClick={openNewsletterModal}
-                className="mt-3 w-full bg-secondary/50 text-foreground hover:bg-secondary/80 border border-border/50 h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                className="mt-3 w-full cursor-pointer bg-secondary/50 text-foreground hover:bg-secondary/80 border border-border/50 h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
               >
                 Stay in the Loop
                 <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -297,7 +300,7 @@ export function ContactSection() {
                 </p>
               )}
               {newsletterSuccess && (
-                <p className="mt-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-center text-xs text-accent">
+                <p className={`mt-3 text-center ${goldNoticeClass}`}>
                   {newsletterSuccess}
                 </p>
               )}
@@ -580,13 +583,7 @@ export function ContactSection() {
 
       {verificationToast && (
         <div className="fixed left-1/2 top-5 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 md:left-auto md:right-5 md:top-auto md:bottom-5 md:w-auto md:translate-x-0">
-          <div
-            className={
-              verificationToast.tone === "success"
-                ? "rounded-xl border border-[#F5B841]/45 bg-[#F5B841]/18 px-4 py-3 text-sm font-medium text-[#FFE5A3] shadow-[0_0_0_1px_rgba(245,184,65,0.18),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
-                : "rounded-xl border border-[#F5B841]/30 bg-[#2A2314]/95 px-4 py-3 text-sm font-medium text-[#FFD58A] shadow-[0_0_0_1px_rgba(245,184,65,0.12),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
-            }
-          >
+          <div className={goldNoticeClass}>
             {verificationToast.message}
           </div>
         </div>

@@ -159,6 +159,7 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **CMS globals + Leads** — `Homepage` + `Site settings` globals; hero + metadata wired from Payload; **`leads`** collection; restore checkpoint **RP-2026-04-08-cms-globals** in [Restore-Points.md](./Restore-Points.md). |
 | 2026-04-08 | **Leads verify click-through fix** — added GET endpoint `leads /verify/:token` for browser email links and redirect to `/?verified=success|error`; keeps verification URL aligned with real route behavior. |
 | 2026-04-08 | **Newsletter verification UX polish** — homepage now shows a gold-themed verify status toast (`?verified=success|error`) with top-center placement on mobile; removed “Need direct booking? Open external link” line from the contact card for cleaner CTA focus. |
+| 2026-04-08 | **Newsletter engine final polish** — unified newsletter success pill + verify toast to the same gold token set for visual consistency; ensured CTA hover states show pointer cursor for `Schedule a Call` and `Stay in the Loop`. |
 
 ---
 

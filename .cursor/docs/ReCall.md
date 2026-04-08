@@ -298,3 +298,9 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Frontend UX:** Added verify status toast on homepage via `?verified=success|error`, styled in site gold accent, auto-clears URL param, and appears top-center on mobile / bottom-right on desktop.
 - **Contact cleanup:** removed “Need direct booking? Open external link” helper text from the contact card; centered newsletter success text.
 
+### 2026-04-08 — Newsletter engine final UI polish
+
+- **Consistency:** unified the newsletter success pill and verify toast to one shared gold token set in `components/contact-section.tsx`.
+- **Affordance:** added `cursor-pointer` hover state on `Schedule a Call` and `Stay in the Loop` buttons for clearer clickability.
+- **Status:** newsletter verification loop considered complete for current local scope.
+
