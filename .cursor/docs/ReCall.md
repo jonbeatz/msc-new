@@ -69,6 +69,12 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-08 — Session closeout (goodbye sequence)
+
+- **Restore branch:** **`msc-new-payload-polished-v3`** on `origin` (checkpoint commit **`c751c92`**); includes marketing nav / Demos scroll / scroll-to-top / docs work (**`145f226`** in history).
+- **Resume:** `git checkout msc-new-payload-polished-v3 && git pull` → **`npm run dev:payload`** → **`http://localhost:3000/`** and **`/admin`** as needed; read **ReCall** + **Development.md** first.
+- **Dev listener:** Goodbye step stopped **`node.exe`** that was **LISTENING on port 3000** (PID 14268). Re-run **`netstat -ano | findstr ":3000"`** after other sessions if a port looks busy.
+
 ### 2026-04-08 — Marketing home: nav anchors, Demos scroll, scroll-to-top, docs
 
 - **Header defaults (`globals/Header.ts`, `lib/cms/header.ts`):** Services submenu ends with **What We Do** → `#msc-creators`; order above it is Own Your Platform, Packages, Requirements. Resources: Testimonials → **Extras** → `#msc-addons`, then FAQ → `#msc-faq`.
