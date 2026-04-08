@@ -310,3 +310,10 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Behavior:** parses API error payload safely, falls back to generic error text when needed.
 - **File:** `components/contact-section.tsx`.
 
+### 2026-04-08 — Homepage hero slide SEO connected to metadata
+
+- **Admin UX:** added a dedicated `seo` group in each `Homepage.heroSlides` row (`title`, `description`, `OpenGraph image`) so legacy/global slides can be edited in-place.
+- **Frontend SEO:** `app/(site)/layout.tsx` `generateMetadata` now uses the active hero slide SEO first, then falls back to slide content and `Site settings`.
+- **Social tags:** OpenGraph + Twitter metadata now mirror the same active-slide SEO values.
+- **Helper:** new `getHomepageActiveSlideSeo()` in `lib/cms/homepage.ts`.
+

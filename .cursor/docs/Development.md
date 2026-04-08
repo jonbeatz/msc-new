@@ -141,7 +141,7 @@ Admin sidebar group **Site**:
 
 **Globals**
 
-- **`homepage`** — hero slides + optional stats (see above).
+- **`homepage`** — hero slides + optional stats (see above). Each slide now includes a per-slide `seo` group (`title`, `description`, `OpenGraph image`) for metadata control directly in the Homepage screen.
 - **`site-settings`** — site name + tagline for SEO metadata.
 
 ---
@@ -161,6 +161,7 @@ Admin sidebar group **Site**:
 | 2026-04-08 | **Newsletter verification UX polish** — homepage now shows a gold-themed verify status toast (`?verified=success|error`) with top-center placement on mobile; removed “Need direct booking? Open external link” line from the contact card for cleaner CTA focus. |
 | 2026-04-08 | **Newsletter engine final polish** — unified newsletter success pill + verify toast to the same gold token set for visual consistency; ensured CTA hover states show pointer cursor for `Schedule a Call` and `Stay in the Loop`. |
 | 2026-04-08 | **Duplicate signup UX fix** — newsletter modal now handles Payload duplicate-email validation gracefully and shows a friendly “already subscribed” message instead of raw JSON error payloads. |
+| 2026-04-08 | **Homepage slide SEO wiring** — added per-slide SEO group in `Homepage.heroSlides`; `generateMetadata` now reads the active slide’s SEO title/description/image (with fallback to slide content + Site settings), and outputs OpenGraph/Twitter metadata automatically. |
 
 ---
 

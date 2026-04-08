@@ -15,6 +15,7 @@
     "@payloadcms/db-sqlite": "^3.81.0",
     "@payloadcms/email-resend": "^3.81.0",
     "@payloadcms/next": "^3.81.0",
+    "@payloadcms/plugin-seo": "^3.81.0",
     "@payloadcms/richtext-lexical": "^3.81.0",
     "@radix-ui/react-accordion": "1.2.12",
     "@radix-ui/react-alert-dialog": "1.1.15",

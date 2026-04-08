@@ -125,3 +125,4 @@ Remove Payload, restore **`output: 'export'`**, and use **headless WordPress** o
 | 2026-04-08 | **Payload Phase A** — integrated in-repo (`withPayload`, `(payload)` routes, SQLite, `bookings`, booking POST); static export removed. |
 | 2026-04-08 | **Admin ops** — documented visible sidebar “Log out”, `/admin/logout`, import map path, and extension-related hydration troubleshooting (see Development.md). |
 | 2026-04-08 | **Homepage in CMS** — globals for hero + site SEO; **Leads** collection; [Restore-Points.md](./Restore-Points.md) checkpoint **RP-2026-04-08-cms-globals**. |
+| 2026-04-08 | **SEO expansion** — official SEO plugin enabled for `pages` and `hero-slides`; legacy `Homepage.heroSlides` rows now include a direct SEO group, and site metadata follows the active slide’s SEO values (including OG/Twitter image). |

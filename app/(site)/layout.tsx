@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "../globals.css"
 import { getSiteSettingsCms } from "@/lib/cms/site-settings"
+import { getHomepageActiveSlideSeo } from "@/lib/cms/homepage"
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -13,19 +14,37 @@ const montserrat = Montserrat({
 const defaultTitle = "My Studio Channel | Professional Creator Platforms"
 const defaultDescription =
   "We build studio-style websites that give creators the look and structure of a major network—powered by a custom plugin and professional video setup."
+const metadataBaseURL =
+  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettingsCms()
-  if (!settings) {
-    return {
-      title: defaultTitle,
-      description: defaultDescription,
-      generator: "v0.app",
-    }
-  }
+  const [settings, slideSeo] = await Promise.all([
+    getSiteSettingsCms(),
+    getHomepageActiveSlideSeo(),
+  ])
+
+  const siteName = settings?.siteName || "My Studio Channel"
+  const titleFromSlide = slideSeo?.title
+    ? `${slideSeo.title} | ${siteName}`
+    : `${siteName} | Professional Creator Platforms`
+  const descriptionFromSlide =
+    slideSeo?.description || settings?.tagline || defaultDescription
+
   return {
-    title: `${settings.siteName} | Professional Creator Platforms`,
-    description: settings.tagline ?? defaultDescription,
+    metadataBase: new URL(metadataBaseURL),
+    title: titleFromSlide,
+    description: descriptionFromSlide,
+    openGraph: {
+      title: titleFromSlide,
+      description: descriptionFromSlide,
+      images: slideSeo?.image ? [slideSeo.image] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titleFromSlide,
+      description: descriptionFromSlide,
+      images: slideSeo?.image ? [slideSeo.image] : undefined,
+    },
     generator: "v0.app",
   }
 }

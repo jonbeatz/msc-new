@@ -7,6 +7,11 @@ export type HeroSlideContent = {
   eyebrow: string
   headline: [string, string, string]
   sub: string
+  seo?: {
+    title?: string
+    description?: string
+    image?: string
+  }
 }
 
 export type HeroStatContent = {

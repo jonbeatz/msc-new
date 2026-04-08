@@ -60,6 +60,43 @@ export const Homepage: GlobalConfig = {
           type: "textarea",
           required: true,
         },
+        {
+          name: "seo",
+          label: "SEO",
+          type: "group",
+          admin: {
+            description:
+              "Per-slide SEO controls used when this slide is the active hero context.",
+          },
+          fields: [
+            {
+              name: "title",
+              type: "text",
+              admin: {
+                description:
+                  "Suggested title for this slide. Leave blank to fall back to Headline line 1.",
+              },
+            },
+            {
+              name: "description",
+              type: "textarea",
+              admin: {
+                description:
+                  "Suggested meta description. Leave blank to fall back to Sub text.",
+              },
+            },
+            {
+              name: "image",
+              label: "OpenGraph image",
+              type: "upload",
+              relationTo: "media",
+              admin: {
+                description:
+                  "Optional social share image. Leave blank to use the slide image.",
+              },
+            },
+          ],
+        },
       ],
     },
     {

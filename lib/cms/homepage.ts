@@ -5,6 +5,12 @@ import type { HeroSlideContent, HeroStatContent } from "./content-types"
 
 export type { HeroSlideContent, HeroStatContent } from "./content-types"
 
+export type HomepageActiveSlideSeo = {
+  title: string | null
+  description: string | null
+  image: string | null
+}
+
 /** Same-origin `/api/media/...` works with `next/image`; absolute only when already provided. */
 function normalizeMediaSrc(pathOrUrl: string): string {
   if (
@@ -53,6 +59,18 @@ export async function getHomepageCmsData(): Promise<{
       ) {
         continue
       }
+
+      let seoImage: string | undefined
+      if (row.seo && typeof row.seo === "object") {
+        const seoImg = (row.seo as { image?: unknown }).image
+        if (seoImg && typeof seoImg === "object" && "url" in seoImg) {
+          const seoImageUrl = (seoImg as { url?: string }).url
+          if (typeof seoImageUrl === "string" && seoImageUrl.length > 0) {
+            seoImage = normalizeMediaSrc(seoImageUrl)
+          }
+        }
+      }
+
       heroSlides.push({
         image: normalizeMediaSrc(url),
         alt,
@@ -61,6 +79,21 @@ export async function getHomepageCmsData(): Promise<{
           typeof row.eyebrow === "string" ? row.eyebrow : "",
         headline: [h1, h2, h3],
         sub: typeof row.sub === "string" ? row.sub : "",
+        seo:
+          row.seo && typeof row.seo === "object"
+            ? {
+                title:
+                  typeof (row.seo as { title?: string }).title === "string"
+                    ? (row.seo as { title: string }).title
+                    : undefined,
+                description:
+                  typeof (row.seo as { description?: string }).description ===
+                  "string"
+                    ? (row.seo as { description: string }).description
+                    : undefined,
+                image: seoImage,
+              }
+            : undefined,
       })
     }
 
@@ -86,5 +119,61 @@ export async function getHomepageCmsData(): Promise<{
     }
   } catch {
     return { heroSlides: null, heroStats: null }
+  }
+}
+
+export async function getHomepageActiveSlideSeo(): Promise<HomepageActiveSlideSeo | null> {
+  try {
+    const payload = await getPayload({ config })
+    const doc = await payload.findGlobal({
+      slug: "homepage",
+      depth: 2,
+    })
+
+    const rawSlides = Array.isArray(doc?.heroSlides) ? doc.heroSlides : []
+    const activeSlide =
+      rawSlides.find(
+        (row) => row && typeof row === "object" && row.isActive !== false
+      ) ?? null
+
+    if (!activeSlide || typeof activeSlide !== "object") return null
+
+    const seo =
+      activeSlide.seo && typeof activeSlide.seo === "object"
+        ? (activeSlide.seo as Record<string, unknown>)
+        : {}
+
+    const fallbackTitle =
+      typeof activeSlide.headlineLine1 === "string"
+        ? activeSlide.headlineLine1.trim()
+        : ""
+    const fallbackDescription =
+      typeof activeSlide.sub === "string" ? activeSlide.sub.trim() : ""
+
+    const seoImageRelation = seo.image
+    const slideImageRelation = activeSlide.image
+
+    let image: string | null = null
+    if (seoImageRelation && typeof seoImageRelation === "object" && "url" in seoImageRelation) {
+      const url = (seoImageRelation as { url?: string }).url
+      if (typeof url === "string" && url.length > 0) image = normalizeMediaSrc(url)
+    } else if (slideImageRelation && typeof slideImageRelation === "object" && "url" in slideImageRelation) {
+      const url = (slideImageRelation as { url?: string }).url
+      if (typeof url === "string" && url.length > 0) image = normalizeMediaSrc(url)
+    }
+
+    return {
+      title:
+        typeof seo.title === "string" && seo.title.trim().length > 0
+          ? seo.title.trim()
+          : fallbackTitle || null,
+      description:
+        typeof seo.description === "string" && seo.description.trim().length > 0
+          ? seo.description.trim()
+          : fallbackDescription || null,
+      image,
+    }
+  } catch {
+    return null
   }
 }

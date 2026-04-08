@@ -1,6 +1,7 @@
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
 import { getHomepageCmsData } from "@/lib/cms/homepage"
+import { getHeaderNavItems } from "@/lib/cms/header"
 import { AboutSection } from "@/components/about-section"
 import { ServicesSection } from "@/components/services-section"
 import { OwnPlatformSection } from "@/components/own-platform-section"
@@ -19,10 +20,11 @@ import { Footer } from "@/components/footer"
 
 export default async function HomePage() {
   const { heroSlides, heroStats } = await getHomepageCmsData()
+  const navItems = await getHeaderNavItems()
 
   return (
     <main className="min-h-screen bg-background">
-      <Header />
+      <Header navItems={navItems} />
       <HeroSection cmsSlides={heroSlides} cmsStats={heroStats} />
       <AboutSection />
       <ServicesSection />
