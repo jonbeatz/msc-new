@@ -80,7 +80,8 @@ Create a new restore branch from the current clean state:
 ### 2026-04-08 — Closeout checkpoint for tomorrow resume
 
 - **Pinned restore branch:** `msc-new-payload-polished-v2`
-- **Latest pushed commit:** `5cc5e20` (`docs(ReCall): add closeout checkpoint for resume on polished-v2 branch.`) — prior feature tip: `98c51c0` (`Finalize pages polish and demo flow closeout.`)
+- **App feature freeze (pages polish + demo):** `98c51c0` (`Finalize pages polish and demo flow closeout.`)
+- **Branch tip:** `git pull` on `msc-new-payload-polished-v2` — may include doc-only commits after the freeze; same runtime as freeze unless `git log` shows newer code changes.
 - **Resume sequence (low risk):**
   1. `git checkout msc-new-payload-polished-v2`
   2. `git pull`
