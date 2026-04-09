@@ -1,6 +1,8 @@
 import type { CollectionConfig } from "payload"
 import { getNotificationConfig } from "../lib/notifications"
 
+const FALLBACK_ORIGIN = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
+
 /**
  * Newsletter / interest signups (future: wire a form to POST /api/leads).
  */
@@ -11,18 +13,25 @@ export const Leads: CollectionConfig = {
       path: "/verify/:token",
       method: "get",
       handler: async (req) => {
-        const fallbackOrigin = "http://localhost:3000"
-        const currentURL = new URL(req.url ?? `${fallbackOrigin}/api/leads/verify`)
+        const requestURL = req.url
+          ? new URL(req.url, FALLBACK_ORIGIN)
+          : new URL("/api/leads/verify", FALLBACK_ORIGIN)
         const tokenFromPath =
           typeof req.routeParams?.token === "string"
             ? req.routeParams.token
             : null
-        const tokenFromQuery = currentURL.searchParams.get("token")
+        const tokenFromQuery = requestURL.searchParams.get("token")
         const token = tokenFromPath || tokenFromQuery
 
         const redirectTo = (status: "success" | "error") => {
-          const target = new URL("/?verified=" + status, currentURL.origin)
-          return Response.redirect(target, 302)
+          // Return a relative redirect so the browser keeps the current public origin.
+          // This avoids proxy/internal hosts like 0.0.0.0 leaking into Location headers.
+          return new Response(null, {
+            status: 302,
+            headers: {
+              Location: "/?verified=" + status,
+            },
+          })
         }
 
         if (!token) return redirectTo("error")
@@ -44,7 +53,7 @@ export const Leads: CollectionConfig = {
     verify: {
       generateEmailSubject: () => "Verify your email - My Studio Channel",
       generateEmailHTML: ({ token }) => {
-        const verificationURL = `http://localhost:3000/api/leads/verify/${token}`
+        const verificationURL = new URL(`/api/leads/verify/${token}`, FALLBACK_ORIGIN).toString()
         return `
 <!doctype html>
 <html>
