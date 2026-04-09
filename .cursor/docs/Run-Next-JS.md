@@ -69,6 +69,14 @@ Use this flow instead:
    - remove/replace `.next` from uploaded zip
 3. Restart Node app from panel.
 
+### cPanel operational shortcuts (session-scoped)
+
+- **Terminal** and **NodeJS Selector** links include `cpsess...` and expire after session timeout/logout.
+- Practical labels used in this project:
+  - **Terminal**: cPanel Terminal page (for `npm install`, unzip, quick checks)
+  - **ReStartIt**: NodeJS app detail page (`/applications/mystudiochannel.com`) for `RESTART` / `STOP APP` / `START APP`
+- Use **ReStartIt -> RESTART** after most code deploys. If behavior looks stale, use full bounce (`STOP APP`, wait 2-3s, then `START APP`).
+
 ---
 
 ## Historical note

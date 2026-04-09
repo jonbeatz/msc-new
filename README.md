@@ -94,5 +94,6 @@ Some shared hosts cannot run `next build` due to Wasm memory limits. In that cas
 - `.cursor/docs/Site-Plans.md` - backend/CMS planning notes
 - `.cursor/docs/Restore-Points.md` - restore checkpoints
 - `.cursor/docs/ReCall.md` - session memory log
+- `.cursor/docs/Spaceship.md` - Spaceship/cPanel deployment playbook (`PushItUP`, `PushItUPzip`, restart flow, low-memory host notes)
 
 **Hash / nav helpers:** `lib/hash-nav.ts` (normalize + pathname-aware `Link` hrefs); `components/home-hash-scroll.tsx` (scroll + single-hash URL on `/`).

@@ -56,6 +56,7 @@ Create a new restore branch from the current clean state:
 - Ask: **"Do a ReCall on this project"** to quickly summarize recent work.
 - Keep updates short and practical (what changed, why, where).
 - Add one entry per notable session.
+- For production deploy/connectivity steps on Spaceship, see **`Spaceship.md`** in this same docs folder.
 
 ---
 
@@ -69,6 +70,13 @@ Create a new restore branch from the current clean state:
 ---
 
 ## Recent changes (latest first)
+
+### 2026-04-09 — Verify email redirect fix for cPanel proxy hosts
+
+- **Issue:** verification links opened correctly on `mystudiochannel.com` but post-verify redirect could land on `https://0.0.0.0:3000/?verified=...` behind Spaceship/cPanel reverse proxy.
+- **Fix:** `collections/Leads.ts` now returns a **relative redirect** (`Location: /?verified=success|error`) from `/api/leads/verify/:token`.
+- **Result:** browser stays on public origin and homepage verify toast/badge appears as expected.
+- **Deploy note:** because host cannot reliably run `next build` (Wasm OOM), rebuild locally and upload refreshed `.next-deploy.zip` before restart.
 
 ### 2026-04-09 — Spaceship production recovery + deploy scripts
 
