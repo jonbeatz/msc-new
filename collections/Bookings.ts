@@ -141,6 +141,7 @@ export const Bookings: CollectionConfig = {
                 </p>
                 <p style="margin:6px 0;color:#d4d4dc;font-size:14px;"><strong>Phone:</strong> ${doc.phone || "Not provided"}</p>
                 <p style="margin:6px 0;color:#d4d4dc;font-size:14px;"><strong>Appointment:</strong> ${appointmentLabel}</p>
+                <p style="margin:6px 0;color:#d4d4dc;font-size:14px;"><strong>Time zone:</strong> ${doc.timeZone || "Not captured"}</p>
                 <p style="margin:12px 0 0;color:#d4d4dc;font-size:14px;"><strong>Message:</strong><br/>${doc.message || "No message provided."}</p>
               </td>
             </tr>

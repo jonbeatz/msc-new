@@ -62,12 +62,24 @@ Create a new restore branch from the current clean state:
 ## Current focus
 
 - **Payload CMS:** `Homepage` + `Site settings` globals drive hero + SEO; **Media** for images; **Leads** collection ready for a future form (`POST /api/leads`).
-- Polish scheduling UX in `components/contact-section.tsx`; keep NovaMira dark + gold.
-- Next: wire more sections to Payload, or **headless WordPress Phase 1**; production: Postgres + lock down public APIs.
+- **Booking:** Schedule modal captures **IANA time zone** (`Intl...timeZone`) and persists to Payload `bookings.timeZone`; admin alert email includes **Time zone** line.
+- **Nav / hashes:** **`lib/hash-nav.ts`** + **`resolveNavHashHref`** in **`header`** / **`footer`**; **`HomeHashScroll`** on **`/`**; see **Development.md** → *Marketing header*.
+- Next: wire more sections to Payload, or **headless WordPress Phase 1** (`msc-api` plugin — not in repo yet); production: Postgres + lock down public APIs.
 
 ---
 
 ## Recent changes (latest first)
+
+### 2026-04-09 — Docs: hash navigation + pathname-aware header/footer
+
+- **Docs:** **Development.md** (marketing header / default nav / **`lib/hash-nav.ts`** / **`HomeHashScroll`**), **ReCall** (current focus), **README** (pointer to hash helpers).
+- **Context:** Section links in admin are **`#msc-*`**; runtime chooses **`#`** on `/` and **`/#`** off home; URL cleanup for stacked fragments remains in **`home-hash-scroll.tsx`**.
+
+### 2026-04-08 — ReCall resume: booking time zone capture
+
+- **Changed:** `BookingRequestPayload` + `submitBookingRequest` send optional `timeZone` to Payload; `contact-section` sets it from `Intl.DateTimeFormat().resolvedOptions().timeZone`.
+- **Admin email:** New booking alert HTML includes **Time zone** (stored field was already on `Bookings`).
+- **Verified:** `npm run build` green; `npm run dev:payload` shows **Next.js (webpack)** at `http://localhost:3000/`.
 
 ### 2026-04-08 — Session closeout (goodbye sequence)
 

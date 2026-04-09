@@ -76,8 +76,10 @@ If no CMS slides exist, the site falls back to hardcoded defaults in `components
 
 ## Docs
 
-- `.cursor/docs/Development.md` - implementation notes and architecture
+- `.cursor/docs/Development.md` - implementation notes and architecture (includes marketing header, **`lib/hash-nav.ts`**, and **`HomeHashScroll`** behavior)
 - `.cursor/docs/Run-Next-JS.md` - run/build instructions
 - `.cursor/docs/Site-Plans.md` - backend/CMS planning notes
 - `.cursor/docs/Restore-Points.md` - restore checkpoints
 - `.cursor/docs/ReCall.md` - session memory log
+
+**Hash / nav helpers:** `lib/hash-nav.ts` (normalize + pathname-aware `Link` hrefs); `components/home-hash-scroll.tsx` (scroll + single-hash URL on `/`).

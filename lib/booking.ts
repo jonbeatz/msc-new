@@ -4,6 +4,8 @@ export type BookingRequestPayload = {
   phone?: string | null
   appointmentDate: string
   message?: string | null
+  /** IANA zone from the visitor's browser, e.g. America/New_York */
+  timeZone?: string | null
 }
 
 /**
@@ -53,6 +55,9 @@ export async function submitBookingRequest(
         phone: payload.phone || undefined,
         appointmentDate: payload.appointmentDate,
         message: payload.message || undefined,
+        ...(payload.timeZone
+          ? { timeZone: payload.timeZone }
+          : {}),
       }),
     })
     if (!res.ok) {

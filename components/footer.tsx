@@ -2,6 +2,13 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
+
+import {
+  resolveNavHashHref,
+  scrollPropForResolvedNav,
+  shouldReplaceHashLink,
+} from "@/lib/hash-nav"
 const footerLinks = {
   company: [
     { label: "About", href: "#msc-about" },
@@ -26,6 +33,8 @@ type FooterProps = {
 }
 
 export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps) {
+  const pathname = usePathname()
+
   return (
     <footer 
       id="msc-footer" 
@@ -59,16 +68,21 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Company</h4>
             <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {footerLinks.company.map((link) => {
+                const href = resolveNavHashHref(pathname, link.href)
+                return (
+                  <li key={link.label}>
+                    <Link
+                      href={href}
+                      replace={shouldReplaceHashLink(pathname, href)}
+                      scroll={scrollPropForResolvedNav(pathname, href)}
+                      className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </div>
 
@@ -76,16 +90,21 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Resources</h4>
             <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {footerLinks.resources.map((link) => {
+                const href = resolveNavHashHref(pathname, link.href)
+                return (
+                  <li key={link.label}>
+                    <Link
+                      href={href}
+                      replace={shouldReplaceHashLink(pathname, href)}
+                      scroll={scrollPropForResolvedNav(pathname, href)}
+                      className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </div>
 

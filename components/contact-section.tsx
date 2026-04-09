@@ -276,12 +276,18 @@ export function ContactSection() {
       if (meridiem === "PM") hours24 += 12
       appointmentDate.setHours(hours24, minutesRaw, 0, 0)
 
+      const tz =
+        typeof Intl !== "undefined"
+          ? Intl.DateTimeFormat().resolvedOptions().timeZone
+          : null
+
       const result = await submitBookingRequest({
         name: bookingName.trim(),
         email: bookingEmail.trim().toLowerCase(),
         phone: bookingPhone.trim() || null,
         message: bookingMessage.trim() || null,
         appointmentDate: appointmentDate.toISOString(),
+        timeZone: tz,
       })
       if (!result.ok) {
         setScheduleError(result.message || "Something went wrong. Please try again.")
