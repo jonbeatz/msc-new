@@ -1,0 +1,254 @@
+param(
+  [Parameter(ValueFromRemainingArguments = $true)]
+  [string[]]$Targets
+)
+
+$ErrorActionPreference = "Stop"
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+
+function Join-FtpPath {
+  param(
+    [string]$Left,
+    [string]$Right
+  )
+
+  $leftClean = ($Left -replace "\\", "/").TrimEnd("/")
+  $rightClean = ($Right -replace "\\", "/").TrimStart("/")
+  if ([string]::IsNullOrWhiteSpace($leftClean)) { return "/$rightClean" }
+  if ([string]::IsNullOrWhiteSpace($rightClean)) { return $leftClean }
+  return "$leftClean/$rightClean"
+}
+
+function Escape-FtpPath {
+  param([string]$PathText)
+  $parts = ($PathText -replace "\\", "/").Split("/", [System.StringSplitOptions]::RemoveEmptyEntries)
+  $encoded = $parts | ForEach-Object { [System.Uri]::EscapeDataString($_) }
+  return ($encoded -join "/")
+}
+
+function New-FtpRequest {
+  param(
+    [string]$Uri,
+    [string]$Method,
+    [System.Net.NetworkCredential]$Credential,
+    [bool]$UseSsl,
+    [bool]$UsePassive
+  )
+
+  $request = [System.Net.FtpWebRequest]::Create($Uri)
+  $request.Credentials = $Credential
+  $request.EnableSsl = $UseSsl
+  $request.UsePassive = $UsePassive
+  $request.UseBinary = $true
+  $request.KeepAlive = $false
+  $request.Timeout = 30000
+  $request.ReadWriteTimeout = 30000
+  $request.Method = $Method
+  return $request
+}
+
+function Get-RelativePathSafe {
+  param(
+    [string]$BasePath,
+    [string]$TargetPath
+  )
+
+  $base = (Resolve-Path -LiteralPath $BasePath).Path
+  $target = (Resolve-Path -LiteralPath $TargetPath).Path
+
+  $baseWithSlash = $base
+  if (-not $baseWithSlash.EndsWith("\")) {
+    $baseWithSlash = "$baseWithSlash\"
+  }
+
+  $baseUri = New-Object System.Uri($baseWithSlash)
+  $targetUri = New-Object System.Uri($target)
+  $relativeUri = $baseUri.MakeRelativeUri($targetUri)
+  $relative = [System.Uri]::UnescapeDataString($relativeUri.ToString())
+  return $relative.Replace("/", "\")
+}
+
+function Test-FtpDirectory {
+  param(
+    [string]$BaseFtpUrl,
+    [string]$DirPath,
+    [System.Net.NetworkCredential]$Credential,
+    [bool]$UseSsl,
+    [bool]$UsePassive
+  )
+
+  $remote = if ([string]::IsNullOrWhiteSpace($DirPath)) { "/" } else { $DirPath }
+  $uri = "$BaseFtpUrl/$(Escape-FtpPath -PathText $remote)"
+  try {
+    $request = New-FtpRequest -Uri $uri -Method ([System.Net.WebRequestMethods+Ftp]::ListDirectory) -Credential $Credential -UseSsl $UseSsl -UsePassive $UsePassive
+    $response = $request.GetResponse()
+    $response.Close()
+    return $true
+  } catch {
+    return $false
+  }
+}
+
+function Ensure-FtpDirectory {
+  param(
+    [string]$BaseFtpUrl,
+    [string]$DirPath,
+    [System.Net.NetworkCredential]$Credential,
+    [bool]$UseSsl,
+    [bool]$UsePassive
+  )
+
+  if ([string]::IsNullOrWhiteSpace($DirPath)) { return }
+
+  $segments = ($DirPath -replace "\\", "/").Split("/", [System.StringSplitOptions]::RemoveEmptyEntries)
+  $running = ""
+  foreach ($segment in $segments) {
+    $running = Join-FtpPath -Left $running -Right $segment
+    $uri = "$BaseFtpUrl/$(Escape-FtpPath -PathText $running)"
+    try {
+      $request = New-FtpRequest -Uri $uri -Method ([System.Net.WebRequestMethods+Ftp]::MakeDirectory) -Credential $Credential -UseSsl $UseSsl -UsePassive $UsePassive
+      $response = $request.GetResponse()
+      $response.Close()
+    } catch [System.Net.WebException] {
+      $resp = $_.Exception.Response
+      if ($null -ne $resp) {
+        $code = [int]$resp.StatusCode
+        $resp.Close()
+        if ($code -notin 550, 553) { throw }
+      } else {
+        throw
+      }
+    }
+  }
+}
+
+function Upload-FileToFtp {
+  param(
+    [string]$BaseFtpUrl,
+    [string]$LocalFile,
+    [string]$RemoteFilePath,
+    [System.Net.NetworkCredential]$Credential,
+    [bool]$UseSsl,
+    [bool]$UsePassive
+  )
+
+  $remoteDir = Split-Path -Path $RemoteFilePath -Parent
+  if ($remoteDir -eq ".") { $remoteDir = "" }
+  Ensure-FtpDirectory -BaseFtpUrl $BaseFtpUrl -DirPath $remoteDir -Credential $Credential -UseSsl $UseSsl -UsePassive $UsePassive
+
+  $uri = "$BaseFtpUrl/$(Escape-FtpPath -PathText $RemoteFilePath)"
+  $request = New-FtpRequest -Uri $uri -Method ([System.Net.WebRequestMethods+Ftp]::UploadFile) -Credential $Credential -UseSsl $UseSsl -UsePassive $UsePassive
+
+  $bytes = [System.IO.File]::ReadAllBytes($LocalFile)
+  $request.ContentLength = $bytes.Length
+
+  $stream = $request.GetRequestStream()
+  $stream.Write($bytes, 0, $bytes.Length)
+  $stream.Close()
+
+  $response = $request.GetResponse()
+  $response.Close()
+}
+
+$workspaceRoot = (Get-Location).Path
+$configPath = Join-Path $workspaceRoot ".vscode/sftp.json"
+
+if (-not (Test-Path $configPath)) {
+  throw "Missing config file: $configPath"
+}
+
+$config = Get-Content -Raw -Path $configPath | ConvertFrom-Json
+$ftpServer = [string]$config.host
+$ftpPort = if ($null -ne $config.port) { [int]$config.port } else { 21 }
+$useSsl = if ($null -ne $config.secure) { [bool]$config.secure } else { $true }
+$usePassive = if ($null -ne $config.passive) { [bool]$config.passive } else { $true }
+$username = [string]$config.username
+$password = [string]$config.password
+$remoteBaseFromConfig = [string]$config.remotePath
+
+if ([string]::IsNullOrWhiteSpace($ftpServer) -or [string]::IsNullOrWhiteSpace($username) -or [string]::IsNullOrWhiteSpace($password)) {
+  throw "sftp.json is missing required FTP fields (host, username, password)."
+}
+
+$baseFtpUrl = "ftp://$ftpServer`:$ftpPort"
+$credential = New-Object System.Net.NetworkCredential($username, $password)
+
+$candidateRemoteBase = if ([string]::IsNullOrWhiteSpace($remoteBaseFromConfig)) { "/" } else { $remoteBaseFromConfig }
+$remoteBase = if (Test-FtpDirectory -BaseFtpUrl $baseFtpUrl -DirPath $candidateRemoteBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive) { $candidateRemoteBase } else { "/" }
+
+if ($null -eq $Targets -or $Targets.Count -eq 0) {
+  $Targets = @(".next")
+}
+
+$uploadItems = New-Object System.Collections.Generic.List[object]
+
+foreach ($target in $Targets) {
+  $resolved = $null
+  try {
+    $resolved = Resolve-Path -Path $target -ErrorAction Stop
+  } catch {
+    throw "Target not found: $target"
+  }
+
+  foreach ($item in $resolved) {
+    $fullPath = $item.Path
+    if ((Test-Path $fullPath -PathType Leaf)) {
+      $relativePath = (Get-RelativePathSafe -BasePath $workspaceRoot -TargetPath $fullPath).Replace("\", "/")
+      $uploadItems.Add([PSCustomObject]@{
+          LocalPath  = $fullPath
+          RemotePath = $relativePath
+        })
+      continue
+    }
+
+    if (Test-Path $fullPath -PathType Container) {
+      $allFiles = Get-ChildItem -Path $fullPath -Recurse -File
+      foreach ($f in $allFiles) {
+        $relativePath = (Get-RelativePathSafe -BasePath $workspaceRoot -TargetPath $f.FullName).Replace("\", "/")
+        $uploadItems.Add([PSCustomObject]@{
+            LocalPath  = $f.FullName
+            RemotePath = $relativePath
+          })
+      }
+      continue
+    }
+
+    throw "Unsupported target type: $target"
+  }
+}
+
+$total = $uploadItems.Count
+if ($total -eq 0) {
+  throw "No files found to upload."
+}
+
+Write-Output "PushItUP starting..."
+Write-Output "Server: $ftpServer`:$ftpPort (FTPS=$useSsl, Passive=$usePassive)"
+Write-Output "Remote base: $remoteBase"
+Write-Output "Files to upload: $total"
+
+$failed = New-Object System.Collections.Generic.List[string]
+$index = 0
+
+foreach ($item in $uploadItems) {
+  $index++
+  $remotePathUnderBase = Join-FtpPath -Left $remoteBase -Right $item.RemotePath
+  try {
+    Upload-FileToFtp -BaseFtpUrl $baseFtpUrl -LocalFile $item.LocalPath -RemoteFilePath $remotePathUnderBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive
+  } catch {
+    $failed.Add($item.RemotePath)
+  }
+
+  if (($index % 100) -eq 0 -or $index -eq $total) {
+    Write-Output "Processed $index / $total (failed: $($failed.Count))"
+  }
+}
+
+if ($failed.Count -gt 0) {
+  Write-Output "PushItUP completed with failures."
+  $failed | Select-Object -First 30 | ForEach-Object { Write-Output "FAILED $_" }
+  exit 1
+}
+
+Write-Output "PushItUP complete. Uploaded $total files."
+exit 0

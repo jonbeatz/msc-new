@@ -1,10 +1,10 @@
 # MSC Next + Payload CMS
 
-Next.js 16 marketing site with an embedded Payload CMS admin/API.
+Next.js 15 marketing site with an embedded Payload CMS admin/API.
 
 ## Stack
 
-- Next.js App Router (`next@16`)
+- Next.js App Router (`next@15.4.11`)
 - Payload CMS 3 (`payload`, `@payloadcms/next`)
 - SQLite for local development (`payload.sqlite`)
 - Tailwind CSS 4 + React 19
@@ -73,6 +73,19 @@ If no CMS slides exist, the site falls back to hardcoded defaults in `components
 - Build: `npm run build`
 - Start (prod-like): `npm run start`
 - Lint: `npm run lint`
+- FTP upload (files/folders): `npm run pushitup -- <target...>`
+- FTP upload (zip-first): `npm run pushitupzip -- <target...>`
+
+## Production note (low-memory hosts)
+
+Some shared hosts cannot run `next build` due to Wasm memory limits. In that case:
+
+1. Build locally: `npm run build`
+2. Upload prebuilt artifacts:
+   - zip-first uploader: `npm run pushitupzip -- .next`
+   - standard uploader (small sets): `npm run pushitup -- .next patches`
+3. On host, install deps only: `npm install --legacy-peer-deps`
+4. Unzip uploaded `.next` archive into `.next` and restart app.
 
 ## Docs
 

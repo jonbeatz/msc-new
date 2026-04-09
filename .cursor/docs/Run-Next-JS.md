@@ -1,6 +1,6 @@
 # Run Next.js locally (this project)
 
-This repo runs **Next.js 16** with **Payload CMS 3** embedded. It is **not** a static `out/`–only export anymore: API and `/admin` need a **Node** runtime.
+This repo runs **Next.js 15.4.11** with **Payload CMS 3** embedded. It is **not** a static `out/`-only export anymore: API and `/admin` need a **Node** runtime.
 
 ---
 
@@ -37,6 +37,8 @@ From the directory with **`package.json`**:
 | Dev (alt) | `npm run dev` | Also uses Webpack via `package.json` |
 | Production build | `npm run build` | Requires env vars (see above) |
 | Production serve | `npm run start` | After `build` -- local smoke test |
+| FTP upload (paths) | `npm run pushitup -- <target...>` | Upload files/folders to Spaceship FTPS |
+| FTP upload (zip-first) | `npm run pushitupzip -- <target...>` | Packs target(s) to zip(s), then uploads |
 
 **First visit:** open **`/admin`** and create the first admin user.
 
@@ -49,6 +51,23 @@ From the directory with **`package.json`**:
 - Run **`npm run build`** on your host or CI.
 - Start with **`npm run start`** (or your platform’s Next adapter).
 - Use a **hosted Postgres** (e.g. Neon) in production: change **`payload.config.ts`** to **`@payloadcms/db-postgres`** and set **`DATABASE_URI`** per Payload docs; SQLite is for local/dev convenience.
+
+### Shared-host memory fallback (Spaceship / cPanel)
+
+If host-side `npm run build` fails with:
+
+- `RangeError: WebAssembly.instantiate(): Out of memory`
+
+Use this flow instead:
+
+1. Local machine:
+   - `npm run build`
+   - `npm run pushitupzip -- .next`
+   - `npm run pushitup -- patches package.json package-lock.json server.js`
+2. Host terminal:
+   - `npm install --legacy-peer-deps`
+   - remove/replace `.next` from uploaded zip
+3. Restart Node app from panel.
 
 ---
 

@@ -8,7 +8,7 @@ Living notes for how this site is wired so humans and agents can find things qui
 
 ## Stack
 
-- **Next.js 16** (App Router), **React 19**, **Tailwind CSS 4**, **Radix**-based UI in `components/ui/`.
+- **Next.js 15.4.11** (App Router), **React 19**, **Tailwind CSS 4**, **Radix**-based UI in `components/ui/`.
 - **Payload CMS 3** integrated via `@payloadcms/next` (`withPayload` in `next.config.mjs`). Admin at **`/admin`**, REST/GraphQL under **`/api/*`**.
 - **Database (local dev):** SQLite file `payload.sqlite` via `@payloadcms/db-sqlite` (`DATABASE_URL=file:./payload.sqlite`). Swap adapter in `payload.config.ts` for Postgres (e.g. Neon) when deploying.
 - **No static-only export:** `output: 'export'` was removed so Payload routes can run. Deploy as a **Node** app (`next build` + `next start`) or a platform that supports Next server routes (Vercel, Railway, etc.).
@@ -29,7 +29,7 @@ Copy **`.env.example`** → **`.env.local`** and set at minimum:
 
 ## Running locally
 
-**Bundler:** Next 16 defaults to **Turbopack** for `next dev`. On this project (Windows + React 19 + Tailwind 4 + Payload), Turbopack has produced **corrupt JS chunks** (`SyntaxError: Unexpected end of input` in `/_next/static/chunks/...` and broken **react-dev-overlay**), which kills hero/demos clicks and shows a **blank `/admin`**.
+**Bundler:** Next defaults to **Turbopack** for `next dev`. On this project (Windows + React 19 + Tailwind 4 + Payload), Turbopack has produced **corrupt JS chunks** (`SyntaxError: Unexpected end of input` in `/_next/static/chunks/...` and broken **react-dev-overlay**), which kills hero/demos clicks and shows a **blank `/admin`**.
 
 **Fix:** Scripts use **`next dev --webpack`** (Webpack dev). Always prefer:
 
@@ -38,6 +38,18 @@ npm run dev:payload
 ```
 
 If anything still looks cached or broken, delete **`.next`** once, then restart dev.
+
+### Production on Spaceship (shared-host memory limits)
+
+- **Observed issue:** host-side `npm run build` can fail with `RangeError: WebAssembly.instantiate(): Out of memory`.
+- **Recommended deployment path on low-memory hosts:**
+  1. Build locally (`npm run build`)
+  2. Upload prebuilt `.next` as a zip (`npm run pushitupzip -- .next`)
+  3. Upload runtime files (`npm run pushitup -- patches package.json package-lock.json server.js`)
+  4. On host, run `npm install --legacy-peer-deps` (skip host build), unpack `.next`, restart app
+- **Uploader commands:**
+  - `PushItUP`: uploads file/folder paths directly
+  - `PushItUPzip`: packs each target to a zip in `.pushitupzips/` and uploads the archive(s)
 
 **Next.js dev UI:** A bottom-left **Preferences / dev tools** panel is Next itself in development, not Payload. This repo sets **`devIndicators: false`** in **`next.config.mjs`** so it does not cover the admin. Re-enable by removing that line if you want the stock Next dev indicator.
 

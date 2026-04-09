@@ -70,6 +70,14 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-09 — Spaceship production recovery + deploy scripts
+
+- **Root causes fixed:** cPanel `npm install` dependency conflict (`next@16.2.0` vs Payload peer range), production postinstall missing `patch-package`, host-side `next build` OOM (`WebAssembly.instantiate`).
+- **Runtime/deps:** pinned `next` to **15.4.11** and Payload packages to exact **3.81.0**; moved `patch-package` into `dependencies`; `server.js` binds to `0.0.0.0`.
+- **Deploy tooling:** added **`scripts/PushItUP.ps1`** (path upload) and **`scripts/PushItUPzip.ps1`** (zip-first upload) with npm aliases `pushitup` / `pushitupzip`.
+- **Shared-host workflow:** build locally, upload `.next` as zip + `patches` + runtime files, then host runs `npm install --legacy-peer-deps` and app restart (skip host build on low-memory plans).
+- **Result:** `https://mystudiochannel.com/` and `/admin/login` load successfully.
+
 ### 2026-04-09 — Docs: hash navigation + pathname-aware header/footer
 
 - **Docs:** **Development.md** (marketing header / default nav / **`lib/hash-nav.ts`** / **`HomeHashScroll`**), **ReCall** (current focus), **README** (pointer to hash helpers).
@@ -398,6 +406,21 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Fix:** newsletter submit now detects duplicate-email responses from Payload and shows a clean user-facing message instead of raw JSON.
 - **Behavior:** parses API error payload safely, falls back to generic error text when needed.
 - **File:** `components/contact-section.tsx`.
+
+### 2026-04-09 — Session closeout (goodbye sequence)
+
+- **Done:**
+  - Fixed `ViewPageLinkField` list-view column showing blank placeholder — added `ViewPageLinkCell` (reads `rowData.slug`) registered under `admin.components.Cell`; sidebar `Field` (useFormFields) and list `Cell` now both work.
+  - Patched `@payloadcms/drizzle` `insertArrays.js` → DELETE stale child rows before re-insert; resolves `UNIQUE constraint failed` on `pages_blocks_feature_grid_items`.
+  - Schema migration `scripts/migrate-sqlite-blocks-id-to-text.py` → block table PKs changed `INTEGER → TEXT` to match Payload 3 ObjectID strings (resolves `datatype mismatch` 500s).
+  - Removed `omitFeatureGridItemPrimaryIds` hook (was making datatype mismatch worse).
+  - Added `rowInstanceUid` / `itemInstanceUid` `defaultValue: randomUUID()`.
+  - `coalesceEmptyPagesSlug` hook + `slug defaultValue: 'msc1'`.
+  - Committed all work (`0148054`); created restore branch **`msc-new-payload-polished-v4`** and pushed to origin.
+  - Updated `Development.md` — dual-context `ui` field pattern (Field + Cell), Cell props reference, changelog entry.
+- **Restore point:** **`msc-new-payload-polished-v4`** on `origin` — tip is commit `0148054`.
+- **Resume:** `git checkout msc-new-payload-polished-v4 && git pull` → `npm run dev:payload` → `http://localhost:3000/` and `/admin`.
+- **Dev listener:** Stopped **`node.exe`** LISTENING on port **3000** (PID 8272). Brave browser had lingering SYN_SENT connections that time out naturally — no action needed. Run `netstat -ano | findstr ":3000"` to confirm clear on next session start.
 
 ### 2026-04-08 — Homepage hero slide SEO connected to metadata
 
