@@ -7,7 +7,11 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { PageJumpLinks } from "@/components/blocks/PageJumpLinks"
 import { SectionsRenderer } from "@/components/blocks/SectionsRenderer"
-import { PageHeroBanner } from "@/components/page-hero-banner"
+import {
+  PageHeroBanner,
+  type PageHeroPrimary,
+  type PageHeroSecondary,
+} from "@/components/page-hero-banner"
 import { getHeaderNavItems } from "@/lib/cms/header"
 import { getSiteSettingsCms } from "@/lib/cms/site-settings"
 
@@ -42,7 +46,10 @@ function resolvePageHeroBlock(
 type PageHeroDoc = {
   enabled: boolean
   image: { url: string; alt: string } | null
+  /** @deprecated legacy field; prefer buttons group */
   ctaLink?: string | null
+  primary: PageHeroPrimary
+  secondary: PageHeroSecondary
   eyebrow?: string | null
   headlineLine1?: string | null
   headlineLine2?: string | null
@@ -139,11 +146,57 @@ async function getPageBySlug(slug: string): Promise<PageDoc | null> {
           image: seoImage,
         }
       }
+      const rawButtons =
+        rawHero.buttons && typeof rawHero.buttons === "object"
+          ? (rawHero.buttons as Record<string, unknown>)
+          : null
+
+      const legacyCta =
+        typeof rawHero.ctaLink === "string" ? rawHero.ctaLink.trim() : ""
+
+      const showPrimary =
+        rawButtons == null || rawButtons.showPrimaryButton !== false
+      const primaryAction: "lightbox" | "link" =
+        rawButtons?.primaryButtonAction === "link" ? "link" : "lightbox"
+      const primaryLinkRaw =
+        typeof rawButtons?.primaryButtonLink === "string"
+          ? rawButtons.primaryButtonLink.trim()
+          : ""
+      const primaryLink =
+        primaryLinkRaw.length > 0
+          ? primaryLinkRaw
+          : legacyCta.length > 0
+            ? legacyCta
+            : "#msc-contact"
+
+      const showSecondary =
+        rawButtons == null || rawButtons.showSecondaryButton !== false
+      const secondaryLabel =
+        typeof rawButtons?.secondaryButtonLabel === "string" &&
+        rawButtons.secondaryButtonLabel.trim().length > 0
+          ? rawButtons.secondaryButtonLabel.trim()
+          : "View Demos"
+      const secondaryHref =
+        typeof rawButtons?.secondaryButtonLink === "string" &&
+        rawButtons.secondaryButtonLink.trim().length > 0
+          ? rawButtons.secondaryButtonLink.trim()
+          : "/#msc-demos"
+
       pageHero = {
         enabled,
         image,
         ctaLink:
           typeof rawHero.ctaLink === "string" ? rawHero.ctaLink : null,
+        primary: {
+          show: showPrimary,
+          action: primaryAction,
+          link: primaryLink,
+        },
+        secondary: {
+          show: showSecondary,
+          label: secondaryLabel,
+          href: secondaryHref,
+        },
         eyebrow:
           typeof rawHero.eyebrow === "string" ? rawHero.eyebrow : null,
         headlineLine1:
@@ -279,9 +332,8 @@ export default async function DynamicPage({ params }: RouteProps) {
   const eyebrow =
     (ph?.eyebrow && ph.eyebrow.trim()) || "For Creators Who Want More"
   const heroSub = (ph?.sub && ph.sub.trim()) || description
-  const ctaLink = (ph?.ctaLink && ph.ctaLink.trim()) || "#msc-contact"
-
   const stickyHeaderEnabled = settings?.stickyHeader !== false
+  const pagePath = `/${slug}`
 
   return (
     <>
@@ -299,7 +351,15 @@ export default async function DynamicPage({ params }: RouteProps) {
           eyebrow={eyebrow}
           headline={[headlineFallback1, headline2, headline3]}
           sub={heroSub}
-          ctaLink={ctaLink}
+          currentPath={pagePath}
+          primary={ph?.primary ?? { show: true, action: "lightbox", link: "#msc-contact" }}
+          secondary={
+            ph?.secondary ?? {
+              show: true,
+              label: "View Demos",
+              href: "/#msc-demos",
+            }
+          }
           overline="My Studio Channel"
         />
       ) : (

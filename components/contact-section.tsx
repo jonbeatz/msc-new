@@ -1,12 +1,13 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useEffect, useState } from "react"
+import { Suspense, useCallback, useEffect, useState } from "react"
 import { ArrowRight, Mail, Phone, Calendar, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { submitBookingRequest } from "@/lib/booking"
+import { ContactScheduleQueryOpener } from "@/components/contact-schedule-query-opener"
 
 const ScheduleCalendar = dynamic(
   () => import("@/components/ui/calendar").then((m) => ({ default: m.Calendar })),
@@ -102,10 +103,10 @@ export function ContactSection() {
     message: string
   } | null>(null)
 
-  function openModal() {
+  const openModal = useCallback(() => {
     setScheduleError(null)
     setIsOpen(true)
-  }
+  }, [])
 
   function closeModal() {
     setIsOpen(false)
@@ -305,6 +306,9 @@ export function ContactSection() {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <ContactScheduleQueryOpener onOpen={openModal} />
+      </Suspense>
       {/* ===== CONTACT SECTION ===== */}
       <section
         id="msc-contact"

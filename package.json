@@ -12,8 +12,11 @@
     "migrate:sqlite:page-hero": "python scripts/migrate-pages-page-hero-sqlite.py",
     "migrate:sqlite:page-hero-blocks": "python scripts/migrate-page-hero-to-blocks-sqlite.py",
     "migrate:sqlite:page-hero-sync-group": "python scripts/sync-page-hero-block-to-group-sqlite.py",
+    "migrate:sqlite:page-hero-buttons": "python scripts/migrate-sqlite-page-hero-buttons.py",
+    "migrate:sqlite:pages-blocks-uid": "python scripts/migrate-sqlite-pages-blocks-uid.py",
     "migrate:sqlite:site-settings-sticky-header": "python scripts/migrate-sqlite-site-settings-sticky-header.py",
     "migrate:sqlite:homepage-hero-secondary-cta": "python scripts/migrate-sqlite-homepage-hero-secondary-cta.py",
+    "migrate:sqlite:blocks-id-to-text": "python scripts/migrate-sqlite-blocks-id-to-text.py",
     "postinstall": "patch-package"
   },
   "dependencies": {

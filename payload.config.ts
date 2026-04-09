@@ -1,4 +1,5 @@
 import path from "path"
+import type { Field } from "payload"
 import { buildConfig } from "payload"
 import { sqliteAdapter } from "@payloadcms/db-sqlite"
 import { resendAdapter } from "@payloadcms/email-resend"
@@ -92,6 +93,51 @@ export default buildConfig({
       collections: ["pages"],
       uploadsCollection: "media",
       tabbedUI: true,
+      // Plugin defaults set `localized: true` on meta title/description/image. This project does
+      // not use Payload localization; leaving them localized can break saves from the admin UI.
+      fields: ({ defaultFields }) =>
+        defaultFields.map((field) => {
+          let next = field as Field
+          if (
+            typeof field === "object" &&
+            field !== null &&
+            "localized" in field &&
+            (field as { localized?: boolean }).localized === true
+          ) {
+            next = { ...field, localized: false } as Field
+          }
+          // Empty meta must not block saves; Overview "issues" are advisory, not required input.
+          if (
+            typeof next === "object" &&
+            next !== null &&
+            "name" in next &&
+            typeof (next as { name?: string }).name === "string" &&
+            ["title", "description", "image"].includes(
+              (next as { name: string }).name,
+            )
+          ) {
+            next = { ...next, required: false } as Field
+          }
+          // Hide scorecard + preview UI (advisory only); keeps the SEO tab from surfacing ghost "issues".
+          if (
+            typeof next === "object" &&
+            next !== null &&
+            "name" in next &&
+            typeof (next as { name?: string }).name === "string" &&
+            ["overview", "preview"].includes((next as { name: string }).name)
+          ) {
+            next = {
+              ...next,
+              admin: {
+                ...(typeof (next as { admin?: object }).admin === "object"
+                  ? (next as { admin?: Record<string, unknown> }).admin
+                  : {}),
+                condition: () => false,
+              },
+            } as Field
+          }
+          return next
+        }),
       generateTitle: async ({ doc, req }) => {
         const fallback = await getSiteSettingsFallback(req)
         const siteName = fallback.siteName || "My Studio Channel"

@@ -2,6 +2,8 @@ import { RichText } from "@payloadcms/richtext-lexical/react"
 
 type RichTextSection = {
   blockType: "richText"
+  id?: string | number | null
+  rowInstanceUid?: string | null
   sectionId?: string | null
   title?: string | null
   content?: unknown
@@ -9,9 +11,13 @@ type RichTextSection = {
 
 type FeatureGridSection = {
   blockType: "featureGrid"
+  id?: string | number | null
+  rowInstanceUid?: string | null
   sectionId?: string | null
   title?: string | null
   items?: Array<{
+    id?: string | number | null
+    itemInstanceUid?: string | null
     icon?: string | null
     text?: string | null
   }> | null
@@ -19,6 +25,8 @@ type FeatureGridSection = {
 
 type VideoPlayerSection = {
   blockType: "videoPlayer"
+  id?: string | number | null
+  rowInstanceUid?: string | null
   sectionId?: string | null
   title?: string | null
   videoUrl?: string | null
@@ -28,6 +36,15 @@ type VideoPlayerSection = {
 }
 
 type PageSection = RichTextSection | FeatureGridSection | VideoPlayerSection
+
+/** Brute-force unique keys: id + index + blockType (survives duplicate numeric ids from CMS). */
+function sectionBlockKey(block: PageSection, index: number): string {
+  const idPart =
+    block.id !== undefined && block.id !== null ? String(block.id) : "noid"
+  const t =
+    typeof block.blockType === "string" ? block.blockType : "block"
+  return `${idPart}-${index}-${JSON.stringify(t)}`
+}
 
 function normalizeUrl(pathOrUrl: string): string {
   if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
@@ -75,7 +92,7 @@ export function SectionsRenderer({ sections }: { sections: PageSection[] }) {
           return (
             <section
               id={sectionId}
-              key={`${block.blockType}-${sectionId}-${index}`}
+              key={sectionBlockKey(block, index)}
               className="rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10"
             >
               {block.title ? (
@@ -96,7 +113,7 @@ export function SectionsRenderer({ sections }: { sections: PageSection[] }) {
           return (
             <section
               id={sectionId}
-              key={`${block.blockType}-${sectionId}-${index}`}
+              key={sectionBlockKey(block, index)}
               className="rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10"
             >
               {block.title ? (
@@ -105,19 +122,28 @@ export function SectionsRenderer({ sections }: { sections: PageSection[] }) {
                 </h2>
               ) : null}
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                {items.map((item, itemIndex) => (
-                  <div
-                    key={`${sectionId}-item-${itemIndex}`}
-                    className="rounded-xl border border-white/10 bg-black/20 p-4"
-                  >
-                    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#D4AF37]">
-                      {item.icon || "Feature"}
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {item.text || ""}
-                    </p>
-                  </div>
-                ))}
+                {items.map((item, itemIndex) => {
+                  const itemKey =
+                    item.itemInstanceUid &&
+                    String(item.itemInstanceUid).length > 0
+                      ? `${sectionBlockKey(block, index)}-item-${item.itemInstanceUid}`
+                      : item.id !== undefined && item.id !== null
+                        ? `${sectionBlockKey(block, index)}-item-${String(item.id)}`
+                        : `${sectionBlockKey(block, index)}-item-${itemIndex}`
+                  return (
+                    <div
+                      key={itemKey}
+                      className="rounded-xl border border-white/10 bg-black/20 p-4"
+                    >
+                      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#D4AF37]">
+                        {item.icon || "Feature"}
+                      </p>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        {item.text || ""}
+                      </p>
+                    </div>
+                  )
+                })}
               </div>
             </section>
           )
@@ -137,7 +163,7 @@ export function SectionsRenderer({ sections }: { sections: PageSection[] }) {
           return (
             <section
               id={sectionId}
-              key={`${block.blockType}-${sectionId}-${index}`}
+              key={sectionBlockKey(block, index)}
               className="rounded-2xl border border-[#D4AF37]/25 bg-[#0f1014] p-8 sm:p-10"
             >
               {block.title ? (

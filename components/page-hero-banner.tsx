@@ -1,13 +1,36 @@
+"use client"
+
 import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowRight, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { resolveNavHashHref, scrollPropForResolvedNav } from "@/lib/hash-nav"
+import { scheduleConsultationHomeHref } from "@/lib/schedule-open"
+
+export type PageHeroPrimary = {
+  show: boolean
+  action: "lightbox" | "link"
+  /** Raw from CMS; resolved with currentPath for Link */
+  link?: string | null
+}
+
+export type PageHeroSecondary = {
+  show: boolean
+  label: string
+  /** Raw href from CMS */
+  href: string
+}
 
 export type PageHeroBannerProps = {
   image: { url: string; alt: string }
   eyebrow: string
   headline: [string, string, string]
   sub: string
-  ctaLink: string
+  /** Current route path, e.g. `/msc1`, for hash link resolution */
+  currentPath: string
+  primary: PageHeroPrimary
+  secondary: PageHeroSecondary
   /** Shown with the hero for accessibility / context */
   overline?: string | null
 }
@@ -17,9 +40,23 @@ export function PageHeroBanner({
   eyebrow,
   headline,
   sub,
-  ctaLink,
+  currentPath,
+  primary,
+  secondary,
   overline,
 }: PageHeroBannerProps) {
+  const router = useRouter()
+
+  const primaryResolved =
+    primary.action === "link" && primary.link && primary.link.trim().length > 0
+      ? resolveNavHashHref(currentPath, primary.link.trim())
+      : null
+
+  const secondaryResolved = resolveNavHashHref(
+    currentPath,
+    secondary.href || "/#msc-demos",
+  )
+
   return (
     <section
       className="relative min-h-[min(100vh,56rem)] flex items-center justify-center overflow-hidden border-b border-white/10"
@@ -78,27 +115,56 @@ export function PageHeroBanner({
           ) : null}
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300 cursor-pointer"
-              asChild
-            >
-              <a href={ctaLink}>
-                Start With a Consultation
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </a>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/20 text-foreground hover:bg-white/10 h-14 px-8 text-base font-medium backdrop-blur-sm cursor-pointer"
-              asChild
-            >
-              <a href="#msc-demos">
-                <Play className="mr-2 h-5 w-5 fill-current" />
-                View Demos
-              </a>
-            </Button>
+            {primary.show ? (
+              primary.action === "lightbox" ? (
+                <Button
+                  type="button"
+                  size="lg"
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300 cursor-pointer"
+                  onClick={() => router.push(scheduleConsultationHomeHref())}
+                >
+                  Start With a Consultation
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              ) : primaryResolved ? (
+                <Button
+                  size="lg"
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300 cursor-pointer"
+                  asChild
+                >
+                  <Link
+                    href={primaryResolved}
+                    scroll={scrollPropForResolvedNav(
+                      currentPath,
+                      primaryResolved,
+                    )}
+                  >
+                    Start With a Consultation
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              ) : null
+            ) : null}
+
+            {secondary.show ? (
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/20 text-foreground hover:bg-white/10 h-14 px-8 text-base font-medium backdrop-blur-sm cursor-pointer"
+                asChild
+              >
+                <Link
+                  href={secondaryResolved}
+                  scroll={scrollPropForResolvedNav(
+                    currentPath,
+                    secondaryResolved,
+                  )}
+                >
+                  <Play className="mr-2 h-5 w-5 fill-current" />
+                  {secondary.label}
+                </Link>
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>

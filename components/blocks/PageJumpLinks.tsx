@@ -91,10 +91,10 @@ export function PageJumpLinks({ sections }: { sections: SectionLike[] }) {
         ref={navListRef}
         className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-sm sm:gap-3"
       >
-        {links.map((link) => {
+        {links.map((link, linkIndex) => {
           const isActive = activeId === link.id
           return (
-            <li key={link.id}>
+            <li key={`${link.id}-${linkIndex}`}>
               <a
                 href={`#${link.id}`}
                 data-anchor-id={link.id}
