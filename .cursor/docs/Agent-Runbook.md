@@ -423,6 +423,45 @@ Please do this in order:
 Rules:
 - Do not auto-commit without my approval.
 - Do not deploy in this flow.
+- Branch name options should follow Jon's style:
+  - keep base family similar to current branch (e.g. `mscNowLive-vN`)
+  - usually bump version number
+  - append clear suffix like `-Snapshot` or `-RestorePoint`
+```
+
+---
+
+## 17) Lets Restore Branch from <branch-name>
+
+Use this when you want to recover to a known-good branch from GitHub.
+
+```text
+Lets Restore Branch from <branch-name>.
+
+Start with handshake line: "Ok Jon - restore flow started for <branch-name>."
+
+Please do this in order:
+1) Run git status and tell me if working tree is clean or dirty.
+2) If dirty: do NOT discard anything automatically. Ask me to choose:
+   - A) stop and let me checkpoint/commit first
+   - B) stash changes with a clear label
+   - C) cancel restore
+3) Run `git fetch --all --prune`.
+4) Verify target branch exists locally or on origin.
+5) Show me current branch -> target branch restore plan in one short summary.
+6) Ask for final confirmation before switching.
+7) After confirmation:
+   - checkout target branch (create tracking branch if needed)
+   - pull latest from origin
+8) Confirm:
+   - active branch name
+   - latest commit SHA + message
+   - clean/dirty status
+9) Give me exact next step to start app locally (`npm run dev:fresh`).
+
+Rules:
+- Do not run destructive commands (`reset --hard`, `checkout -- .`, etc.) unless I explicitly request it.
+- Do not deploy in this flow.
 ```
 
 ---
@@ -508,3 +547,6 @@ Use these as quick "commands in plain English" for the agent.
 
 23. **`Take a snapshot`**  
     - Runs docs checkpoint + approved commit/push, then proposes 3 branch names and cuts a restore branch for rollback safety.
+
+24. **`Lets Restore Branch from <branch-name>`**  
+    - Safely switches to a known-good branch from GitHub with dirty-tree protection and explicit confirmation gates.
