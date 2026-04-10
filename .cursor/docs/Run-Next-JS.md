@@ -33,8 +33,8 @@ From the directory with **`package.json`**:
 | Step | Command | Notes |
 |------|---------|--------|
 | Install | `npm install` | After dependency changes |
-| Dev (recommended) | `npm run dev:payload` | **Webpack** dev (`--webpack`); avoids Turbopack chunk corruption on this stack |
-| Dev (alt) | `npm run dev` | Also uses Webpack via `package.json` |
+| Dev (recommended) | `npm run dev:payload` | Plain **`next dev`** — webpack is the default on **Next 15.4** (do not pass `--turbo`) |
+| Dev (alt) | `npm run dev` | Same as **`dev:payload`** |
 | Production build | `npm run build` | Requires env vars (see above) |
 | Production serve | `npm run start` | After `build` -- local smoke test |
 | FTP upload (paths) | `npm run pushitup -- <target...>` | Upload files/folders to Spaceship FTPS |
@@ -53,6 +53,8 @@ From the directory with **`package.json`**:
 - Use a **hosted Postgres** (e.g. Neon) in production: change **`payload.config.ts`** to **`@payloadcms/db-postgres`** and set **`DATABASE_URI`** per Payload docs; SQLite is for local/dev convenience.
 
 ### Shared-host memory fallback (Spaceship / cPanel)
+
+Step-by-step **build → FTP → when to Restart** (including **zip vs whole `.next` folder**): see **[Spaceship.md](./Spaceship.md)** → *Same-day deploy cheat sheet*.
 
 If host-side `npm run build` fails with:
 

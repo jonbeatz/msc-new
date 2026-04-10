@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { MSC_ADMIN_VERSION } from "@/lib/msc-admin-version"
 
 export function MscPayloadNavDashboard() {
   return (
@@ -12,6 +13,9 @@ export function MscPayloadNavDashboard() {
       >
         Dashboard
       </Link>
+      <div className="msc-payload-nav-dashboard__version" title="MSC admin bundle version">
+        v{MSC_ADMIN_VERSION}
+      </div>
     </div>
   )
 }

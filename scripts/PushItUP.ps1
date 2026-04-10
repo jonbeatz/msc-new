@@ -22,7 +22,16 @@ function Join-FtpPath {
 function Escape-FtpPath {
   param([string]$PathText)
   $parts = ($PathText -replace "\\", "/").Split("/", [System.StringSplitOptions]::RemoveEmptyEntries)
-  $encoded = $parts | ForEach-Object { [System.Uri]::EscapeDataString($_) }
+  $encoded = $parts | ForEach-Object {
+    $seg = $_
+    # EscapeDataString turns "@lexical.js" into "%40lexical.js". Some FTP servers save that literal
+    # filename, but Node resolves "./vendor-chunks/@lexical.js" — 500 at runtime. Keep leading @ literal.
+    if ($seg.StartsWith("@")) {
+      "@" + [System.Uri]::EscapeDataString($seg.Substring(1))
+    } else {
+      [System.Uri]::EscapeDataString($seg)
+    }
+  }
   return ($encoded -join "/")
 }
 
@@ -182,17 +191,20 @@ if ($null -eq $Targets -or $Targets.Count -eq 0) {
 
 $uploadItems = New-Object System.Collections.Generic.List[object]
 
-foreach ($target in $Targets) {
+foreach ($rawTarget in $Targets) {
+  # npm on Windows sometimes passes args with wrapping quotes as part of the string (e.g. `'app/(payload)/x'`).
+  $target = $rawTarget.Trim().Trim([char[]]@("'", '"'))
   $resolved = $null
   try {
-    $resolved = Resolve-Path -Path $target -ErrorAction Stop
+    # -LiteralPath: paths like app/(payload)/foo use "(" which is special for -Path (wildcard).
+    $resolved = Resolve-Path -LiteralPath $target -ErrorAction Stop
   } catch {
     throw "Target not found: $target"
   }
 
   foreach ($item in $resolved) {
     $fullPath = $item.Path
-    if ((Test-Path $fullPath -PathType Leaf)) {
+    if ((Test-Path -LiteralPath $fullPath -PathType Leaf)) {
       $relativePath = (Get-RelativePathSafe -BasePath $workspaceRoot -TargetPath $fullPath).Replace("\", "/")
       $uploadItems.Add([PSCustomObject]@{
           LocalPath  = $fullPath
@@ -201,8 +213,8 @@ foreach ($target in $Targets) {
       continue
     }
 
-    if (Test-Path $fullPath -PathType Container) {
-      $allFiles = Get-ChildItem -Path $fullPath -Recurse -File
+    if (Test-Path -LiteralPath $fullPath -PathType Container) {
+      $allFiles = Get-ChildItem -LiteralPath $fullPath -Recurse -File
       foreach ($f in $allFiles) {
         $relativePath = (Get-RelativePathSafe -BasePath $workspaceRoot -TargetPath $f.FullName).Replace("\", "/")
         $uploadItems.Add([PSCustomObject]@{

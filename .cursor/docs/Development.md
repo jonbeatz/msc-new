@@ -29,9 +29,9 @@ Copy **`.env.example`** → **`.env.local`** and set at minimum:
 
 ## Running locally
 
-**Bundler:** Next defaults to **Turbopack** for `next dev`. On this project (Windows + React 19 + Tailwind 4 + Payload), Turbopack has produced **corrupt JS chunks** (`SyntaxError: Unexpected end of input` in `/_next/static/chunks/...` and broken **react-dev-overlay**), which kills hero/demos clicks and shows a **blank `/admin`**.
+**Bundler (Next 15.4+):** Stock **`next dev`** uses **webpack**. Turbopack is **opt-in** (`--turbo` / `--turbopack`). Do **not** pass those flags here — on **Next 16** the default flipped to Turbopack and **corrupt JS chunks** / **blank `/admin`** were observed on this stack; this repo pins **Next 15.4.11** so **`npm run dev`** stays on webpack without extra flags. (If you upgrade to a Turbopack-default Next major, use the framework’s webpack flag or pin until stable.)
 
-**Fix:** Scripts use **`next dev --webpack`** (Webpack dev). Always prefer:
+**Run dev:**
 
 ```bash
 npm run dev:payload
@@ -217,7 +217,8 @@ Admin sidebar group **Site**:
 | 2026-04-07 | **Schedule a Call** — centralised booking URL; dialog UX. |
 | 2026-04-08 | **Turbopack / static serve** — documented build + serve workaround when using static export (pre-Payload). |
 | 2026-04-08 | **Payload integration** — `withPayload`, `app/(payload)`, SQLite, `bookings` collection, booking POST from site, `(site)` route group for marketing. Static export removed; use `next start` or hosted Node. |
-| 2026-04-08 | **Webpack dev** — `dev` / `dev:payload` use `next dev --webpack`; default Turbopack dev broke chunks and `/admin` on Windows. |
+| 2026-04-09 | **Dev scripts (Next 15.4)** — `dev` / `dev:payload` run plain **`next dev`** (`--webpack` removed from CLI; webpack is default). |
+| 2026-04-08 | **Webpack dev** — avoid Turbopack on this stack when it was default (Next 16); use webpack dev. |
 | 2026-04-08 | **Dual document shells** — marketing shell in `app/(site)/layout.tsx`; Payload `RootLayout` for `/admin`; **passthrough** `app/layout.tsx` (`return children`) required or dev returns 500 on `/` and `/admin`. |
 | 2026-04-08 | **Payload admin UX + hydration** — `afterNavLinks` “Log out” link (`msc-payload-nav-logout.tsx`); `patch-package` on `@payloadcms/next` so `suppressHydrationWarning` applies to `<html>` (after `htmlProps`) and `<body>`; extensions on `localhost` documented as common false-positive source. |
 | 2026-04-08 | **CMS globals + Leads** — `Homepage` + `Site settings` globals; hero + metadata wired from Payload; **`leads`** collection; restore checkpoint **RP-2026-04-08-cms-globals** in [Restore-Points.md](./Restore-Points.md). |

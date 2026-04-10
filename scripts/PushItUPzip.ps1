@@ -20,8 +20,9 @@ Get-ChildItem -Path $zipDir -File -Filter "*.zip" -ErrorAction SilentlyContinue 
 
 $archives = New-Object System.Collections.Generic.List[string]
 
-foreach ($target in $Targets) {
-  $resolvedItems = Resolve-Path -Path $target -ErrorAction Stop
+foreach ($rawTarget in $Targets) {
+  $target = $rawTarget.Trim().Trim([char[]]@("'", '"'))
+  $resolvedItems = Resolve-Path -LiteralPath $target -ErrorAction Stop
 
   foreach ($resolved in $resolvedItems) {
     $fullPath = $resolved.Path
@@ -34,7 +35,12 @@ foreach ($target in $Targets) {
 
     $name = Split-Path -Path $fullPath -Leaf
     if ([string]::IsNullOrWhiteSpace($name)) { $name = "target" }
-    $safeName = $name -replace "[^a-zA-Z0-9._-]", "-"
+    # `.next.zip` is often hidden in cPanel (leading dot). Use a visible name for the .next folder.
+    if ($name -eq ".next") {
+      $safeName = "next-build"
+    } else {
+      $safeName = $name -replace "[^a-zA-Z0-9._-]", "-"
+    }
     $archivePath = Join-Path $zipDir "$safeName.zip"
 
     if (Test-Path $archivePath) {

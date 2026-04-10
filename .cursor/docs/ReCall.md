@@ -19,7 +19,7 @@ Continue from ReCall.
    - Open Questions
 3) Start local dev runtime:
    - run install only if needed (`npm install`)
-   - run `npm run dev:payload` (or `npm run dev` — both use Webpack in `package.json`)
+   - run `npm run dev:payload` (or `npm run dev` — same as `next dev`; webpack is default on Next 15, avoid `--turbo`)
    - confirm Local URL at dev root (`http://localhost:3000/`) and `/admin` if testing Payload
 4) Then start implementation for: <PASTE TODAY'S TASK HERE>
 5) As you work, update ReCall with any major changes, bug fixes, or decisions.
@@ -70,6 +70,12 @@ Create a new restore branch from the current clean state:
 ---
 
 ## Recent changes (latest first)
+
+### 2026-04-09 — Dev scripts aligned with Next.js 15.4 CLI
+
+- **Issue:** `npm run dev:payload` failed with `error: unknown option '--webpack'` — Next **15.4.11** uses **webpack by default**; Turbopack is opt-in (`--turbo` / `--turbopack`). `--no-server-fast-refresh` is not a valid flag on this CLI.
+- **Fix:** `package.json` → **`dev`** and **`dev:payload`** both run plain **`next dev`**.
+- **Verified:** `npm install` (patches OK) → dev server **Ready**; **`http://localhost:3000/`** and **`/admin`** return **200**.
 
 ### 2026-04-09 — Verify email redirect fix for cPanel proxy hosts
 
@@ -293,7 +299,7 @@ cache, hard refresh, and incognito window all made no difference.
   dynamic import, which is invalid ESM — moved all imports to top, `dynamic()` call after).
 - Added `Image` import back to `footer.tsx` after it was accidentally removed.
 
-**Update (Payload + Webpack):** Default **`npm run dev`** (Turbopack) is still risky on this stack. **`npm run dev`** and **`npm run dev:payload`** in **`package.json`** now pass **`--webpack`**, so normal **dev with HMR** is fine. Use **`npm run build` + `npm run start`** only when you want a production-like smoke test.
+**Update (Payload + Webpack):** On **Next 16**, default dev was Turbopack and risky on this stack. **`package.json`** later used **`next dev --webpack`** where the CLI supported it. **As of Next 15.4.11 in this repo,** dev scripts are plain **`next dev`** (webpack default; `--webpack` flag removed). Use **`npm run build` + `npm run start`** for a production-like smoke test.
 
 **Historical (pre-Webpack scripts):** The workflow below was used when dev server meant Turbopack-only:
 
@@ -367,7 +373,7 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 
 - **Symptom:** `SyntaxError` in `/_next/static/chunks/*` and react-dev-overlay; hero/demos dead; `/admin` blank.
 - **Cause:** Next 16 default **Turbopack** dev on this stack corrupts or truncates client JS.
-- **Fix:** `package.json` dev scripts use **`next dev --webpack`**. Cleared **`.next`**, restart **`npm run dev:payload`**. Terminal should show **`Next.js (webpack)`** not Turbopack.
+- **Fix (era):** Dev scripts forced webpack where the CLI had **`--webpack`**. **Next 15.4+:** plain **`next dev`**. Cleared **`.next`**, restart **`npm run dev:payload`** if chunks look stale.
 
 ### 2026-04-08 — Payload CMS integrated (Phase A)
 

@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache"
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
 import { getHomepageCmsData } from "@/lib/cms/homepage"
@@ -21,6 +22,7 @@ import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
 
 export default async function HomePage() {
+  noStore()
   const { heroSlides, heroStats } = await getHomepageCmsData()
   const navItems = await getHeaderNavItems()
   const demoProjects = await getDemoProjects()

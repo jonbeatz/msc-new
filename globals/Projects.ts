@@ -58,11 +58,19 @@ export const ProjectsGlobal: GlobalConfig = {
           name: "isFeatured",
           type: "checkbox",
           defaultValue: false,
+          admin: {
+            description:
+              "Shows this project in the large featured card on the public homepage (Demos section). Only one row should be featured.",
+          },
         },
         {
           name: "isVisible",
           type: "checkbox",
           defaultValue: true,
+          admin: {
+            description:
+              "Must be ON for this project to appear on the live site. When OFF, saves in admin still work but the homepage ignores this row.",
+          },
         },
       ],
       hooks: {

@@ -29,6 +29,7 @@ payload.sqlite-*
 
 # local editor deploy secrets
 .vscode/sftp.json
+.vscode/cpanel-bookmarks.txt
 
 # typescript
 *.tsbuildinfo

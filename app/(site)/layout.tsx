@@ -7,6 +7,10 @@ import { getHomepageActiveSlideSeo } from "@/lib/cms/homepage"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { HomeHashScroll } from "@/components/home-hash-scroll"
 
+/** CMS-backed routes: no full route cache; no fetch/Data cache defaults that could stale Payload reads on shared hosting. */
+export const dynamic = "force-dynamic"
+export const fetchCache = "force-no-store"
+
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
@@ -75,7 +79,8 @@ export default function SiteRootLayout({
         {children}
         <HomeHashScroll />
         <ScrollToTop />
-        {process.env.NODE_ENV === "production" && <Analytics />}
+        {process.env.NODE_ENV === "production" &&
+          process.env.VERCEL === "1" && <Analytics />}
       </body>
     </html>
   )

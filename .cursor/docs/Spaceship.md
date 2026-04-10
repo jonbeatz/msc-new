@@ -4,6 +4,96 @@ Single-source reference for connecting, deploying, and troubleshooting this app 
 
 ---
 
+## Successful live update protocol (use every deploy)
+
+Follow **in order**. Repo root on your PC is the folder that contains **`package.json`** (e.g. `D:\Cursor_Projectz\MSC_Clean_v2\msc-new`).
+
+### The rule: `pushitup` = PC only
+
+**`npm run pushitup`** uses **PowerShell** and **FTPS** from **this repo on your Windows machine**. It does **not** run on cPanel’s Linux terminal. There you will see **`npm: command not found`** (until you activate the Node venv) and **`pushitup` is not a server command**. Uploads always happen **from Cursor’s terminal on your PC**.
+
+### Standard update (most times)
+
+| # | Where | What |
+|---|--------|------|
+| 1 | **PC — Cursor terminal** | `npm run build` — wait until the build finishes. |
+| 2 | **PC** | If you changed **admin UI, version label, or Payload admin SCSS**: `npm run pushitup:admin-ui` |
+| 3 | **PC** | If you changed **deps or server config**: `npm run pushitup -- package.json package-lock.json server.js patches middleware.ts` (add/remove paths to match what you edited). |
+| 4 | **PC** | `npm run pushitup -- .next` — wait for **“PushItUP complete”** and the file count. |
+| 5 | **cPanel → Setup Node.js App** | **Restart** the app (or **Stop** → wait a few seconds → **Start**). |
+| 6 | **Browser** | Open **`https://mystudiochannel.com`** in **Incognito** (or hard refresh) so you are not seeing an old cached page. |
+
+Skip step 2 or 3 when nothing in those areas changed.
+
+### cPanel Terminal — when to use it
+
+- **`npm install --legacy-peer-deps`** — only after you uploaded **`package.json`**, **`package-lock.json`**, or **`patches/`**. First activate the app’s Node environment, then `cd` to the app folder (see **Terminal after upload** below).
+- **`rm -rf .next`** — only when fixing a **broken or mixed** production build (500s, missing `vendor-chunks`). **Right after**, you **must** run **`npm run pushitup -- .next`** again **from your PC**; otherwise the site has no build folder.
+
+**Never** run **`npm run pushitup`** in cPanel Terminal.
+
+### Small mistakes to avoid
+
+- **Two commands on one line** — e.g. `.nextnpm run ...` breaks; run **one** command, press **Enter**, then the next.
+- **`rm -rf .next` on the server without re-uploading** — the live site will break until you **`pushitup -- .next`** from the PC again.
+
+---
+
+## Same-day deploy cheat sheet (typical “agent builds → you restart” flow)
+
+Use this when **Cursor fixed something locally** and you want it on **mystudiochannel.com**.
+
+| Step | Where | What |
+|------|--------|------|
+| 1 | **Your PC** (repo root) | `npm run build` — produces a fresh **`.next`** (host often **cannot** build: Wasm OOM). |
+| 2 | **Your PC** | `npm run pushitup -- package.json package-lock.json server.js patches middleware.ts` (always safe) **+** `npm run pushitup -- .next` (**whole folder — no zip, no unzip in cPanel**). |
+| 3 | **cPanel → Terminal** | Paste the block under **“Terminal after upload”** below (activates Node venv, `cd` to app, `npm install` if deps changed). |
+| 4 | **cPanel → Node.js Selector** (`ReStartIt`) | **RESTART** — or **STOP** → wait 2–3s → **START**. Do this **after** uploads (and Terminal step if you ran it). |
+
+### Terminal after upload (Spaceship / mystudiochannel.com)
+
+Run in **cPanel → Terminal** whenever **`package.json` / `package-lock.json` / `patches`** were uploaded, or after a big `.next` refresh:
+
+```bash
+source /home/wjehbnzcoy/nodevenv/mystudiochannel.com/20/bin/activate
+cd /home/wjehbnzcoy/mystudiochannel.com
+npm install --legacy-peer-deps
+```
+
+If the live site ever looks like it’s mixing **old and new** Next chunks, run **`rm -rf .next`** once in that same directory, then **re-run** `npm run pushitup -- .next` from your PC and **Restart** Node again.
+
+### File Manager: why `.next` “folder” time looks old
+
+cPanel often shows the **directory’s** “Last modified” only when something changes **immediately inside that folder** (new top-level file, etc.). Uploading mostly updates **nested** paths (` .next/server/...`, `.next/static/...`), so the **parent** `.next` row can stay an old time while **`BUILD_ID`**, **`server/`**, **`static/`**, and the JSON manifests show **today’s** time. Open **`.next`** and check those — that is the real proof the build landed.
+
+### Live **500** / `Cannot find module './vendor-chunks/date-fns.js'` or `@lexical.js`
+
+Next puts some dependencies in **`.next/server/vendor-chunks/`** with names like **`@lexical.js`**. Older **PushItUP** builds URL-encoded **`@`** as **`%40`**, and a few hosts saved the remote file as **`%40lexical.js`**, so Node could not resolve **`@lexical.js`**. **PushItUP** now keeps a leading **`@`** in each path segment. After updating the script, run **`npm run build`**, **`rm -rf .next`** on the host (Terminal), **`npm run pushitup -- .next`**, then **Restart** Node. In **File Manager**, **`vendor-chunks`** should list **`@lexical.js`**, not **`%40lexical.js`**.
+
+The browser may also request **`/_next/static/development/...`** while the tab still has an old dev session cached — use a **hard refresh** or **Incognito** after the server is healthy.
+
+### `patch-package` says “No patch files found” in Terminal
+
+`postinstall` runs **`patch-package`**, which looks for a **`patches/`** folder **next to `package.json`** containing **`*.patch`** files. If that folder is missing, empty, or not uploaded, you see **No patch files found** — **`npm install` still succeeded**; patches just were not applied until **`patches/`** is on the server. Fix: `npm run pushitup -- patches` from your PC, then on the host run **`npm install --legacy-peer-deps`** again (or delete `node_modules` and reinstall if you need a clean apply).
+
+### Optional: zip upload (faster line speed, one file)
+
+| Method | Command (local) | On the server |
+|--------|------------------|---------------|
+| **Zip** | `npm run pushitupzip -- .next` | `rm -rf .next && mkdir -p .next && unzip -o .pushitupzips/next-build.zip -d .next` |
+
+Use zip only if you prefer one archive; **default workflow here is folder `pushitup -- .next`** (no unzip).
+
+**Almost every deploy** should also upload anything that changed outside `.next`, e.g.:
+
+`npm run pushitup -- package.json package-lock.json server.js patches middleware.ts …`
+
+(Adjust the list to match what changed — **collections**, **globals**, **app/**, **lib/**, etc.)
+
+**Primary references:** this file (full detail), **Run-Next-JS.md** → *Deploy (summary)*, **Development.md** → *Production on Spaceship*, **Jedi-List.md** → npm commands.
+
+---
+
 ## What this is for
 
 Use this doc when starting a new session or a new project and you need to:
@@ -43,16 +133,31 @@ Used by local deploy scripts (`PushItUP`, `PushItUPzip`):
 
 ---
 
-## cPanel quick links (session-scoped)
+## cPanel: links you can use every day
 
-These URLs include `cpsess...` and expire after logout/session timeout.
+**Important:** “Magic” cPanel URLs that contain **`cpsess...`** in the middle **stop working** after you log out or the session times out. This doc keeps links that **stay valid**; for one-click shortcuts, bookmark pages **while you are logged in** (browser bookmarks).
 
-- **Terminal** (label: `Terminal`)
-  - `https://server9.shared.spaceship.host:2083/.../terminal/index.html`
-- **Node app controls** (label: `ReStartIt`)
-  - `https://server9.shared.spaceship.host:2083/.../nodejs-selector.html.tt#/applications/mystudiochannel.com`
+### Always works (log in first)
 
-If expired: open cPanel manually and navigate to Terminal / Node.js Selector.
+| What | Link or step |
+|------|----------------|
+| **cPanel login** | [https://server9.shared.spaceship.host:2083/](https://server9.shared.spaceship.host:2083/) — use your cPanel username/password (Spaceship may also route you here from the client area). |
+| **Terminal** | After login: use the cPanel **search** (magnifying glass) → type **`Terminal`** → open **Terminal**. *(Path varies by theme; sometimes under **Advanced**.)* |
+| **Node.js app — Start / Stop / Restart** | After login: search **`Node.js`** or **`Setup Node.js App`** → open it → find **`mystudiochannel.com`** → use **RESTART** or **STOP** / **START**. |
+
+### Optional: your own bookmark file (local only)
+
+If you want **true one-click** links with `cpsess...` in them:
+
+1. Log into cPanel, open **Terminal** and **Node.js Selector** in tabs.
+2. Copy each URL from the address bar.
+3. Paste them into a file on your machine only, e.g. **`.vscode/cpanel-bookmarks.txt`** (add that filename to **`.gitignore`** if you store session URLs), or save as **browser bookmarks**.
+
+Never commit session URLs to git.
+
+### Legacy note (session URLs)
+
+If you saved links like `.../terminal/index.html` or `.../nodejs-selector.html.tt#/applications/mystudiochannel.com` with a long `cpsess...` segment, treat them as **temporary**. When they 404 or bounce to login, use the table above instead.
 
 ---
 
@@ -142,12 +247,14 @@ cPanel reverse proxy can leak internal origin (`0.0.0.0`) unless redirect handli
 
 1. Local:
    - `npm run build`
-   - create/upload `.next-deploy.zip` (or `pushitupzip -- .next`)
-2. Host terminal:
+   - `npm run pushitupzip -- .next` — produces **`.pushitupzips/next-build.zip`** locally and uploads it as **`.pushitupzips/next-build.zip`** on the server (visible name; old **`.next.zip`** was easy to miss in cPanel because names starting with **`.`** are often treated as hidden).
+2. **Where is the zip on the server?** PushItUP uses your FTPS login root, then the path **relative to the repo** (e.g. `.pushitupzips/next-build.zip`). That may land under **`mystudiochannel.com/.pushitupzips/`** or one directory above, depending on how Spaceship maps FTP home — check **Settings → Show Hidden Files** in File Manager if you expect a dot-prefixed name from an older run.
+3. Host terminal (app directory, e.g. `/home/.../mystudiochannel.com`):
    - `rm -rf .next`
    - `mkdir -p .next`
-   - `unzip -o .next-deploy.zip -d .next`
-3. Restart app.
+   - `unzip -o .pushitupzips/next-build.zip -d .next`  
+     (or copy the zip into the app dir first if it uploaded elsewhere)
+4. Restart app.
 
 ---
 
@@ -164,18 +271,18 @@ Install deps:
 npm install --legacy-peer-deps
 ```
 
-Replace `.next` from uploaded zip:
+Replace `.next` from uploaded zip (prefer **`next-build.zip`** from `pushitupzip`):
 
 ```bash
 rm -rf .next
 mkdir -p .next
-unzip -o .next-deploy.zip -d .next
+unzip -o .pushitupzips/next-build.zip -d .next
 ```
 
 If `unzip` unavailable:
 
 ```bash
-python -m zipfile -e .next-deploy.zip .next
+python -m zipfile -e .pushitupzips/next-build.zip .next
 ```
 
 ---
@@ -218,6 +325,14 @@ Optional:
 ---
 
 ## Troubleshooting quick map
+
+## Admin saves OK but homepage Demos / Projects look old
+
+1. **Confirm the API sees the new data (bypasses HTML layout):** open (in a private window is fine):
+   - `https://mystudiochannel.com/api/globals/projects-home?depth=1`
+   - Check `projectItems[0].title` (etc.) matches what you saved in **Site → Projects**.
+2. **If the JSON is correct but the homepage is wrong:** the **HTML for `/` is being cached** somewhere (LiteSpeed, cPanel “Cache Manager”, Cloudflare, etc.) while **`/api/*` is not** — so globals JSON shows `v111` but the document still shows old Demos. Fix: deploy the latest app (includes **root `middleware.ts`** that sets **`Cache-Control: no-store`** on document routes), **restart Node**, then **purge site cache** in cPanel/hosting panel if available; test in a **private window**.
+3. **If the JSON is also old:** you are not looking at the same database the app uses (wrong `DATABASE_URL` / duplicate app directory), or the save did not persist—compare with a second browser or `/admin` reload.
 
 ## `npm install` fails with peer conflicts
 
