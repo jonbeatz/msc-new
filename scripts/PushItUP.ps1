@@ -241,6 +241,8 @@ Write-Output "Files to upload: $total"
 
 $failed = New-Object System.Collections.Generic.List[string]
 $index = 0
+$progressEvery = [Math]::Max(1, [Math]::Ceiling($total / 20))
+$startedAt = Get-Date
 
 foreach ($item in $uploadItems) {
   $index++
@@ -251,8 +253,10 @@ foreach ($item in $uploadItems) {
     $failed.Add($item.RemotePath)
   }
 
-  if (($index % 100) -eq 0 -or $index -eq $total) {
-    Write-Output "Processed $index / $total (failed: $($failed.Count))"
+  if (($index % $progressEvery) -eq 0 -or $index -eq $total) {
+    $pct = [Math]::Round(($index * 100.0) / $total, 1)
+    $elapsed = [Math]::Round(((Get-Date) - $startedAt).TotalSeconds, 1)
+    Write-Output "Processed $index / $total ($pct%) (failed: $($failed.Count), elapsed: ${elapsed}s)"
   }
 }
 

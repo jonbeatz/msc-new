@@ -34,6 +34,19 @@ Human-named checkpoints so you can roll back mentally or on disk if a change goe
 | **RP-2026-04-09-spaceship-live-recovery** | 2026-04-09 | **Production recovery on Spaceship shared hosting:** pinned runtime compatibility (`next@15.4.11`, Payload 3.81 exact), moved `patch-package` into dependencies for production postinstall, updated `server.js` host binding to `0.0.0.0`, introduced deploy scripts `PushItUP` + `PushItUPzip`, documented low-memory host workflow (local build + upload prebuilt `.next` zip), uploaded `patches/` to restore Payload admin behavior, and confirmed public site + `/admin/login` live. |
 | **RP-2026-04-09-email-verify-redirect-final** | 2026-04-09 | **Verification redirect finalized on live host:** `collections/Leads.ts` verify endpoint now uses relative redirect targets (`/?verified=success|error`) to avoid reverse-proxy/internal host leakage (`0.0.0.0:3000`). Email links use `NEXT_PUBLIC_SERVER_URL` for public origin. Confirmed live homepage toast appears after verification. |
 
+## New restore-point template (copy/paste)
+
+Use this template when adding a checkpoint:
+
+```md
+| **RP-YYYY-MM-DD-short-name** | YYYY-MM-DD | **What was working:** short summary. **Branch/commit:** `<branch> @ <sha>`. **Restore steps:** 1) checkout branch/sha 2) run exact startup/deploy commands 3) note any env/dependency caveats. |
+```
+
+Suggested naming:
+
+- `RP-2026-04-10-admin-v103-sidebar-version`
+- `RP-2026-04-10-deploy-pushit-live-stable`
+
 ### Files worth diffing from this checkpoint
 
 - `payload.config.ts`

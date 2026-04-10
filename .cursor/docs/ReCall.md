@@ -12,7 +12,11 @@ Use this at the start of a new session:
 ```text
 Continue from ReCall.
 
-1) Read `.cursor/docs/ReCall.md` and `.cursor/docs/Development.md` first.
+1) Read docs in this order first:
+   - `.cursor/docs/Agent-Runbook.md`
+   - `.cursor/docs/Spaceship.md`
+   - `.cursor/docs/ReCall.md`
+   - `.cursor/docs/Development.md`
 2) Give me a quick resume using this format:
    - Done
    - Next

@@ -4,6 +4,18 @@ Quick reference for **npm scripts** and related tooling wired up in **`package.j
 
 ---
 
+## Source of truth order (for agents and new sessions)
+
+When docs differ, use this priority:
+
+1. **`Agent-Runbook.md`** (daily prompts / operating workflow)
+2. **`Spaceship.md`** (deploy + cPanel responsibilities)
+3. **`Jedi-List.md`** (command quick reference)
+4. **`Development.md`** (architecture details)
+5. **`ReCall.md`** (session log/history)
+
+---
+
 ## When local `/` or `/admin` breaks (do this first)
 
 Symptoms: **Runtime Error** `Cannot find module './vendor-chunks/date-fns.js`**, missing styles, giant logo only, or admin overlay after **`npm run build`**, switching branches, or heavy edits.
@@ -27,7 +39,7 @@ If it still misbehaves, close other Node processes on port **3000**, then repeat
 | 3 | **cPanel → Terminal** | Only if **`package.json` / lockfile / `patches`** changed: activate Node venv, **`cd`** to the app folder, **`npm install --legacy-peer-deps`** (see **Spaceship.md**). **Do not** run **`pushitup`** here. |
 | 4 | **cPanel → Node.js Selector** | **Restart** the app (or Stop → Start). |
 
-**Admin version check:** After deploy, open **`/admin`** — under **Dashboard** you should see **`v1.0.x`** from **`lib/msc-admin-version.ts`**. Bump that file when you ship admin-facing changes so live vs local is obvious.
+**Admin version check:** After deploy, open **`/admin`** — you should see **`v1.0.x`** near the sidebar **Log out** area (bottom-left). Bump `lib/msc-admin-version.ts` when you ship admin-facing changes.
 
 ---
 
@@ -41,6 +53,7 @@ If it still misbehaves, close other Node processes on port **3000**, then repeat
 | **`npm run dev:fresh`** | **`clean:next`** then **`dev:payload`** — use after **`npm run build`** if local dev looks broken. |
 | **`npm run build`** | Production build (`next build`). Use before `next start` or before zipping `.next` for low-memory hosts. Requires env (see **Run-Next-JS.md**). |
 | **`npm run start`** | Serves the **last build** (`next start`). Use for a local smoke test after `build`. |
+| **`npm run verify:local`** | Local pre-deploy smoke checks for `/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
 
 ---
 
@@ -62,7 +75,7 @@ If it still misbehaves, close other Node processes on port **3000**, then repeat
 
 ## Admin deploy version (visual check)
 
-After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.1` → `1.0.2`). The sidebar under **Dashboard** shows **`v1.0.x`** (muted text under the gold **Dashboard** link) so you can confirm the new build is live.
+After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.3` → `1.0.4`). The sidebar shows **`v1.0.x`** near **Log out** so you can confirm the new build is live.
 
 ---
 
@@ -107,20 +120,25 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 |--------|----------------|
 | **`npm run pushitup`** (or **`npm run PushItUP`**) | **`scripts/PushItUP.ps1`** — uploads listed **files or folders** directly over FTPS. **Spaceship default:** `npm run pushitup -- .next` after **`npm run build`** = full build folder, **no zip/unzip** (see **Spaceship.md** cheat sheet). Example: `npm run pushitup -- server.js` |
 | **`npm run pushitup:admin-ui`** | Uploads **`middleware.ts`**, **`lib/msc-admin-version.ts`**, **`components/msc-payload-nav-dashboard.tsx`**, **`app/(payload)/custom.scss`** — safe on Windows (no manual quoting). |
+| **`npm run pushit:live`** | **`npm run build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`npm run dev:fresh`** (auto-fixes local stale `.next` after deploy), then prints reminder to **Restart** Node in cPanel. Say *“push it live”* / *“run pushit live”* in chat to mean this. |
+| **`npm run pushit:live:safe`** | Runs **`verify:local`** preflight first; if all checks pass, runs full **`pushit:live`** flow. Use when you want extra guardrails. |
 | **`npm run pushitupzip`** (or **`npm run PushItUPzip`**) | **`scripts/PushItUPzip.ps1`** — zips each target under **`.pushitupzips/`**, then uploads. For **`.next`**, the file is **`next-build.zip`** (not **`.next.zip`**, so cPanel shows it). Remote path: **`.pushitupzips/next-build.zip`** under your FTPS root. Example: `npm run pushitupzip -- .next` |
 | **`npm run test:spaceship-ftp`** | **`scripts/Test-SpaceshipFtp.ps1`** — read-only FTPS check using **`.vscode/sftp.json`** (login + LIST). Does not upload. If `remotePath` returns 550, **PushItUP** already falls back to FTP session root (`/`); uploads can still work (see **Spaceship.md**). |
 
-Typical low-memory host workflow: **`npm run build`** locally → **`pushitupzip`** for **`.next`** → **`pushitup`** for **`patches`**, **`package.json`**, **`package-lock.json`**, **`server.js`**, etc. — then on the host **`npm install --legacy-peer-deps`**, unpack, restart (see **Development.md** → Spaceship).
+Default workflow: **`npm run pushit:live`** (build + admin-ui files + full `.next` + local `dev:fresh`) then restart Node in cPanel.  
+Use **`pushitupzip`** only when explicitly needed (bandwidth/workaround scenario documented in **Spaceship.md**).
 
 ---
 
 ## Related docs
 
+- **START-HERE.md** — first-stop daily operational guide (source-of-truth order + deploy rules).
 - **Run-Next-JS.md** — URLs, env, first-time `/admin`.
 - **Development.md** — architecture, Payload quirks, webpack vs Turbopack.
 - **ReCall.md** — session memory and resume checklist.
 - **Restore-Points.md** — checkpoints and DB backups.
 - **Spaceship.md** — production host notes, **cPanel login + how to open Terminal / Node.js** (session `cpsess` links expire; stable links are in that doc).
+- **Agent-Runbook.md** — copy/paste prompts (**Lets Start / Continue / Finish / Finish + Deploy / Push It Live**).
 
 ---
 

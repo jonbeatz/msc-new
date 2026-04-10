@@ -20,6 +20,12 @@
   border-bottom: 1px solid var(--theme-elevation-150);
 }
 
+.msc-payload-nav-dashboard__links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
 .msc-payload-nav-dashboard__link {
   display: inline-flex;
   align-items: center;
@@ -36,17 +42,14 @@
   text-decoration: underline;
 }
 
-.msc-payload-nav-dashboard__version {
-  margin-top: 0.45rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: #a8a29e;
-  text-transform: none;
+.msc-payload-nav-dashboard__link--external::after {
+  content: " ↗";
+  font-size: 0.75em;
+  opacity: 0.85;
 }
 
 .msc-payload-account-logout-inline {
-  margin-top: 0.9rem;
+  margin-top: 0.75rem;
   margin-bottom: 0.2rem;
 }
 
@@ -68,4 +71,14 @@
 .msc-payload-account-logout-inline__link:hover {
   background: rgba(212, 175, 55, 0.18);
   text-decoration: none;
+}
+
+.msc-payload-sidebar-version {
+  margin-top: 0.45rem;
+  margin-bottom: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #a8a29e;
+  text-transform: none;
 }

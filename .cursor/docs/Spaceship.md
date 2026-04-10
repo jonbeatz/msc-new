@@ -37,6 +37,34 @@ Skip step 2 or 3 when nothing in those areas changed.
 - **Two commands on one line** — e.g. `.nextnpm run ...` breaks; run **one** command, press **Enter**, then the next.
 - **`rm -rf .next` on the server without re-uploading** — the live site will break until you **`pushitup -- .next`** from the PC again.
 
+### Reference: step-by-step “get this live” (copy for your notes)
+
+1. **PC — repo root** in Cursor terminal: `npm run build` (wait until it finishes).
+2. **PC — optional:** `npm run pushitup:admin-ui` if you touched admin nav, version, or `app/(payload)/custom.scss`.
+3. **PC — optional:** `npm run pushitup -- …` for other changed **source** files (e.g. `collections/Foo.ts`, `lib/bar.ts`) *only if* those paths changed and you want the server disk copy to match — **the browser still uses the compiled output in `.next`**, so for UI/routes you must still do steps 1 + 4.
+4. **PC:** `npm run pushitup -- .next` — wait for **PushItUP complete** (file count varies by build; that is normal).
+5. **cPanel — optional:** if **`package.json`**, **`package-lock.json`**, or **`patches/`** changed: Terminal → `cd` app + `source` nodevenv → `npm install --legacy-peer-deps`.
+6. **cPanel → Setup Node.js App:** **Restart** the app.
+7. **Browser:** open **`https://mystudiochannel.com`** in **Incognito**.
+
+### Build + `.next`: full upload every time? Or only “pieces”?
+
+- **`npm run build`** regenerates the **`.next`** output on your PC. The number of files uploaded (e.g. 300 vs 380) **is not fixed**; it changes with the project and the build.
+- For **almost every change** to pages, admin, components, hooks, middleware, or Next config: run **`npm run build`**, then upload the **entire** **`.next`** folder with **`npm run pushitup -- .next`**. Do **not** try to upload only some files inside `.next`; manifests, **`BUILD_ID`**, and hashed chunks must stay in sync or you get **500s** and missing **`vendor-chunks`** errors.
+- Uploading **“pieces”** of the **repo** (source) makes sense **together with** a fresh **`.next`** from a build that already includes those edits — or for **non-Next** artifacts only (e.g. static files under **`public/`**, restoring **`payload.sqlite`**, editing **`.env`** on the host).
+
+**Rule of thumb:** changed **`.ts` / `.tsx`** that affect the site or admin → **full build + full `.next` upload**.
+
+### One command: `npm run pushit:live` (build + admin bundle files + `.next`)
+
+From the **repo root** on your PC:
+
+```bash
+npm run pushit:live
+```
+
+This runs **`npm run build`**, **`npm run pushitup:admin-ui`**, **`npm run pushitup -- .next`**, then **`npm run dev:fresh`** (to keep local stable after deploy), and prints a reminder to **Restart** the Node app in cPanel. It does **not** run **`npm install`** on the server or upload **`package.json`** unless you changed deps — add those steps manually when needed.
+
 ---
 
 ## Same-day deploy cheat sheet (typical “agent builds → you restart” flow)
