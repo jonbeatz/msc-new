@@ -60,19 +60,27 @@ export const Leads: CollectionConfig = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="supported-color-schemes" content="dark light" />
     <title>Verify your email</title>
     <style>
+      :root { color-scheme: dark; supported-color-schemes: dark; }
+      body, table, td, p, h1 { color: #f3f4f6 !important; }
       a, a:link, a:visited, a:hover, a:active {
+        color: #D4AF37 !important;
+        text-decoration: none !important;
+      }
+      a[x-apple-data-detectors], .apple-link a {
         color: #D4AF37 !important;
         text-decoration: none !important;
       }
     </style>
   </head>
-  <body style="margin:0;padding:0;background:#0b0b0f;font-family:Inter,Segoe UI,Arial,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px;">
+  <body bgcolor="#0b0b0f" style="margin:0;padding:0;background:#0b0b0f !important;font-family:Inter,Segoe UI,Arial,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#0b0b0f" style="padding:24px;background:#0b0b0f !important;">
       <tr>
-        <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#15151c;border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden;">
+        <td align="center" bgcolor="#0b0b0f">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#15151c" style="max-width:560px;background:#15151c !important;border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden;">
             <tr>
               <td style="padding:28px 28px 18px;">
                 <div style="display:inline-block;background:rgba(245,184,65,0.12);color:#f5b841;border:1px solid rgba(245,184,65,0.35);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">
@@ -155,18 +163,28 @@ export const Leads: CollectionConfig = {
 <!doctype html>
 <html>
   <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="supported-color-schemes" content="dark light" />
     <style>
+      :root { color-scheme: dark; supported-color-schemes: dark; }
+      body, table, td, p, h1 { color: #f3f4f6 !important; }
       a, a:link, a:visited, a:hover, a:active {
+        color: #D4AF37 !important;
+        text-decoration: none !important;
+      }
+      a[x-apple-data-detectors], .apple-link a {
         color: #D4AF37 !important;
         text-decoration: none !important;
       }
     </style>
   </head>
-  <body style="margin:0;padding:0;background:#0b0b0f;font-family:Inter,Segoe UI,Arial,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px;">
+  <body bgcolor="#0b0b0f" style="margin:0;padding:0;background:#0b0b0f !important;font-family:Inter,Segoe UI,Arial,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#0b0b0f" style="padding:24px;background:#0b0b0f !important;">
       <tr>
-        <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#15151c;border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden;">
+        <td align="center" bgcolor="#0b0b0f">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#15151c" style="max-width:620px;background:#15151c !important;border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden;">
             <tr>
               <td style="padding:28px;">
                 <div style="display:inline-block;background:rgba(245,184,65,0.12);color:#f5b841;border:1px solid rgba(245,184,65,0.35);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">

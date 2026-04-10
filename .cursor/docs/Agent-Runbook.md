@@ -507,6 +507,7 @@ Rules:
 - `pushitup` commands run on your PC (Cursor terminal), not cPanel Terminal.
 - cPanel links with `cpsess...` can expire after logout/session timeout.
 - For app/admin code changes, use full build + full `.next` upload (via `npm run pushit:live`).
+- When prompts are added/changed in this runbook, mirror the same entries (with short descriptions) in `.cursor/docs/Custom-Prompts.md`.
 
 ---
 

@@ -75,6 +75,19 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-10 — Email template dark-mode hardening + dev preview lab
+
+- Hardened email templates for iPhone/Apple Mail consistency in:
+  - `collections/Leads.ts` (verify + admin lead alert)
+  - `collections/Bookings.ts` (booking confirmed + admin booking alert)
+- Added dark-mode compatibility attributes and styles (`color-scheme`, `supported-color-schemes`, explicit `bgcolor`, Apple data detector link overrides).
+- Added dev-only preview route for the 3 core templates:
+  - `app/(site)/dev/email-preview/page.tsx`
+- Safety behavior:
+  - preview returns 404 in production (and when `ENABLE_DEV_LAB=false`).
+- Status check:
+  - local verify checks pass after changes.
+
 ### 2026-04-10 — Incident recovery: live 500 + local port drift
 
 - **Live incident:** site and admin returned `500` after deploy; cPanel `.stderr.log` showed missing `.next` runtime modules (`./vendor-chunks/@payloadcms.js`, `date-fns.js`, `next.js`).
