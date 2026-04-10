@@ -1,108 +1,29 @@
 ---
-description: >-
-  NovaMira MSC Media Engine — WordPress + Divi 4 + ACF + child theme. Vader
-  protocol (msc_), security, cinematic grids, red-pill filters, and delivery
-  checklist. Complements the Nova skill at .cursor/skills/Nova/SKILL.md.
+description: Project core operating rules for msc-new
 alwaysApply: true
 ---
 
-# NovaMira MSC Media Engine (Divi 4)
+# msc-new Core Rules
 
-Use **Divi 4** (Classic Builder / `et_pb_*` shortcodes, Theme Builder as shipped with Divi 4). **Do not** assume Divi 5 block JSON, `divi/*` block namespaces, or Divi 5–only APIs unless the user explicitly switches this project.
+Use this file as the high-level base. Detailed guidance is split into scoped files under `.cursor/rules/`.
 
-For extended conventions (file naming, edge cases), follow the **Nova** project skill:
+## Source of truth order
 
-`.cursor/skills/Nova/SKILL.md`
+1. `.cursor/docs/START-HERE.md`
+2. `.cursor/docs/Agent-Runbook.md`
+3. `.cursor/docs/Spaceship.md`
+4. `.cursor/docs/Jedi-List.md`
+5. `.cursor/docs/ReCall.md` and `.cursor/docs/Restore-Points.md`
 
----
+## Safety defaults
 
-## 1. Tech stack
+- Keep deploy actions explicit; do not run live deploy commands unless the user asks.
+- `pushitup` commands run on local PC terminal, not cPanel Terminal.
+- For app/admin changes, prefer full build + full `.next` upload.
+- If local dev breaks, recover with `npm run dev:fresh` and verify `http://localhost:3000/` and `/admin`.
 
-- **Core:** WordPress 6.x, **Divi 4.x** (stable), child theme.
-- **Data:** ACF (e.g. Show Data / project fields) where the project uses it.
-- **Environment:** LocalWP (or equivalent); CSS in child theme `style.css`.
-- **PHP naming:** Prefix **all** custom functions, classes, and hooks with `msc_`.
-- **CSS naming:** Custom classes use `msc-` or `nm-` so they do not collide with Divi/WP core.
+## Skills and specialized rules
 
----
-
-## 2. Security and bootstrap
-
-- Every PHP file must start with: `defined( 'ABSPATH' ) || exit;`
-- Use WordPress **nonces** for custom AJAX, REST mutations, and privileged form actions.
-
----
-
-## 3. WordPress and Divi 4 behavior
-
-- **Queries:** Use `WP_Query` for custom loops. Never use `query_posts`. Prefer `'no_found_rows' => true` when pagination counts are not needed.
-- **Layouts:** Builder pages use the standard Divi meta (e.g. `_et_pb_use_builder` where applicable). Prefer **module settings + custom CSS classes** over huge inline style blobs on modules.
-- **Modules / shortcodes:** Think in **Divi 4 shortcodes** (`et_pb_*`) and third-party modules (e.g. DiviGear) as registered by the theme/plugins—**not** Divi 5 serialized block comments.
-- **Grids:** Prefer **Featured Image** for thumbnails when it keeps SEO/plugins simple; align with ACF “Show Data” where the project defines it.
-- **Full width:** Use full-width page layout where needed (e.g. `et_full_width_page`) so sidebars do not break grid layouts—match what the project already uses.
-
----
-
-## 4. UI (NovaMira standard)
-
-- **Thumbnails:** **16:9** on show/project grids (e.g. `.dg-cpt-image-wrap img`, `.msc-show-card img`, `.et_pb_portfolio_image img`): `aspect-ratio: 16/9; object-fit: cover; width: 100%;`
-- **Red pill filters** (DiviGear / filter nav): background `#c01a1a`, text `#ffffff`, `border-radius: 20px`, padding `6px 18px`
-- **Interaction:** `cursor: pointer` on clickables; `transition: all 0.2s ease-in-out`; subtle hover scale on cards (e.g. `transform: scale(1.03)`)
-- **Spacing:** Prefer 8px increments (8, 16, 24, 32, 64). Check `style.css` for existing variables (e.g. `--gcid-*`) before inventing new hex colors.
-- **Background:** Primary page background target is **`#000000`** where the design calls for black.
-
----
-
-## 5. Pre-delivery checklist
-
-- Responsive at **375px** and **1024px**
-- No bad layout shift on hover
-- Text **contrast** at least **4.5:1** on `#000000` where applicable
-- Images: meaningful `alt` text; **`loading="lazy"`** where appropriate
-
----
-
-## 6. Workflow
-
-1. **CSS:** Child theme `style.css` (or enqueued partials if the project splits them).
-2. **Layout:** Visual Builder / Divi 4 modules; **NovaMira MCP** only if the project wires it—do not assume a tool exists without checking.
-3. **Before finishing:** Re-read the checklist above and the following core logic files:
-- **Primary Logic:** .cursor/skills/Nova/SKILL.md
-- **Design Logic:** .cursor/skills/NovaMira-Design/SKILL.md
-- **Emergency Docs:** .cursor/docs/FixNodeSite.md
-- **Onboarding:** .cursor/docs/Fresh-Start.md
-
----
-
-## 7. Data and ACF (project-specific)
-
-- When the project defines it: sync or map **show thumbnail** needs with **Featured Image** for consistency.
-- Keep **Show Data** (or equivalent) field groups scoped to the **project** post type per project config—do not duplicate field groups without intent.
-- Avoid **legacy Divi shortcodes** that force unnecessary backwards-compatibility mode when a current module or settings path exists.
-
-## 8. Hybrid Stack Architecture (Next.js + WordPress)
-- **The Golden Rule:** All Next.js assets MUST be referenced via root-relative paths (e.g., `/wp-content/themes/MSC_Clean-Pro/assets/...`) to satisfy the Turbopack Promise Map.
-- **Hydration Safety:** Never output PHP content (echo/print) before the `<!DOCTYPE html>` tag or inside the `__next` container.
-- **Folder Masking:** Always treat `_next` as `next-assets` in the final build.
-- **Script Handling:** Always strip type="module" from generated script tags to ensure document.currentScript remains accessible to the Turbopack runtime, preventing the "chunk path empty" error.
-
-## 9. Automation: MCP Server Sync (Nova-Key)
-
-- [cite_start]**Source of Truth:** `.cursor/docs/Nova-Key.md` 
-- **Trigger:** Whenever `.cursor/docs/Nova-Key.md` is updated or the user mentions "sync mcp," "update novamira," "update local site," or "switch site."
-- **Action:** 1. Read the JSON block inside `.cursor/docs/Nova-Key.md`.
-    2. Locate the global Cursor MCP config at `%APPDATA%\Cursor\User\globalStorage\mcp-servers.json` (Windows).
-    3. Overwrite the `env` values in the `"novamira-active"` section with the new `WP_API_URL`, `WP_API_USERNAME`, and `WP_API_PASSWORD` from the markdown file.
-- **Confirmation:** After applying the change, remind the user to click the **Refresh** icon in Cursor Settings > Features > MCP to finalize the new connection.
-
----
-
-## 10. Next.js front-end reference (`Development.md`)
-
-- **Source of truth for the Next App Router site in this repo:** `.cursor/docs/Development.md` — section order (`app/page.tsx` → `components/*-section.tsx`), static export notes, local asset paths (`public/images` → `/images/...`), integration hooks (e.g. contact booking URL), and constraints that differ from WordPress/Divi.
-- **How to use it:** Read it when editing or debugging the Next bundle, when adding/reordering homepage sections, or when wiring external URLs and deploy paths. Pair with `.cursor/docs/Run-Next-JS.md` for dev server and `out` build commands.
-- **Keep it current:** After meaningful front-end changes, append or edit **Development.md** so future sessions do not lose context—especially: new/changed files and responsibilities, export / hosting path changes, non-obvious bug fixes (symptom + cause + files), and any new site-wide constants or config patterns. Prefer short bullets; avoid pasting large logs. If the user agrees, update the changelog table in that doc when you land a notable fix.
-- **Session memory (`ReCall.md`):** At session start or when the user says "continue from last time", read `.cursor/docs/ReCall.md` + `.cursor/docs/Development.md`, then return a short resume in this format: **Done / Next / Open Questions** before new implementation.
-- **ReCall startup runtime check:** As part of ReCall startup, ensure local dev runtime is active: run install only if needed, run `npm run dev`, and confirm the Local URL at **`http://localhost:3000/`** (or the port shown in the terminal) from terminal output.
-- **Goodbye runtime cleanup:** On session close phrases like "I'm done for now" / "continue later", stop local dev listeners (e.g. Node processes bound to 3000-3010 when safe) so future restarts avoid busy ports, then confirm cleanup status.
-- **Ongoing memory / closeout:** During notable work, append concise entries to **ReCall.md**. If the user says "I'm done for now" or "continue later," append a closeout note to ReCall and confirm it was saved.
+- Nova conventions: `.cursor/skills/Nova/SKILL.md`
+- NovaMira design system: `.cursor/skills/NovaMira-Design/SKILL.md`
+- Payload blocks/admin conventions: `.cursor/rules/payload-blocks-first.mdc`

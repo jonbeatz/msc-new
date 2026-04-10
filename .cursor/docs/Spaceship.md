@@ -32,6 +32,12 @@ Skip step 2 or 3 when nothing in those areas changed.
 
 **Never** run **`npm run pushitup`** in cPanel Terminal.
 
+If cPanel says `npm: command not found`, activate the app environment first:
+
+```bash
+source ~/nodevenv/mystudiochannel.com/*/bin/activate
+```
+
 ### Small mistakes to avoid
 
 - **Two commands on one line** — e.g. `.nextnpm run ...` breaks; run **one** command, press **Enter**, then the next.
@@ -99,6 +105,36 @@ cPanel often shows the **directory’s** “Last modified” only when something
 Next puts some dependencies in **`.next/server/vendor-chunks/`** with names like **`@lexical.js`**. Older **PushItUP** builds URL-encoded **`@`** as **`%40`**, and a few hosts saved the remote file as **`%40lexical.js`**, so Node could not resolve **`@lexical.js`**. **PushItUP** now keeps a leading **`@`** in each path segment. After updating the script, run **`npm run build`**, **`rm -rf .next`** on the host (Terminal), **`npm run pushitup -- .next`**, then **Restart** Node. In **File Manager**, **`vendor-chunks`** should list **`@lexical.js`**, not **`%40lexical.js`**.
 
 The browser may also request **`/_next/static/development/...`** while the tab still has an old dev session cached — use a **hard refresh** or **Incognito** after the server is healthy.
+
+### Live 500 with mixed/missing `.next` chunks (current known recovery)
+
+If `.stderr.log` shows repeated `Cannot find module './vendor-chunks/...js'` for files like `@payloadcms.js`, `date-fns.js`, or `next.js`:
+
+1. In cPanel Node.js Selector: **Stop** app.
+2. In cPanel Terminal (app directory): `rm -rf .next`
+3. On PC: `npm run build`
+4. On PC: `npm run pushitup -- .next`
+5. If upload ends with failures, re-upload failed chunk areas:
+   - `npm run pushitup -- .next/static/chunks .next/server/chunks .next/server/webpack-runtime.js`
+6. In cPanel Node.js Selector: **Start** app.
+7. Validate in Incognito: `/` and `/admin`.
+
+This fixes artifact mismatch where server `.next` is partially old + partially new.
+
+### cPanel log filenames (easy typo trap)
+
+Use these exact files in app root:
+
+- `.stderr.log`
+- `.stdout.log`
+
+Commands:
+
+```bash
+cd ~/mystudiochannel.com
+tail -n 120 .stderr.log
+tail -n 120 .stdout.log
+```
 
 ### `patch-package` says “No patch files found” in Terminal
 

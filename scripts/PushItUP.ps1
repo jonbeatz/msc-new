@@ -239,7 +239,7 @@ Write-Output "Server: $ftpServer`:$ftpPort (FTPS=$useSsl, Passive=$usePassive)"
 Write-Output "Remote base: $remoteBase"
 Write-Output "Files to upload: $total"
 
-$failed = New-Object System.Collections.Generic.List[string]
+$failed = New-Object System.Collections.Generic.List[object]
 $index = 0
 $progressEvery = [Math]::Max(1, [Math]::Ceiling($total / 20))
 $startedAt = Get-Date
@@ -250,7 +250,7 @@ foreach ($item in $uploadItems) {
   try {
     Upload-FileToFtp -BaseFtpUrl $baseFtpUrl -LocalFile $item.LocalPath -RemoteFilePath $remotePathUnderBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive
   } catch {
-    $failed.Add($item.RemotePath)
+    $failed.Add($item)
   }
 
   if (($index % $progressEvery) -eq 0 -or $index -eq $total) {
@@ -261,9 +261,26 @@ foreach ($item in $uploadItems) {
 }
 
 if ($failed.Count -gt 0) {
-  Write-Output "PushItUP completed with failures."
-  $failed | Select-Object -First 30 | ForEach-Object { Write-Output "FAILED $_" }
-  exit 1
+  Write-Output "Retrying failed uploads once ($($failed.Count) files)..."
+  $retryFailed = New-Object System.Collections.Generic.List[object]
+
+  foreach ($item in $failed) {
+    $remotePathUnderBase = Join-FtpPath -Left $remoteBase -Right $item.RemotePath
+    try {
+      Upload-FileToFtp -BaseFtpUrl $baseFtpUrl -LocalFile $item.LocalPath -RemoteFilePath $remotePathUnderBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive
+    } catch {
+      $retryFailed.Add($item)
+    }
+  }
+
+  if ($retryFailed.Count -gt 0) {
+    Write-Output "PushItUP completed with failures after retry."
+    $retryFailed | Select-Object -First 30 | ForEach-Object { Write-Output "FAILED $($_.RemotePath)" }
+    exit 1
+  }
+
+  Write-Output "Retry succeeded. Uploaded $total files."
+  exit 0
 }
 
 Write-Output "PushItUP complete. Uploaded $total files."

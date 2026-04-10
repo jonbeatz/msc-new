@@ -75,6 +75,21 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-10 — Incident recovery: live 500 + local port drift
+
+- **Live incident:** site and admin returned `500` after deploy; cPanel `.stderr.log` showed missing `.next` runtime modules (`./vendor-chunks/@payloadcms.js`, `date-fns.js`, `next.js`).
+- **Root cause:** mixed/incomplete server `.next` artifacts from interrupted/partial FTPS chunk uploads.
+- **Fix path (confirmed):**
+  1) activate nodevenv in cPanel so `npm` is available
+  2) remove server `.next`
+  3) rebuild locally
+  4) re-upload full `.next` from PC
+  5) re-upload failed chunk areas when `PushItUP` reports end-of-run failures
+  6) restart Node app (Stop -> wait -> Start)
+- **Result:** live `https://mystudiochannel.com/` and `/admin` recovered; admin version `v1.0.3` visible.
+- **Local incident:** `verify:local` failed (`/` 404 + `/admin` 500) while API stayed `200` because stale node process kept port 3000 and dev booted on 3002/3003/3004.
+- **Local fix:** kill stale process on `3000`, rerun `npm run dev:fresh`, then `npm run verify:local` passes all checks.
+
 ### 2026-04-09 — Dev scripts aligned with Next.js 15.4 CLI
 
 - **Issue:** `npm run dev:payload` failed with `error: unknown option '--webpack'` — Next **15.4.11** uses **webpack by default**; Turbopack is opt-in (`--turbo` / `--turbopack`). `--no-server-fast-refresh` is not a valid flag on this CLI.

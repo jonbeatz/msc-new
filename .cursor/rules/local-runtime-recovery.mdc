@@ -1,0 +1,22 @@
+---
+description: Local runtime recovery guardrails for localhost 3000
+alwaysApply: false
+globs:
+  - scripts/**/*.ps1
+  - .cursor/docs/START-HERE.md
+  - .cursor/docs/Jedi-List.md
+  - .cursor/docs/ReCall.md
+---
+
+# Local runtime recovery
+
+When local `http://localhost:3000` is broken:
+
+1. Run `npm run dev:fresh`.
+2. Verify:
+   - `http://localhost:3000/`
+   - `http://localhost:3000/admin`
+   - local API smoke route
+3. If `/` is 404 and `/admin` is 500 while API is 200, check for stale process occupying 3000 and restart cleanly.
+4. Prefer this minimal sequence over ad-hoc cache/command changes.
+

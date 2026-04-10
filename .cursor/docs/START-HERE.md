@@ -45,6 +45,11 @@ Other docs are reference/history and optional unless a task specifically needs t
 Portable workflow skills pack for reuse in other projects:
 - `.cursor/skills/Workflow-Portable/README.md`
 
+Project rules layout:
+- Core rule file: `.cursorrules`
+- Scoped rules folder: `.cursor/rules/` (topic-specific `.mdc` files)
+- Skills: `.cursor/skills/`
+
 ---
 
 ## Docs map (what to read when)
@@ -114,6 +119,25 @@ These `cpsess...` links can expire. If they do, log in at:
 5. Only run server `npm install --legacy-peer-deps` when `package.json`, lockfile, or `patches/` changed.
 6. Keep `patches/` present on server if install relies on `patch-package`.
 7. After deploy, restart Node app and validate in Incognito.
+
+---
+
+## Quick incident recovery (when things suddenly break)
+
+1. Local broken after deploy? Run `npm run dev:fresh`.
+2. If `verify:local` still fails on `/` + `/admin`, check for port hijack:
+   - kill stale node process on `3000`
+   - rerun `npm run dev:fresh`
+3. Live 500 with `vendor-chunks` module errors:
+   - Stop app in cPanel
+   - remove server `.next`
+   - re-upload full `.next` from PC
+   - Start app again
+4. In cPanel Terminal, if `npm: command not found`, activate nodevenv first:
+   - `source ~/nodevenv/mystudiochannel.com/*/bin/activate`
+5. Use correct log files in app root:
+   - `.stderr.log`
+   - `.stdout.log`
 
 ---
 

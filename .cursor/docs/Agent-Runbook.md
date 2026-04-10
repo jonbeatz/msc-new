@@ -136,6 +136,7 @@ From repo root D:\Cursor_Projectz\MSC_Clean_v2\msc-new:
 4) Tell me the exact next action: restart app, then test live in incognito.
 
 If pushit:live fails, stop and tell me the exact failing step + shortest recovery command.
+If upload finishes with failures, re-run upload for failed paths before restart.
 ```
 
 ---
@@ -162,6 +163,34 @@ Please do this in order:
 6) After confirmation: commit and push to current branch.
 
 Do not deploy to live in this flow.
+```
+
+---
+
+## 6a) Lets Checkpoint Docs
+
+Use this to capture useful documentation updates during active work, without any git actions.
+
+```text
+Lets Checkpoint Docs.
+
+Please review today's work and update only the necessary docs:
+- .cursor/docs/START-HERE.md
+- .cursor/docs/Agent-Runbook.md
+- .cursor/docs/Spaceship.md
+- .cursor/docs/Jedi-List.md
+- .cursor/docs/ReCall.md
+- .cursor/docs/Restore-Points.md (only if this is a meaningful milestone)
+
+Requirements:
+1) Sync docs to scripts (no guessing): verify command wording against package.json scripts.
+2) Add incident notes and recovery steps from today (root cause + shortest fix path).
+3) Keep edits minimal, practical, and non-duplicative.
+4) Return:
+   - docs changed summary
+   - why each change was needed
+   - any follow-up doc suggestions
+5) STOP before any git actions. Do not commit or push.
 ```
 
 ---
@@ -197,13 +226,19 @@ Use this to create a clean starting point quickly.
 ```text
 Lets Cut New Branch.
 
-1) Ask me for the new branch name (or propose one from current context).
-2) Create branch from current HEAD.
-3) Push with upstream tracking.
-4) Confirm I am now on that branch.
-5) Show quick git status.
+1) Run git status first and tell me if working tree is clean or dirty.
+2) If dirty: do NOT auto-commit. Ask me whether to:
+   - continue branch cut with current uncommitted changes, or
+   - stop so I can run a checkpoint/commit first.
+3) Ask me for the new branch name (or propose one from current context).
+4) Create branch from current HEAD.
+5) Push with upstream tracking.
+6) Confirm I am now on that branch.
+7) Show quick git status.
 
-Do not deploy in this flow.
+Rules:
+- Do not auto-commit in this flow.
+- Do not deploy in this flow.
 ```
 
 ---
@@ -279,6 +314,7 @@ Start with handshake line: "Ok Jon - drift audit started."
 
 Please review:
 - `.cursorrules`
+- `.cursor/rules/` (all active `.mdc` project rules)
 - local project skills under `.cursor/skills/`
 - `.cursor/docs/Agent-Runbook.md`
 - `.cursor/docs/START-HERE.md`
@@ -358,6 +394,39 @@ Keep output concise and actionable.
 
 ---
 
+## 16) Take a snapshot
+
+Use this when you want one command to create a full rollback point before risky work.
+
+```text
+Take a snapshot.
+
+Start with handshake line: "Ok Jon - snapshot flow started."
+
+Please do this in order:
+1) Run git status and summarize what is dirty.
+2) Review/update only necessary docs for today's changes:
+   - .cursor/docs/START-HERE.md
+   - .cursor/docs/Agent-Runbook.md
+   - .cursor/docs/Spaceship.md
+   - .cursor/docs/Jedi-List.md
+   - .cursor/docs/ReCall.md
+   - .cursor/docs/Restore-Points.md (if milestone/incident)
+3) Show docs changed summary.
+4) Draft a why-focused commit message and ask for my approval.
+5) After approval, commit and push current branch.
+6) Propose 3 branch-name options for a restore branch.
+7) I pick one name.
+8) Create the new branch from current HEAD and push with upstream tracking.
+9) Confirm active branch, latest commit SHA, and quick git status.
+
+Rules:
+- Do not auto-commit without my approval.
+- Do not deploy in this flow.
+```
+
+---
+
 ## Notes
 
 - If the agent is unsure what to trust, tell it: **"Use Agent-Runbook.md then Spaceship.md as source of truth."**
@@ -433,3 +502,9 @@ Use these as quick "commands in plain English" for the agent.
 
 21. **`Pre-deploy risk check for current changes`**  
     - Reviews current diff and lists top deployment risks plus the shortest prevention steps.
+
+22. **`Lets Checkpoint Docs`**  
+    - Updates only needed docs for current work, syncs commands to scripts, and stops before any git commit/push.
+
+23. **`Take a snapshot`**  
+    - Runs docs checkpoint + approved commit/push, then proposes 3 branch names and cuts a restore branch for rollback safety.

@@ -8,11 +8,12 @@ Quick reference for **npm scripts** and related tooling wired up in **`package.j
 
 When docs differ, use this priority:
 
-1. **`Agent-Runbook.md`** (daily prompts / operating workflow)
-2. **`Spaceship.md`** (deploy + cPanel responsibilities)
-3. **`Jedi-List.md`** (command quick reference)
-4. **`Development.md`** (architecture details)
-5. **`ReCall.md`** (session log/history)
+1. **`START-HERE.md`** (daily guardrails + source-of-truth root)
+2. **`Agent-Runbook.md`** (daily prompts / operating workflow)
+3. **`Spaceship.md`** (deploy + cPanel responsibilities)
+4. **`Jedi-List.md`** (command quick reference)
+5. **`Development.md`** (architecture details)
+6. **`ReCall.md`** (session log/history)
 
 ---
 
@@ -25,6 +26,9 @@ Symptoms: **Runtime Error** `Cannot find module './vendor-chunks/date-fns.js`**,
 3. Run **`npm run dev:payload`** and reload the browser.
 
 If it still misbehaves, close other Node processes on port **3000**, then repeat step 2–3. The Next.js error overlay may say **Webpack**; that label is normal for some dev paths and is not the root cause — stale **`.next`** chunks are.
+
+Fast triage pattern:
+- `404` on `/` and `500` on `/admin` with API still `200` often means the dev server moved to a different port (3002/3003/3004). Clear stale node on `3000`, then rerun `npm run dev:fresh`.
 
 ---
 
@@ -128,11 +132,14 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 Default workflow: **`npm run pushit:live`** (build + admin-ui files + full `.next` + local `dev:fresh`) then restart Node in cPanel.  
 Use **`pushitupzip`** only when explicitly needed (bandwidth/workaround scenario documented in **Spaceship.md**).
 
+If `pushitup -- .next` ends with `PushItUP completed with failures`, immediately re-run `pushitup` for failed areas (usually `.next/static/chunks` and `.next/server/chunks`) before restarting app.
+
 ---
 
 ## Related docs
 
 - **START-HERE.md** — first-stop daily operational guide (source-of-truth order + deploy rules).
+- **Project rules:** `.cursorrules` (core) + `.cursor/rules/*.mdc` (scoped project rules).
 - **Run-Next-JS.md** — URLs, env, first-time `/admin`.
 - **Development.md** — architecture, Payload quirks, webpack vs Turbopack.
 - **ReCall.md** — session memory and resume checklist.
