@@ -466,6 +466,41 @@ Rules:
 
 ---
 
+## 18) Lets run system check
+
+Use this when you want one command to validate overall readiness before development or deploy.
+
+```text
+Lets run system check.
+
+Start with handshake line: "Ok Jon - system check started."
+
+Please run these checks in order:
+1) Local health check:
+   - `npm run verify:local`
+2) Live health check:
+   - `npm run verify:live`
+3) FTP connection check:
+   - `npm run test:spaceship-ftp`
+4) Repo readiness check:
+   - `git status --short`
+
+Return results in this format:
+- Local: PASS/FAIL
+- Live: PASS/FAIL
+- FTP: PASS/FAIL
+- Repo status: CLEAN/DIRTY
+- Overall: GREEN / YELLOW / RED
+- Exact next recommended action (one line)
+
+Rules:
+- Do not deploy in this flow.
+- Do not commit/push in this flow.
+- Keep output concise and pass/fail focused.
+```
+
+---
+
 ## Notes
 
 - If the agent is unsure what to trust, tell it: **"Use Agent-Runbook.md then Spaceship.md as source of truth."**
@@ -550,3 +585,21 @@ Use these as quick "commands in plain English" for the agent.
 
 24. **`Lets Restore Branch from <branch-name>`**  
     - Safely switches to a known-good branch from GitHub with dirty-tree protection and explicit confirmation gates.
+
+25. **`Run verify:local and show pass/fail only`**  
+    - Runs local endpoint health checks only (`/`, `/admin`, API) with concise pass/fail output.
+
+26. **`Run verify:live and show pass/fail only`**  
+    - Runs live endpoint health checks only (`https://mystudiochannel.com/`, `/admin`, API) with concise pass/fail output.
+
+27. **`Lets test Local`**  
+    - Alias for running `verify:local` and returning pass/fail only.
+
+28. **`Lets test Live`**  
+    - Alias for running `verify:live` and returning pass/fail only.
+
+29. **`Lets test FTP`**  
+    - Runs `test:spaceship-ftp` for a quick FTPS login/list check and reports ready/not-ready.
+
+30. **`Lets run system check`**  
+    - Runs local + live + FTP + repo-status checks and returns one consolidated readiness report.

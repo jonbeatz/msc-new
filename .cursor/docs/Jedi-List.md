@@ -58,6 +58,7 @@ Fast triage pattern:
 | **`npm run build`** | Production build (`next build`). Use before `next start` or before zipping `.next` for low-memory hosts. Requires env (see **Run-Next-JS.md**). |
 | **`npm run start`** | Serves the **last build** (`next start`). Use for a local smoke test after `build`. |
 | **`npm run verify:local`** | Local pre-deploy smoke checks for `/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
+| **`npm run verify:live`** | Live smoke checks for `https://mystudiochannel.com/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
 
 ---
 
