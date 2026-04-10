@@ -46,7 +46,7 @@ export function normalizeInternalNavLink(link: string): string {
     return t
   }
 
-  let pathPart = t.slice(0, firstHash).trim()
+  const pathPart = t.slice(0, firstHash).trim()
   const afterHashes = t.slice(firstHash + 1)
 
   if (!afterHashes) {

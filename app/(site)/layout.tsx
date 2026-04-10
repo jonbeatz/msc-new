@@ -17,7 +17,6 @@ const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700", "800"],
 })
 
-const defaultTitle = "My Studio Channel | Professional Creator Platforms"
 const defaultDescription =
   "We build studio-style websites that give creators the look and structure of a major network—powered by a custom plugin and professional video setup."
 const metadataBaseURL =

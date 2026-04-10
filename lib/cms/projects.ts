@@ -19,6 +19,7 @@ function normalizeMediaSrc(pathOrUrl: string): string {
   return pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`
 }
 
+/** Match hero fallbacks (`components/hero-section.tsx`) so local assets exist when CMS has no projects. */
 const FALLBACK_DEMOS: DemoProject[] = [
   {
     id: "fallback-1",
@@ -26,7 +27,7 @@ const FALLBACK_DEMOS: DemoProject[] = [
     category: "Interview Format",
     subtitle:
       "Professional talk show layout with guest management, episode scheduling, and live audience interaction features.",
-    image: "/images/demo-talkshow.jpg",
+    image: "/images/tv-wall.jpg",
     demoUrl: "#msc-demos",
     isFeatured: true,
   },
@@ -36,7 +37,7 @@ const FALLBACK_DEMOS: DemoProject[] = [
     category: "Cooking Show",
     subtitle:
       "Recipe-driven content platform with ingredient lists, step-by-step guides, and meal planning integration.",
-    image: "/images/demo-cooking.jpg",
+    image: "/images/show-cards.jpg",
     demoUrl: "#msc-demos",
     isFeatured: false,
   },
@@ -46,7 +47,7 @@ const FALLBACK_DEMOS: DemoProject[] = [
     category: "Podcast Platform",
     subtitle:
       "Audio-first streaming experience with playlist support, transcriptions, and subscriber management.",
-    image: "/images/demo-podcast.jpg",
+    image: "/images/on-air.jpg",
     demoUrl: "#msc-demos",
     isFeatured: false,
   },
@@ -56,7 +57,7 @@ const FALLBACK_DEMOS: DemoProject[] = [
     category: "Documentary Series",
     subtitle:
       "Cinematic storytelling platform with chapter navigation, behind-the-scenes content, and filmmaker profiles.",
-    image: "/images/demo-documentary.jpg",
+    image: "/images/creator-solo.jpg",
     demoUrl: "#msc-demos",
     isFeatured: false,
   },

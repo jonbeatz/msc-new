@@ -45,7 +45,6 @@ export function Header({
 
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console -- verify Site settings → Enable Sticky Header
       console.log("[MSC] Enable Sticky Header (prop):", stickyHeader)
     }
   }, [stickyHeader])

@@ -74,13 +74,13 @@ Fast triage pattern:
 
 | Command | What it does |
 |--------|----------------|
-| **`npm run lint`** | Runs **ESLint** across the project (`eslint .`). |
+| **`npm run lint`** | Runs **`next lint`** (Next.js + ESLint flat config via **`eslint.config.mjs`**). |
 
 ---
 
 ## Admin deploy version (visual check)
 
-After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.3` → `1.0.4`). The sidebar shows **`v1.0.x`** near **Log out** so you can confirm the new build is live.
+After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.4` → `1.0.5`). The sidebar shows **`v1.0.x`** near **Log out** so you can confirm the new build is live.
 
 ---
 

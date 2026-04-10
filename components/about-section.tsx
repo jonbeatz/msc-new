@@ -92,7 +92,7 @@ export function AboutSection() {
           </div>
 
           {/* Feature Cards - 4 across */}
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <div
               key={feature.title}
               className="lg:col-span-3 bento-card group p-6 rounded-2xl border border-border/50 bg-card/30 hover:bg-card/50 transition-all duration-300"

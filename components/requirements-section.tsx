@@ -2,10 +2,22 @@
 
 import { useState } from "react"
 import NextImage from "next/image"
+import type { LucideIcon } from "lucide-react"
 import { Image, Film, Video, Globe, Server, CheckCircle2, ArrowRight, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const requirements = [
+type RequirementCard = {
+  id: number
+  icon: LucideIcon
+  title: string
+  subtitle: string
+  description: string
+  specs: string[]
+  highlight: boolean
+  hasImage?: boolean
+}
+
+const requirements: RequirementCard[] = [
   {
     id: 1,
     icon: Image,
@@ -86,7 +98,7 @@ export function RequirementsSection() {
 
         {/* Requirements Grid */}
         <div className="grid lg:grid-cols-2 gap-6 mb-12">
-          {requirements.map((item, index) => (
+          {requirements.map((item) => (
             <div
               key={item.id}
               className={cn(
@@ -104,7 +116,7 @@ export function RequirementsSection() {
                 <span className="text-sm font-bold text-accent">{item.id}</span>
               </div>
         {/* Card with optional image layout */}
-              {(item as any).hasImage ? (
+              {item.hasImage ? (
                 <div className="flex flex-col lg:flex-row">
                   {/* Left: text content */}
                   <div className="p-8 flex flex-col justify-between flex-1">

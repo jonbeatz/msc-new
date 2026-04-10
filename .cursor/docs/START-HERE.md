@@ -100,13 +100,17 @@ Important: `pushitup` runs on PC, not cPanel Terminal.
 
 ## cPanel links (session-scoped)
 
+**Jon’s current bookmarks** (update this block when `cpsess…` expires after logout):
+
 - Node app Start/Stop page:  
-  <https://server9.shared.spaceship.host:2083/cpsess0284884427/frontend/jupiter/lveversion/nodejs-selector.html.tt#/applications/mystudiochannel.com>
+  <https://server9.shared.spaceship.host:2083/cpsess0827945513/frontend/jupiter/lveversion/nodejs-selector.html.tt#/applications/mystudiochannel.com>
 - Terminal page:  
-  <https://server9.shared.spaceship.host:2083/cpsess0284884427/frontend/jupiter/terminal/index.html>
+  <https://server9.shared.spaceship.host:2083/cpsess0827945513/frontend/jupiter/terminal/index.html>
 
 These `cpsess...` links can expire. If they do, log in at:
 <https://server9.shared.spaceship.host:2083/>
+
+**Agent instruction:** When telling Jon to run something, always say whether it is **Local (Cursor / PC repo root)** or **Live (cPanel → Terminal)**. For Start/Stop, use the Node link above; for host shell steps, use the Terminal link above.
 
 ---
 

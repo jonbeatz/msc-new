@@ -1,11 +1,24 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { DemoProject } from "@/lib/cms/projects"
 import { cn } from "@/lib/utils"
+
+/** Same-tab for hashes and internal paths; new tab only for off-site URLs. */
+function demoLinkProps(url: string): { target?: string; rel?: string } {
+  const u = url.trim()
+  if (
+    u.startsWith("http://") ||
+    u.startsWith("https://") ||
+    u.startsWith("//")
+  ) {
+    return { target: "_blank", rel: "noreferrer" }
+  }
+  return {}
+}
 
 type DemosSectionProps = {
   demos: DemoProject[]
@@ -21,6 +34,13 @@ export function DemosSection({
   const activeDemo = useMemo(() => {
     return demos.find((demo) => demo.id === activeDemoId) ?? demos[0]
   }, [activeDemoId, demos])
+
+  useEffect(() => {
+    if (demos.length === 0) return
+    if (!demos.some((d) => d.id === activeDemoId)) {
+      setActiveDemoId(demos[0]!.id)
+    }
+  }, [demos, activeDemoId])
 
   const listDemos = demos
   const featuredDemo = activeDemo
@@ -108,8 +128,7 @@ export function DemosSection({
                   <div className="mt-3">
                     <a
                       href={demo.demoUrl}
-                      target="_blank"
-                      rel="noreferrer"
+                      {...demoLinkProps(demo.demoUrl)}
                       className="pointer-events-auto inline-flex items-center gap-1 text-xs font-semibold text-[#D4AF37] no-underline transition-opacity hover:opacity-90"
                     >
                       View Live Demo
@@ -161,14 +180,15 @@ export function DemosSection({
                 <div className="mt-5 flex items-center gap-4">
                   <a
                     href={featuredDemo.demoUrl}
-                    target="_blank"
-                    rel="noreferrer"
+                    {...demoLinkProps(featuredDemo.demoUrl)}
                     className="inline-flex items-center rounded-xl border border-[#D4AF37]/55 bg-[#D4AF37]/14 px-4 py-2 text-sm font-semibold text-[#D4AF37] no-underline transition-all hover:bg-[#D4AF37]/20"
                   >
                     View Live Demo
                     <ArrowUpRight className="ml-2 h-4 w-4" />
                   </a>
-                  <span className="text-sm text-gray-400">Featured placement from CMS toggle</span>
+                  <span className="text-sm text-gray-400">
+                    Choose a demo in the list to preview it here
+                  </span>
                 </div>
               </div>
             </div>
@@ -185,12 +205,20 @@ export function DemosSection({
             style={{ scrollbarWidth: "thin" }}
           >
             {listDemos.map((demo) => (
-              <button
+              <div
                 key={demo.id}
-                type="button"
+                role="button"
+                tabIndex={0}
+                aria-pressed={demo.id === featuredDemo.id}
                 onClick={() => setActiveDemoId(demo.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    setActiveDemoId(demo.id)
+                  }
+                }}
                 className={cn(
-                  "bento-card group min-h-[112px] shrink-0 overflow-hidden rounded-2xl border bg-card/30 text-left transition-all duration-300 cursor-pointer",
+                  "bento-card group min-h-[112px] shrink-0 overflow-hidden rounded-2xl border bg-card/30 text-left transition-all duration-300 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   demo.id === featuredDemo.id
                     ? "border-accent/55 ring-1 ring-accent/30"
                     : "border-border/50 hover:border-accent/35"
@@ -238,8 +266,8 @@ export function DemosSection({
                     <div className="mt-2">
                       <a
                         href={demo.demoUrl}
-                        target="_blank"
-                        rel="noreferrer"
+                        {...demoLinkProps(demo.demoUrl)}
+                        onClick={(e) => e.stopPropagation()}
                         className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4AF37] no-underline transition-opacity hover:opacity-90"
                       >
                         View Live Demo
@@ -248,7 +276,7 @@ export function DemosSection({
                     </div>
                   </div>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>

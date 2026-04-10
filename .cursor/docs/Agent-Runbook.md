@@ -18,6 +18,8 @@ When starting/resuming from docs, begin with a short handshake line using the op
 
 This is the confirmation that docs/context were read correctly.
 
+**Command locality:** Whenever you tell Jon to run a command, label **Local (Cursor / PC repo root)** vs **Live (cPanel → Terminal)**. Use Jon’s Node.js and Terminal URLs from **`START-HERE.md`** (session `cpsess` updates when links expire).
+
 Trigger rule (for custom prompt flows):
 
 - For any recognized trigger prompt (e.g. `Lets Start`, `Lets Continue`, `Lets Push It Live`, `Run verify:local and show pass/fail only`), the first response must start with:
@@ -128,12 +130,12 @@ Lets Push It Live.
 From repo root D:\Cursor_Projectz\MSC_Clean_v2\msc-new:
 1) Run npm run pushit:live
 2) Stream upload/build progress until complete
-3) When done, give me these clickable links:
-   - Start/Stop (Node.js app):
-     https://server9.shared.spaceship.host:2083/cpsess0284884427/frontend/jupiter/lveversion/nodejs-selector.html.tt#/applications/mystudiochannel.com
-   - Terminal:
-     https://server9.shared.spaceship.host:2083/cpsess0284884427/frontend/jupiter/terminal/index.html
-4) Tell me the exact next action: restart app, then test live in incognito.
+3) When done, give me these clickable links (Jon’s current `cpsess`; refresh in `START-HERE.md` if expired):
+   - Start/Stop (Node.js app) — **Live (cPanel)**:
+     https://server9.shared.spaceship.host:2083/cpsess0827945513/frontend/jupiter/lveversion/nodejs-selector.html.tt#/applications/mystudiochannel.com
+   - Terminal — **Live (cPanel → Terminal)**:
+     https://server9.shared.spaceship.host:2083/cpsess0827945513/frontend/jupiter/terminal/index.html
+4) Tell me the exact next action: **Live (cPanel)** — restart app, then test live in incognito. Always label commands as **Local (Cursor)** vs **Live (cPanel)** when giving run instructions.
 
 If pushit:live fails, stop and tell me the exact failing step + shortest recovery command.
 If upload finishes with failures, re-run upload for failed paths before restart.

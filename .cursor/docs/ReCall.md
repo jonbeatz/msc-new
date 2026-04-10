@@ -75,6 +75,14 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-10 — Checkpoint: demos polish, ESLint, admin v1.0.4 live, operator docs
+
+- **Demos:** `components/demos-section.tsx` — valid focusable rail (no `<button>` wrapping `<a>`), same-tab links for non-HTTP URLs, selection sync when CMS list changes; `lib/cms/projects.ts` fallback images aligned with hero assets.
+- **Tooling:** `eslint.config.mjs` + `next lint`; ESLint devDeps; lint fixes (`hash-nav`, requirements typing, toast action types, unused imports).
+- **Admin:** `MSC_ADMIN_VERSION` **1.0.4**; shipped with local **`npm run build`** + **`pushitup:admin-ui`** + **`pushitup -- .next`** (client bundle must include version).
+- **Docs / ops:** `START-HERE` + `Agent-Runbook` updated cPanel session URLs; new **`.cursor/rules/jon-operator-cpanel.mdc`** — always label **Local (Cursor)** vs **Live (cPanel)** and use Jon’s Node + Terminal links for Start/Stop vs host shell steps.
+- **Verify:** `npm run lint`, `npm run build`, `verify:local` / `verify:live`, `test:spaceship-ftp` used during session; port-3000 hijack note: free stale listener before `verify:local`.
+
 ### 2026-04-10 — Email template dark-mode hardening + dev preview lab
 
 - Hardened email templates for iPhone/Apple Mail consistency in:

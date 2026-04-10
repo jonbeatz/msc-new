@@ -201,6 +201,8 @@ Used by local deploy scripts (`PushItUP`, `PushItUPzip`):
 
 **Important:** “Magic” cPanel URLs that contain **`cpsess...`** in the middle **stop working** after you log out or the session times out. This doc keeps links that **stay valid**; for one-click shortcuts, bookmark pages **while you are logged in** (browser bookmarks).
 
+**Operator bookmarks (Jon):** session-scoped **Node.js** and **Terminal** click-through URLs live in **`.cursor/docs/START-HERE.md`** (*cPanel links*) and are mirrored for agents in **`.cursor/rules/jon-operator-cpanel.mdc`**. Refresh both when `cpsess` changes.
+
 ### Always works (log in first)
 
 | What | Link or step |

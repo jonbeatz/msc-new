@@ -1,7 +1,6 @@
 "use client"
 
-import { ImageIcon, Share2, Settings, Globe, Server, Video, Headphones, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ImageIcon, Share2, Settings, Globe, Server, Video, Headphones } from "lucide-react"
 
 const addons = [
   {
