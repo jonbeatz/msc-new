@@ -22,9 +22,50 @@ This is the confirmation that docs/context were read correctly.
 
 Trigger rule (for custom prompt flows):
 
-- For any recognized trigger prompt (e.g. `Lets Start`, `Lets Continue`, `Lets Push It Live`, `Run verify:local and show pass/fail only`), the first response must start with:
+- For any recognized trigger prompt (e.g. `Ready to begin`, `Lets Start`, `Lets Continue`, `Lets Push It Live`, `Run verify:local and show pass/fail only`), the first response must start with:
   - `Ok Jon - <recognized command>. <one-line action plan>.`
 - Use this once at flow start (not on every follow-up message) to avoid noise.
+
+---
+
+## 0) Ready to begin (full sync)
+
+Use this when you open a new session and want **everything** loaded: docs, operator settings, rules, repo state, and local health—before writing code.
+
+```text
+Ready to begin.
+
+Project root: D:\Cursor_Projectz\MSC_Clean_v2\msc-new
+Operator: Jon. Use handshake: "Ok Jon - Ready to begin. Full sync from docs and repo."
+
+You must actually read these files (not from memory) in this order:
+1) .cursor/docs/START-HERE.md — source-of-truth order, daily rules, Jon’s cPanel session links (Node.js + Terminal), fast workflow.
+2) .cursor/docs/Agent-Runbook.md — operator handshake + command locality (Local Cursor vs Live cPanel).
+3) .cursor/docs/Spaceship.md — deploy protocol: pushitup/pushit:live on PC only; cPanel = restart / optional npm install; never pushitup on host.
+4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, build, lint, verify:local, verify:live, pushit:live, test:spaceship-ftp).
+5) .cursor/docs/ReCall.md — "Current focus" + latest "Recent changes" entry.
+6) Skim .cursor/docs/Restore-Points.md — newest checkpoint row only (if any).
+
+Also load project constraints:
+- Read .cursorrules if present.
+- List and skim .cursor/rules/*.mdc — at minimum include operator/cPanel rules (e.g. jon-operator-cpanel.mdc): Jon’s bookmarks, always label Local vs Live when giving commands.
+
+Then run Local (Cursor) checks from repo root:
+- git branch --show-current && git status -sb
+- If nothing healthy on http://localhost:3000/: free port 3000 if another node is bound, then npm run dev:fresh (or confirm dev already running on 3000).
+- Optionally: npm run verify:local — report pass/fail only for /, /admin, projects-home API.
+
+Respond with:
+A) Confirmed docs read (one line).
+B) Operator + locality reminder (Jon; Local vs Live; where cPanel links live).
+C) Git: branch + clean/dirty + notable untracked if any.
+D) Local: port + dev status + verify:local result if you ran it.
+E) ReCall "Current focus" in 2–4 bullets.
+F) One suggested next action based on git + ReCall.
+G) Ask me: "What do you want to work on today?" if I did not say yet.
+
+Rules: do not deploy. Do not run pushit:live or pushitup unless I explicitly ask later.
+```
 
 ---
 

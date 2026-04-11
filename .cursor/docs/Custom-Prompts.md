@@ -2,8 +2,48 @@
 
 Use these as quick "commands in plain English" for the agent.
 
+0. **`Ready to begin`**  
+   - **Full sync:** agent reads **START-HERE → Agent-Runbook → Spaceship → Jedi-List → ReCall** (+ newest **Restore-Points**), loads **`.cursorrules`** and **`.cursor/rules`**, then git status + local dev health + optional **`verify:local`**. Use when you want to be fully aligned before coding (best for a new chat or after a break). Canonical wording: **`.cursor/docs/Agent-Runbook.md`** → **§0 Ready to begin (full sync)**.
+
+   **Paste this (or say `Ready to begin.` in chat — same intent):**
+
+   ```text
+   Ready to begin.
+
+   Project root: D:\Cursor_Projectz\MSC_Clean_v2\msc-new
+   Operator: Jon. Use handshake: "Ok Jon - Ready to begin. Full sync from docs and repo."
+
+   You must actually read these files (not from memory) in this order:
+   1) .cursor/docs/START-HERE.md — source-of-truth order, daily rules, Jon’s cPanel session links (Node.js + Terminal), fast workflow.
+   2) .cursor/docs/Agent-Runbook.md — operator handshake + command locality (Local Cursor vs Live cPanel).
+   3) .cursor/docs/Spaceship.md — deploy protocol: pushitup/pushit:live on PC only; cPanel = restart / optional npm install; never pushitup on host.
+   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, build, lint, verify:local, verify:live, pushit:live, test:spaceship-ftp).
+   5) .cursor/docs/ReCall.md — "Current focus" + latest "Recent changes" entry.
+   6) Skim .cursor/docs/Restore-Points.md — newest checkpoint row only (if any).
+
+   Also load project constraints:
+   - Read .cursorrules if present.
+   - List and skim .cursor/rules/*.mdc — at minimum include operator/cPanel rules (e.g. jon-operator-cpanel.mdc): Jon’s bookmarks, always label Local vs Live when giving commands.
+
+   Then run Local (Cursor) checks from repo root:
+   - git branch --show-current && git status -sb
+   - If nothing healthy on http://localhost:3000/: free port 3000 if another node is bound, then npm run dev:fresh (or confirm dev already running on 3000).
+   - Optionally: npm run verify:local — report pass/fail only for /, /admin, projects-home API.
+
+   Respond with:
+   A) Confirmed docs read (one line).
+   B) Operator + locality reminder (Jon; Local vs Live; where cPanel links live).
+   C) Git: branch + clean/dirty + notable untracked if any.
+   D) Local: port + dev status + verify:local result if you ran it.
+   E) ReCall "Current focus" in 2–4 bullets.
+   F) One suggested next action based on git + ReCall.
+   G) Ask me: "What do you want to work on today?" if I did not say yet.
+
+   Rules: do not deploy. Do not run pushit:live or pushitup unless I explicitly ask later.
+   ```
+
 1. **`Lets Start`**  
-   - Morning bootstrap: checks git, starts local safely, verifies `/` + `/admin`, confirms deploy tooling.
+   - Lighter morning bootstrap: checks git, starts local safely, verifies `/` + `/admin`, confirms deploy tooling.
 
 2. **`Lets Continue`**  
    - Rehydrates context from docs + git and gives a concise "what matters now" summary.
@@ -91,3 +131,9 @@ Use these as quick "commands in plain English" for the agent.
 
 30. **`Lets run system check`**  
     - Runs local + live + FTP + repo-status checks and returns one consolidated readiness report.
+
+31. **`Ready to begin`**  
+    - Same full-sync flow as **item 0** above (and **`Agent-Runbook.md` §0**): read **START-HERE**, **Agent-Runbook**, **Spaceship**, **Jedi-List**, **ReCall** (+ skim **Restore-Points**), **`.cursorrules`** + **`.cursor/rules`**, then **Local (Cursor)** git status, healthy **`localhost:3000`** (free port **3000** / **`dev:fresh`** if needed), optional **`verify:local`**; reply in sections **A–G**; handshake **`Ok Jon - Ready to begin`**; **no deploy**. Say **`Ready to begin.`** in chat or paste the block under **item 0**.
+
+32. **`I'm done for now`** (or **`Continue later`**)  
+    - End-of-session closeout: short **ReCall.md** append (what shipped, next step), confirm docs saved if edited, optionally stop **Local (Cursor)** dev on port **3000**; no deploy unless you say otherwise.

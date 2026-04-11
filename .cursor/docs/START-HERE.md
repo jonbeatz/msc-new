@@ -57,7 +57,7 @@ Project rules layout:
 | Doc | Use it for | Priority |
 |---|---|---|
 | `START-HERE.md` | Daily startup/deploy guardrails | Daily |
-| `Agent-Runbook.md` | Copy/paste prompts (`Lets Start`, etc.) | Daily |
+| `Agent-Runbook.md` | Copy/paste prompts (`Ready to begin`, `Lets Start`, etc.) | Daily |
 | `Spaceship.md` | Production deploy + cPanel + FTP rules | Daily |
 | `Jedi-List.md` | Commands and script meanings | Daily |
 | `Restore-Points.md` | Known-good checkpoints + rollback notes | Daily (after milestones) |
@@ -147,7 +147,9 @@ These `cpsess...` links can expire. If they do, log in at:
 
 ## What to tell a new agent
 
-Paste this:
+**Full session sync (recommended):** say **`Ready to begin`** — see **`Agent-Runbook.md` → §0 Ready to begin (full sync)**. The agent reads the core docs, rules, and git/local state before work.
+
+**Minimal bootstrap:** paste this:
 
 ```text
 Use `.cursor/docs/START-HERE.md` then `.cursor/docs/Agent-Runbook.md` and `.cursor/docs/Spaceship.md` as source of truth.
