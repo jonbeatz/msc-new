@@ -17,7 +17,7 @@ Follow **in order**. Repo root on your PC is the folder that contains **`package
 | # | Where | What |
 |---|--------|------|
 | 1 | **PC — Cursor terminal** | `npm run build` — wait until the build finishes. |
-| 2 | **PC** | If you changed **admin UI, version label, or Payload admin SCSS**: `npm run pushitup:admin-ui` |
+| 2 | **PC** | **MSC PRO ENGINE / Payload admin:** If you changed **admin UI, version label, branding, or Payload config/SCSS**, run **`npm run pushitup:admin-ui`**. This is the **primary** FTPS command for shipping the **MSC PRO ENGINE** look and feel (gold sidebar, dashboard/logout nav, login + sidebar graphics, password-field enhancement, `Users` collection notes, and Payload config). It uploads: **`middleware.ts`**, **`lib/msc-admin-version.ts`**, **`components/msc-payload-nav-dashboard.tsx`**, **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. For a **smaller** upload when only the branding subset changed, use **`npm run pushitup:admin-branding`** (same list minus middleware, version file, and nav dashboard — see **`package.json`**). |
 | 3 | **PC** | If you changed **deps or server config**: `npm run pushitup -- package.json package-lock.json server.js patches middleware.ts` (add/remove paths to match what you edited). |
 | 4 | **PC** | `npm run pushitup -- .next` — wait for **“PushItUP complete”** and the file count. |
 | 5 | **cPanel → Setup Node.js App** | **Restart** the app (or **Stop** → wait a few seconds → **Start**). |
@@ -46,7 +46,7 @@ source ~/nodevenv/mystudiochannel.com/*/bin/activate
 ### Reference: step-by-step “get this live” (copy for your notes)
 
 1. **PC — repo root** in Cursor terminal: `npm run build` (wait until it finishes).
-2. **PC — optional:** `npm run pushitup:admin-ui` if you touched admin nav, version, or `app/(payload)/custom.scss`.
+2. **PC — optional:** **`npm run pushitup:admin-ui`** if you touched **MSC PRO ENGINE** admin UI — nav, version, branding components, **`Users`**, **`payload.config.ts`**, or **`app/(payload)/custom.scss`** (full list in step 2 of the table above). Use **`npm run pushitup:admin-branding`** for the smaller branding-only path when appropriate.
 3. **PC — optional:** `npm run pushitup -- …` for other changed **source** files (e.g. `collections/Foo.ts`, `lib/bar.ts`) *only if* those paths changed and you want the server disk copy to match — **the browser still uses the compiled output in `.next`**, so for UI/routes you must still do steps 1 + 4.
 4. **PC:** `npm run pushitup -- .next` — wait for **PushItUP complete** (file count varies by build; that is normal).
 5. **cPanel — optional:** if **`package.json`**, **`package-lock.json`**, or **`patches/`** changed: Terminal → `cd` app + `source` nodevenv → `npm install --legacy-peer-deps`.

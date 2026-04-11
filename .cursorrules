@@ -20,7 +20,7 @@ Use this file as the high-level base. Detailed guidance is split into scoped fil
 - Keep deploy actions explicit; do not run live deploy commands unless the user asks.
 - `pushitup` commands run on local PC terminal, not cPanel Terminal.
 - For app/admin changes, prefer full build + full `.next` upload.
-- If local dev breaks, recover with `npm run dev:fresh` and verify `http://localhost:3000/` and `/admin`.
+- If local dev breaks, the **agent** runs recovery from repo root (`npm run dev:recover`, `dev:fresh`, or `repair:dev` as needed) — do not only tell Jon to run commands; Jon may still confirm in the browser. Smoke URLs: `http://localhost:3000/` and `/admin`.
 
 ## Skills and specialized rules
 

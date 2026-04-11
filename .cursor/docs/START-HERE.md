@@ -86,6 +86,14 @@ If an agent over-reads history/planning docs, tell it:
 
 If local breaks with missing vendor chunks (`date-fns`, etc.), run `npm run dev:fresh` again.
 
+### Why the browser shows a white page + `/_next/static/chunks/fallback/*` (500)
+
+That pattern almost always means **`.next` was deleted or overwritten while `next dev` was still running** — for example **`npm run verify:next`** or **`npm run clean:next`** in a **second** terminal while the dev server was up. The dev server then serves broken chunks and error fallbacks.
+
+**Fix (Local / Cursor / repo root):** one terminal only — **`npm run dev:recover`** (or **`npm run repair:dev`** for clean + build + dev). Do not run **`verify:next`** until dev is stopped unless you use **`npm run verify:next:safe`**, which stops whatever is on port **3000** first.
+
+**Prevention:** Cursor blocks **`verify:next`** / **`clean:next`** when port **3000** is busy (see **`.cursor/hooks.json`**). Prefer **`verify:next:safe`** when you are not sure.
+
 ### Push to live
 
 From repo root on PC:

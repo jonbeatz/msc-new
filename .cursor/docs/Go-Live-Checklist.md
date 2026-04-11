@@ -61,9 +61,25 @@ npm run pushit:live
 
 This does:
 1. `npm run build`
-2. `npm run pushitup:admin-ui`
+2. `npm run pushitup:admin-ui` (includes Payload admin sources: middleware, version label, nav, **branding** — see list below)
 3. `npm run pushitup -- .next`
 4. `npm run dev:fresh` (local reset)
+
+**Admin branding + config (included in step 2 via `pushitup:admin-ui`):** upload these from **Local (Cursor / repo root)** so login/sidebar graphics, SCSS, auth collection notes, and Payload config stay in sync with the live app:
+
+- `components/msc-payload-graphics.tsx`
+- `components/msc-payload-admin-enhancements.tsx`
+- `collections/Users.ts` (login eyeball / virtual password docs)
+- `payload.config.ts`
+- `app/(payload)/custom.scss`
+
+**Branding-only FTP (no full go-live):** when you only touched admin look-and-feel and want a smaller upload than the whole pipeline, **Local (Cursor / repo root):**
+
+```bash
+npm run pushitup:admin-branding
+```
+
+That runs `pushitup` for exactly the five paths above. You still need **`npm run build`** + **`npm run pushitup -- .next`** (or **`npm run pushit:live`**) for React/admin bundle changes to match on the server; use **Custom-Prompts** shortcut **`Push my branding`** (item **37**) for the agent to run the targeted script and remind you of build + cPanel restart.
 
 A full **`.next`** upload is what fixes many **vendor-chunk** / missing-module errors on the host; if the browser shows **`Cannot find module './vendor-chunks/...'`** or similar after a deploy, re-run **`npm run pushitup -- .next`** (after a successful local **`npm run build`**) so chunk paths stay in sync.
 
@@ -174,7 +190,9 @@ If **`/media/`** images are wrong or 404 after deploy, sync **`public/media`** t
 Use this if you want to run go-live mostly by prompt commands:
 
 1. `Lets run system check`
-2. `Lets Push It Live (Safe)` (or `Lets Push It Live` if you already checked)
+2. `Lets Push It Live (Safe)` (or `Lets Push It Live` if you already checked) — **`pushit:live`** already uploads admin branding files via **`pushitup:admin-ui`** (see list in **§2**).
 3. Restart Node app in cPanel (Stop -> wait -> Start)
 4. `Lets Verify Live`
 5. Optional: `Lets Checkpoint Docs` (docs only) or `Lets Checkpoint Docs + Commit`
+
+**Admin branding only (no full deploy):** use **`Push my branding`** (**`Custom-Prompts.md`** item **37**) — runs **`npm run pushitup:admin-branding`**, then follow the reminder to **`npm run build`** + **`.next`** upload and cPanel restart if React/admin code changed.

@@ -1,5 +1,58 @@
 /* Optional: Payload admin theme overrides */
 
+/* Brand graphics: login (`graphics.Logo`) + sidebar (`graphics.Icon`) — see `components/msc-payload-graphics.tsx` */
+.msc-payload-admin-graphic--logo img {
+  display: block;
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.msc-payload-admin-graphic--icon img {
+  display: block;
+  max-height: 40px;
+  width: auto;
+  height: auto;
+}
+
+/* Login password visibility (DOM enhancement on `/admin/login`) */
+.msc-payload-login-password-field {
+  position: relative;
+}
+
+.msc-payload-login-password__toggle {
+  position: absolute;
+  right: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--theme-elevation-800);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.msc-payload-login-password__toggle:hover,
+.msc-payload-login-password__toggle:focus-visible {
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.12);
+  outline: none;
+}
+
+.msc-payload-login-password__icon {
+  display: flex;
+  line-height: 0;
+}
+
 .nav-group__toggle {
   color: #d4af37;
   font-weight: 600;

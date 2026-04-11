@@ -17,7 +17,7 @@ Use these as quick "commands in plain English" for the agent.
    1) .cursor/docs/START-HERE.md — source-of-truth order, daily rules, Jon’s cPanel session links (Node.js + Terminal), fast workflow.
    2) .cursor/docs/Agent-Runbook.md — operator handshake + command locality (Local Cursor vs Live cPanel).
    3) .cursor/docs/Spaceship.md — deploy protocol: pushitup/pushit:live on PC only; cPanel = restart / optional npm install; never pushitup on host.
-   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, test:spaceship-ftp).
+   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, dev:recover, verify:next:safe, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, test:spaceship-ftp).
    5) .cursor/docs/ReCall.md — "Current focus" + latest "Recent changes" entry.
    6) Skim .cursor/docs/Restore-Points.md — newest checkpoint row only (if any).
 
@@ -146,3 +146,9 @@ Use these as quick "commands in plain English" for the agent.
 
 35. **`Full media refresh`**  
     - Runs **Clean my folders** followed by **Sync my media**. Verifies all UI components use `/media/` paths and confirms the project is **Ready to begin** for design or deploy.
+
+36. **`Fix localhost (white screen / 500 / fallback chunks)`**  
+   - **Local (Cursor / repo root):** explain the usual cause (**`.next`** deleted while **`next dev`** was still running — often **`verify:next`** or **`clean:next`** in a second terminal). Run **`npm run dev:recover`** (or **`npm run repair:dev`**). For production checks when dev might be on port **3000**, use **`npm run verify:next:safe`** instead of raw **`verify:next`**. Remind: Cursor hooks block **`verify:next`** when **3000** is busy.
+
+37. **`Push my branding`**  
+   - **Local (Cursor / repo root):** runs **`npm run pushitup:admin-branding`**, which FTPS only the Payload admin look-and-feel sources: **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`** (docs for login eyeball / virtual password), **`payload.config.ts`**, **`app/(payload)/custom.scss`**. Use when you changed admin branding, SCSS, or graphics hooks and want a **small targeted upload** instead of listing paths by hand. **Important:** React/admin UI changes still need a **production build** and **`.next`** on the host to match — run **`npm run build`** then **`npm run pushitup -- .next`**, or use **`npm run pushit:live`** (which runs **`pushitup:admin-ui`**, now including these same branding files, plus full **`.next`**). After any upload, **Live (cPanel)** — Restart the Node.js app for `mystudiochannel.com`.

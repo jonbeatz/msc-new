@@ -64,6 +64,21 @@ Create a new restore branch from the current clean state:
 
 ---
 
+## Deployment docs ↔ `package.json` (keep in sync)
+
+**Source of truth for npm deploy aliases:** root **`package.json`** (`pushitup`, **`pushitup:admin-ui`**, **`pushitup:admin-branding`**, **`pushit:live`**, **`pushit:live:safe`**, etc.).
+
+These four operator docs should match those scripts whenever deploy behavior changes:
+
+1. **`Jedi-List.md`** — command cheat sheet and Deploy uploaders table  
+2. **`Spaceship.md`** — PC vs cPanel protocol and Standard update step 2  
+3. **`Go-Live-Checklist.md`** — local → live flow and branding file lists  
+4. **`Custom-Prompts.md`** — shortcuts including **Push my branding** (item **37**)
+
+If **`package.json`** scripts change, update the four docs in the same commit when possible.
+
+---
+
 ## Current focus
 
 - **Payload CMS:** `Homepage` + `Site settings` globals drive hero + SEO; **Media** for images; **Leads** collection ready for a future form (`POST /api/leads`).
@@ -74,6 +89,18 @@ Create a new restore branch from the current clean state:
 ---
 
 ## Recent changes (latest first)
+
+### 2026-04-11 — Snapshot: MSC PRO admin branding + deploy docs (`Take a snapshot`)
+
+- **Checkpoint:** **`RP-2026-04-11-msc-pro-admin-branding`** in **`Restore-Points.md`**. **Branch:** **`mscNowLive-v4-RestorePoint`** + pushed **`snapshot/2026-04-11-msc-pro-admin-branding`** at the same commit.
+- **Verified:** **`npm run build`** green immediately before commit.
+- **Includes:** Payload admin graphics, password-field enhancement, **`pushitup:admin-ui` / `pushitup:admin-branding`**, doc sync (Jedi-List, Spaceship, Go-Live, Custom-Prompts), hooks / **`verify-next-safe`**, version **1.0.5**.
+
+### 2026-04-11 — Deploy docs synced with `package.json` (admin branding scripts)
+
+- **`package.json`:** **`pushitup:admin-ui`** uploads the full MSC PRO ENGINE / Payload admin bundle (middleware, **`lib/msc-admin-version.ts`**, nav dashboard, **`msc-payload-graphics`**, **`msc-payload-admin-enhancements`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**); **`pushitup:admin-branding`** uploads the branding subset only.
+- **Docs aligned:** **`Jedi-List.md`** (workflow + Deploy rows), **`Spaceship.md`** (Standard update step 2), **`Go-Live-Checklist.md`**, **`Custom-Prompts.md`** (shortcut **Push my branding**) — all describe the same paths and commands as **`package.json`**.
+- **ReCall:** added **Deployment docs ↔ package.json** section above so future sessions treat the four docs + **`package.json`** as a single contract.
 
 ### 2026-04-11 — Take a snapshot (commit + restore branch)
 

@@ -88,6 +88,15 @@ export default buildConfig({
     components: {
       beforeNavLinks: ["@/components/msc-payload-nav-dashboard#MscPayloadNavDashboard"],
       afterNavLinks: ["@/components/msc-payload-nav-logout#MscPayloadNavLogout"],
+      /**
+       * Payload maps `Logo` → login screen, `Icon` → navigation/sidebar (see `Config.admin.components.graphics` in payload types).
+       * Both use `public/media/msc-icon.png` via unified `/media/` URLs.
+       */
+      graphics: {
+        Logo: "@/components/msc-payload-graphics#MscPayloadAdminLogo",
+        Icon: "@/components/msc-payload-graphics#MscPayloadAdminIcon",
+      },
+      providers: ["@/components/msc-payload-admin-enhancements#MscPayloadAdminEnhancements"],
     },
     importMap: {
       baseDir: path.resolve(process.cwd()),

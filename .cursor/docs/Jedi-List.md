@@ -39,7 +39,7 @@ Fast triage pattern:
 | Step | Where | Action |
 |------|--------|--------|
 | 1 | **PC (repo root)** | Develop with **`npm run dev:payload`**. Before production upload, **`npm run build`** must succeed. |
-| 2 | **PC** | Upload: **`npm run pushitup -- package.json package-lock.json server.js patches middleware.ts`** (adjust if you changed more). For **admin version + Payload admin styles**, use **`npm run pushitup:admin-ui`** (avoids PowerShell breaking paths with **`()`**). Then **`npm run pushitup -- .next`** (full folder; no zip required). |
+| 2 | **PC** | Upload: **`npm run pushitup -- package.json package-lock.json server.js patches middleware.ts`** (adjust if you changed more). For **Payload admin / MSC PRO ENGINE look and feel**, run **`npm run pushitup:admin-ui`** (full admin bundle; see **Deploy uploaders** table below). For **branding-only** FTPS (smaller list), **`npm run pushitup:admin-branding`**. Then **`npm run pushitup -- .next`** (full folder; no zip required). |
 | 3 | **cPanel → Terminal** | Only if **`package.json` / lockfile / `patches`** changed: activate Node venv, **`cd`** to the app folder, **`npm install --legacy-peer-deps`** (see **Spaceship.md**). **Do not** run **`pushitup`** here. |
 | 4 | **cPanel → Node.js Selector** | **Restart** the app (or Stop → Start). |
 
@@ -59,7 +59,9 @@ Fast triage pattern:
 | **`npm run start`** | Serves the **last build** (`next start`). Use for a local smoke test after `build`. |
 | **`npm run verify:local`** | Local pre-deploy smoke checks for `/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
 | **`npm run verify:live`** | Live smoke checks for `https://mystudiochannel.com/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
-| **`npm run verify:next`** | **`clean:next`** + **`next build`** — production build gate after app/config edits (see **`.cursor/rules/local-runtime-recovery.mdc`**). Do not run while relying on a live **`next dev`** session unless you will restart dev afterward. |
+| **`npm run verify:next`** | **`clean:next`** + **`next build`** — production build gate after app/config edits (see **`.cursor/rules/local-runtime-recovery.mdc`**). **Never** run while **`next dev`** is on port **3000** (deletes **`.next`** → **500** + broken **`/_next/static/chunks/fallback/*`**). |
+| **`npm run verify:next:safe`** | Frees port **3000** (stops stray **`next dev`**), then **`verify:next`**. Use whenever you need a build check and are not sure nothing is listening on **3000**. |
+| **`npm run dev:recover`** | Same as **`npm run restart:dev`** — kill **3000**, then **`npm run dev`** (clean is inside **`dev`**). Fast recovery from white screen / chunk errors. |
 | **Build recovery (images/assets look wrong after `build`)** | Run **`npm run clean:next`**, then **`npm run dev:fresh`**. Clears stale **`.next`** so dev serves **`/media/...`** and chunks correctly. |
 
 ---
@@ -93,7 +95,7 @@ Fast triage pattern:
 
 ## Admin deploy version (visual check)
 
-After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.4` → `1.0.5`). The sidebar shows **`v1.0.x`** near **Log out** so you can confirm the new build is live.
+After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.4` → `1.0.5`). The sidebar shows **`v1.0.x`** near **Log out** so you can confirm the new build is live. Ship that file (and the rest of the **MSC PRO ENGINE** admin bundle) with **`npm run pushitup:admin-ui`** — see **Deploy uploaders** table above.
 
 ---
 
@@ -132,12 +134,13 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 
 **Windows:** PowerShell with **ExecutionPolicy** satisfied (scripts use **Bypass**). Credentials/target host come from your environment or script config as documented in **Spaceship.md** / **Development.md**.
 
-**Paths with parentheses** (e.g. **`app/(payload)/...`**): PowerShell treats **`(`** as special. Either **quote** the path: `npm run pushitup -- "app/(payload)/custom.scss"` or use the alias **`npm run pushitup:admin-ui`** for the usual admin version + styles files.
+**Paths with parentheses** (e.g. **`app/(payload)/...`**): PowerShell treats **`(`** as special. Either **quote** the path: `npm run pushitup -- "app/(payload)/custom.scss"` or use **`npm run pushitup:admin-ui`** / **`npm run pushitup:admin-branding`** (both include **`app/(payload)/custom.scss`** without manual quoting).
 
 | Command | What it does |
 |--------|----------------|
 | **`npm run pushitup`** (or **`npm run PushItUP`**) | **`scripts/PushItUP.ps1`** — uploads listed **files or folders** directly over FTPS. **Spaceship default:** `npm run pushitup -- .next` after **`npm run build`** = full build folder, **no zip/unzip** (see **Spaceship.md** cheat sheet). Example: `npm run pushitup -- server.js` |
-| **`npm run pushitup:admin-ui`** | Uploads **`middleware.ts`**, **`lib/msc-admin-version.ts`**, **`components/msc-payload-nav-dashboard.tsx`**, **`app/(payload)/custom.scss`** — safe on Windows (no manual quoting). |
+| **`npm run pushitup:admin-ui`** | **Primary MSC PRO ENGINE / Payload admin bundle:** uploads **`middleware.ts`**, **`lib/msc-admin-version.ts`**, **`components/msc-payload-nav-dashboard.tsx`**, **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. Matches **`package.json`**; safe on Windows (no manual quoting for the SCSS path). |
+| **`npm run pushitup:admin-branding`** | **Branding-only subset:** **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. Use when you only changed admin look-and-feel sources; you still need **`npm run build`** + **`pushitup -- .next`** if React/admin bundle output must change on the host. Shortcut: **Custom-Prompts.md** → **Push my branding** (item **37**). |
 | **`npm run pushit:live`** | **`npm run build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`npm run dev:fresh`** (auto-fixes local stale `.next` after deploy), then prints reminder to **Restart** Node in cPanel. Say *“push it live”* / *“run pushit live”* in chat to mean this. |
 | **`npm run pushit:live:safe`** | Runs **`verify:local`** preflight first; if all checks pass, runs full **`pushit:live`** flow. Use when you want extra guardrails. |
 | **`npm run pushitupzip`** (or **`npm run PushItUPzip`**) | **`scripts/PushItUPzip.ps1`** — zips each target under **`.pushitupzips/`**, then uploads. For **`.next`**, the file is **`next-build.zip`** (not **`.next.zip`**, so cPanel shows it). Remote path: **`.pushitupzips/next-build.zip`** under your FTPS root. Example: `npm run pushitupzip -- .next` |

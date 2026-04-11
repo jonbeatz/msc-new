@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Local runtime recovery and post-change verification
 
+## Execute local recovery — do not only tell Jon to run it
+
+Whenever fixing or checking **Local (Cursor / PC repo root)** health — including **`npm run dev:recover`**, **`npm run dev`** / **`dev:fresh`**, **`npm run repair:dev`**, **`npm run verify:next:safe`**, **`npm run verify:local`**, freeing port **3000**, or **`curl`** / **`Invoke-WebRequest`** smoke tests — the agent **must run those commands itself** from the repo root and report pass/fail. **Do not** substitute a handoff like “you should run …” unless the step is **Live (cPanel → Terminal)** or genuinely unsafe to automate (e.g. Jon’s browser Incognito check — say what you ran and suggest Incognito only as optional).
+
 ## Automatic verification (Cursor)
 
 This repo has a **Cursor `stop` hook** (`.cursor/hooks.json` → `node .cursor/hooks/verify-after-agent.mjs`). After each **completed** agent turn, it runs **`npm run verify:next`** when Git shows changes under runtime paths (`app/`, `components/`, `lib/`, etc.) **and** nothing is listening on **port 3000** (so `.next` is not deleted under a running dev server). If port 3000 is busy, it skips the build and surfaces a short follow-up reminder.
@@ -14,7 +18,7 @@ This repo has a **Cursor `stop` hook** (`.cursor/hooks.json` → `node .cursor/h
 If you changed **any** file that can affect the running app — including `app/`, `components/`, `lib/`, `collections/`, `globals/`, `middleware.ts`, `next.config.mjs`, `payload.config.ts`, `package.json`, or scripts that feed the bundle — you **must**:
 
 1. **Run** `npm run verify:next` **from the repo root** and fix errors until it exits **0**.  
-   (`verify:next` = `clean:next` + `next build`.)
+   (`verify:next` = `clean:next` + `next build`.) On **Windows**, if **`next dev`** might still be on port **3000**, use **`npm run verify:next:safe`** instead (frees **3000** first) so you never delete **`.next`** under a running dev server.
 
 2. **Do not** run `next dev` immediately after `next build` without letting **`npm run dev`** wipe `.next` first — **`npm run dev` now runs `clean:next` before the dev server** so production and dev artifacts are never mixed (fixes **`Cannot find module './431.js'`** / missing chunks / **500** + React **#418**).
 
@@ -22,15 +26,18 @@ If you changed **any** file that can affect the running app — including `app/`
 
 4. If you only changed **markdown under `.cursor/docs/`** or other non-runtime files, `npm run build` is optional — but when in doubt, run **`verify:next`**.
 
-5. **Do not** run **`npm run verify:next`** while **`next dev`** is already running. `verify:next` deletes **`.next`**, which corrupts the live dev server and causes **500** / missing chunks until you **stop** dev and run **`npm run dev`** again.
+5. **Do not** run **`npm run verify:next`** or **`npm run clean:next`** while **`next dev`** is already running. They delete **`.next`**, which corrupts the live dev server and causes **500**, **`/_next/static/chunks/fallback/*`** failures, and missing chunks until you **stop** dev and run **`npm run dev`** again (or **`npm run dev:recover`**). The repo’s **Cursor `beforeShellExecution` hook** blocks these commands when port **3000** is in use; use **`npm run verify:next:safe`** instead.
 
-## What the user should run when the browser breaks (Jon, local / PC)
+## When the browser breaks (agent playbook — run these for Jon)
 
-1. Stop **all** `next dev` / Node processes on port **3000** (only one server).
-2. **`npm run repair:dev`** — clean + full build + `next dev` on **3000** (best fix for vendor-chunk / static 404 issues on Windows).
-3. Or: **`npm run verify:next`**, then **`npm run dev`**.
-4. Open **`http://localhost:3000`** and **`/admin`** in a **new Incognito** window (avoids cached old chunk URLs).
-5. **Disable the Console Ninja browser extension** for this workspace — it hooks Next/Webpack and can worsen flaky dev behavior.
+**Agents:** execute in order until **`/`** and **`/admin`** respond (or you hit a real code error). **Jon** only opens the browser if needed; do not leave recovery as “Jon should run …”.
+
+1. Free **port 3000** if multiple listeners (kill stale Node) — **run** the same steps **`restart-dev.ps1`** uses, or **`npm run dev:recover`**.
+2. **`npm run dev:recover`** first — same as **`restart:dev`**: free **3000**, then **`npm run dev`** (includes **`clean:next`**). Fastest fix for white screen / **500** / **`/_next/static/chunks/fallback/*`** after a bad **`verify:next`** overlap.
+3. If still broken: **`npm run repair:dev`** — clean + full build + dev on **3000** (Windows).
+4. For build gates when dev might be up: **`npm run verify:next:safe`** — never raw **`verify:next`** while **3000** is busy.
+5. Optionally **`npm run verify:local`** once dev is listening.
+6. Remind Jon (only if relevant): Incognito for **`/`** and **`/admin`**, and **Console Ninja** disabled for this workspace — you still **ran** the server-side recovery yourself.
 
 ## Smoke checks
 

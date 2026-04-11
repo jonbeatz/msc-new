@@ -6,6 +6,12 @@
         "command": "node .cursor/hooks/verify-after-agent.mjs",
         "timeout": 600
       }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "node .cursor/hooks/guard-clean-while-dev.mjs",
+        "matcher": "verify:next|clean:next|clean-next-cache"
+      }
     ]
   }
 }

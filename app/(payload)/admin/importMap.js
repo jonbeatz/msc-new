@@ -29,8 +29,11 @@ import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PayloadEffectiveRecipientNote as PayloadEffectiveRecipientNote_d125e34e2e226488f3ef55985fe73e3c } from '@/components/payload-effective-recipient-note'
+import { MscPayloadAdminIcon as MscPayloadAdminIcon_366e3bc23f41617e7cf0dbb3a9e5fdc9 } from '@/components/msc-payload-graphics'
+import { MscPayloadAdminLogo as MscPayloadAdminLogo_366e3bc23f41617e7cf0dbb3a9e5fdc9 } from '@/components/msc-payload-graphics'
 import { MscPayloadNavLogout as MscPayloadNavLogout_74db0ad96afcf572d95aee4f0fd629a7 } from '@/components/msc-payload-nav-logout'
 import { MscPayloadNavDashboard as MscPayloadNavDashboard_b08ba28865281da8ef8a829ac40eddb4 } from '@/components/msc-payload-nav-dashboard'
+import { MscPayloadAdminEnhancements as MscPayloadAdminEnhancements_8697601b331d291bf1ec2168fa7b04d4 } from '@/components/msc-payload-admin-enhancements'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -65,7 +68,10 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/components/payload-effective-recipient-note#PayloadEffectiveRecipientNote": PayloadEffectiveRecipientNote_d125e34e2e226488f3ef55985fe73e3c,
+  "@/components/msc-payload-graphics#MscPayloadAdminIcon": MscPayloadAdminIcon_366e3bc23f41617e7cf0dbb3a9e5fdc9,
+  "@/components/msc-payload-graphics#MscPayloadAdminLogo": MscPayloadAdminLogo_366e3bc23f41617e7cf0dbb3a9e5fdc9,
   "@/components/msc-payload-nav-logout#MscPayloadNavLogout": MscPayloadNavLogout_74db0ad96afcf572d95aee4f0fd629a7,
   "@/components/msc-payload-nav-dashboard#MscPayloadNavDashboard": MscPayloadNavDashboard_b08ba28865281da8ef8a829ac40eddb4,
+  "@/components/msc-payload-admin-enhancements#MscPayloadAdminEnhancements": MscPayloadAdminEnhancements_8697601b331d291bf1ec2168fa7b04d4,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
