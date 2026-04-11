@@ -78,6 +78,7 @@ Create a new restore branch from the current clean state:
 ### 2026-04-11 — Take a snapshot (commit + restore branch)
 
 - **`verify:next`** green, then full **`git add -A`** commit on **`mscNowLive-v3-RestorePoint`**, **`git push origin`**, restore branch **`snapshot/2026-04-11-msc-next-payload-media`** pushed for rollback. **`Restore-Points.md`** row **RP-2026-04-11-snapshot-next-payload-media**.
+- **Active branch (post-snapshot):** **`mscNowLive-v4-RestorePoint`** — created from the same snapshot commit, pushed to **`origin`**, and used as the ongoing **RestorePoint** line (replaces **v3** for day-to-day work).
 
 ### 2026-04-11 — Docs checkpoint (scripts ↔ Jedi-List)
 
