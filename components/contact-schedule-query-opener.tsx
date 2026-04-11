@@ -20,7 +20,7 @@ export function ContactScheduleQueryOpener({
   const router = useRouter()
 
   useEffect(() => {
-    if (searchParams.get(MSC_SCHEDULE_QUERY) !== MSC_SCHEDULE_QUERY_VALUE) {
+    if (searchParams?.get(MSC_SCHEDULE_QUERY) !== MSC_SCHEDULE_QUERY_VALUE) {
       return
     }
     onOpen()

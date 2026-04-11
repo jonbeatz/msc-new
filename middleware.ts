@@ -9,10 +9,8 @@ function isDocumentPath(pathname: string): boolean {
   if (pathname === "/") return true
   if (pathname.startsWith("/api")) return false
   if (pathname.startsWith("/_next")) return false
-  // Include /admin so HTML is not cached by the host after deploys (version label + UI updates).
-  if (pathname.startsWith("/images/")) return false
   if (pathname.startsWith("/media/")) return false
-  // skip typical static files in /public
+  // Public files with extensions (e.g. robots.txt, files in /public)
   if (/\.[a-z0-9]{2,5}$/i.test(pathname)) return false
   return true
 }
@@ -31,5 +29,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    /*
+     * Never run on `/_next/*` (includes dev HMR, `/_next/static/chunks/fallback/*`, CSS, fonts) or `/api/*`.
+     * Single `_next/` prefix avoids path-to-regexp edge cases that could still match some `/_next/...` requests.
+     */
+    "/((?!api/|_next/|favicon\\.ico).*)",
+  ],
 }

@@ -1,6 +1,6 @@
 ---
 name: Headless WP Backend
-overview: "Connect the existing Next.js static site to headless WordPress (LocalWP for dev, Spaceship for production) covering three data flows: booking requests, email signups, and CMS-driven content editing -- all without changing `output: 'export'`."
+overview: "Optional future track: connect headless WordPress (LocalWP for dev, Spaceship for production) to additional data flows (booking, signups, WP-driven content). The live MSC app (`msc-new`) is already a full Next.js + Payload bundle with unified assets under `/media/`; this plan does not replace Payload — it describes how a WP plugin could complement Payload if you choose to wire REST endpoints later."
 todos:
   - id: wp-plugin
     content: Build msc-api WordPress plugin with booking-request, booking-availability, and signup endpoints
@@ -32,26 +32,27 @@ todos:
 isProject: false
 ---
 
-# Headless WordPress Backend -- Full Integration Plan
+# Headless WordPress Backend — optional integration plan
 
-## Architecture
+**Phase note (2026):** **`msc-new` has completed the move** from a static-export style workflow to a **full Next.js + Payload** application. **Booking, leads, hero, and Media** are implemented in Payload with static files in **`public/media`** (**`/media/...`** URLs). The flows below describe a **possible WordPress plugin** layer if you want **WP** to own some endpoints or content **in addition to** Payload — not a replacement for the current bundle.
+
+## Architecture (if you add WP endpoints later)
 
 ```mermaid
 flowchart LR
     subgraph dev [Local Dev]
-        NL[Next.js\nlocalhost:3000]
+        NL[Next + Payload\nlocalhost:3000]
         WL[LocalWP\nlocalhost:PORT/wp-json/msc/v1/...]
-        NL -->|fetch| WL
+        NL -. optional fetch .-> WL
     end
     subgraph prod [Production - Spaceship]
-        NS[Next.js static out/\nmystudiochannel.com/msc-new]
+        NS[Next + Payload app\nmystudiochannel.com]
         WS[WordPress\nmystudiochannel.com/wp-json/msc/v1/...]
-        NS -->|fetch at runtime| WS
-        NS -->|fetch at build time\nfor CMS content| WS
+        NS -. optional fetch .-> WS
     end
 ```
 
-**Key constraint preserved:** `output: 'export'` stays. Dynamic data (booking, signup) fetches from the browser at runtime. CMS content (hero, shows, testimonials) fetches at build time -- a `npm run build` publishes WP content changes to the static site.
+**If implemented:** dynamic data would use browser or server `fetch` to WP where you wire it. **Core MSC** remains **`next build` + `.next` deploy** with **`/media/`** for images — not an **`out/`**-only static tree.
 
 ---
 
@@ -67,11 +68,11 @@ Three endpoints registered under `msc/v1`:
 - `GET /wp-json/msc/v1/booking-availability?date=YYYY-MM-DD` -- returns booked slots for a date so the calendar knows what to grey out.
 - `POST /wp-json/msc/v1/signup` -- saves an email + name to a custom post type `msc_lead`; optionally triggers a welcome email.
 
-Security: public POSTs protected by a shared secret header (`X-MSC-Key`) checked against a WP option. No nonce needed for static-to-WP calls. All functions prefixed `msc_` per project rules.
+Security: public POSTs protected by a shared secret header (`X-MSC-Key`) checked against a WP option. No nonce needed for browser-to-WP calls. All functions prefixed `msc_` per project rules.
 
-### B -- Next.js lib files (TypeScript)
+### B -- Next.js lib files (TypeScript) — only if wiring this WP track
 
-- [`lib/booking.ts`](lib/booking.ts) -- replace the mock `submitBookingRequest` with a real `fetch` POST to `NEXT_PUBLIC_MSC_BOOKING_URL`. Add `fetchBookingAvailability(date)` for live slot data.
+- [`lib/booking.ts`](lib/booking.ts) — today often points at **Payload** (`NEXT_PUBLIC_MSC_BOOKING_URL=payload`); this plan describes an **alternate** `fetch` POST to WP when you set URLs to **`wp-json`** instead.
 - `lib/signup.ts` -- new file, `submitSignup({ email, name })` POSTs to `NEXT_PUBLIC_MSC_SIGNUP_URL`.
 - `lib/cms.ts` -- new file, fetch functions that pull CMS content from WP REST + ACF at build time (hero slides, show cards, testimonials). Falls back to the current hardcoded values if the API is unreachable.
 
@@ -99,19 +100,21 @@ ACF field groups for: Hero Slides, Show Cards, Testimonials, Process Steps. Expo
 
 ---
 
-## Phased delivery
+## Phased delivery (WordPress track — optional; Payload is Phase-complete for MSC)
 
-**Phase 1 -- Live booking + signup (touches the least code, highest value)**
+**Current MSC (done):** Payload admin, **`/api`**, **`public/media`**, **`npm run media:sync`** — see **Site-Plans.md** and **Development.md**.
+
+**WP Phase 1 — booking + signup via WordPress (only if you choose this path)**
 1. Build and install the WordPress plugin on LocalWP.
-2. Wire `lib/booking.ts` to the real endpoint; wire the contact form's email field to `lib/signup.ts`.
-3. Test locally end-to-end: pick date + time, submit, verify `msc_booking` CPT entry appears in WP Admin.
-4. Deploy plugin to Spaceship WP, update `.env` to point at live URL, rebuild.
+2. Wire `lib/booking.ts` / forms to the WP endpoints **or** keep Payload as source of truth and use WP for parallel experiments (avoid double-writes unless designed).
+3. Test locally end-to-end against WP if enabled.
+4. Deploy plugin to Spaceship WP, update `.env` to point at live URL, **`npm run build`** + **`pushitup -- .next`** per **Go-Live-Checklist.md**.
 
-**Phase 2 -- CMS-driven content**
-5. Register ACF field groups for Hero, Shows, Testimonials.
-6. Write `lib/cms.ts` fetch functions with hardcoded fallbacks.
-7. Update 2-3 components (`hero-section.tsx`, `demos-section.tsx`, `testimonials-section.tsx`) to accept props from `lib/cms.ts`.
-8. Rebuild; confirm content from WP Admin appears in static output.
+**WP Phase 2 — CMS-driven content from WordPress**
+5. Register ACF field groups for Hero, Shows, Testimonials (WP side).
+6. Write `lib/cms.ts` fetch functions with fallbacks **alongside** Payload-driven content.
+7. Update components only where you intentionally dual-source from WP.
+8. Rebuild and deploy **`.next`**; confirm WP-fed content appears as expected without breaking **`/media/`** assets served from Next.
 
 ---
 

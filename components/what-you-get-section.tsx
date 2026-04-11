@@ -33,7 +33,7 @@ export function WhatYouGetSection() {
       {/* Darkened Background Image */}
       <div className="absolute inset-0">
         <Image
-          src="/images/msc-background.jpg"
+          src="/media/msc-background.jpg"
           alt="Background"
           fill
           className="object-cover"

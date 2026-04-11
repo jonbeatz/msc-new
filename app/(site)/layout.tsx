@@ -6,6 +6,7 @@ import { getSiteSettingsCms } from "@/lib/cms/site-settings"
 import { getHomepageActiveSlideSeo } from "@/lib/cms/homepage"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { HomeHashScroll } from "@/components/home-hash-scroll"
+import { getPublicOrigin } from "@/lib/public-origin"
 
 /** CMS-backed routes: no full route cache; no fetch/Data cache defaults that could stale Payload reads on shared hosting. */
 export const dynamic = "force-dynamic"
@@ -19,51 +20,67 @@ const montserrat = Montserrat({
 
 const defaultDescription =
   "We build studio-style websites that give creators the look and structure of a major network—powered by a custom plugin and professional video setup."
-const metadataBaseURL =
-  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
+
+function metadataBaseUrl(): URL {
+  try {
+    return new URL(getPublicOrigin())
+  } catch {
+    return new URL("http://localhost:3000")
+  }
+}
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [settings, slideSeo] = await Promise.all([
-    getSiteSettingsCms(),
-    getHomepageActiveSlideSeo(),
-  ])
+  try {
+    const [settings, slideSeo] = await Promise.all([
+      getSiteSettingsCms(),
+      getHomepageActiveSlideSeo(),
+    ])
 
-  const siteName = settings?.siteName || "My Studio Channel"
-  const titleSuffix =
-    settings?.siteTitleSuffix && settings.siteTitleSuffix.trim().length > 0
-      ? settings.siteTitleSuffix.trim()
-      : `| ${siteName}`
-  const homeFallbackTitle = `${siteName} | Professional Creator Platforms`
-  const titleFromSlide = slideSeo?.title
-    ? `${slideSeo.title} ${titleSuffix}`.trim()
-    : homeFallbackTitle
-  const descriptionFromSlide =
-    slideSeo?.description || settings?.tagline || defaultDescription
-  const defaultOgImage = settings?.ogImage || slideSeo?.image || undefined
+    const siteName = settings?.siteName || "My Studio Channel"
+    const titleSuffix =
+      settings?.siteTitleSuffix && settings.siteTitleSuffix.trim().length > 0
+        ? settings.siteTitleSuffix.trim()
+        : `| ${siteName}`
+    const homeFallbackTitle = `${siteName} | Professional Creator Platforms`
+    const titleFromSlide = slideSeo?.title
+      ? `${slideSeo.title} ${titleSuffix}`.trim()
+      : homeFallbackTitle
+    const descriptionFromSlide =
+      slideSeo?.description || settings?.tagline || defaultDescription
+    const defaultOgImage = settings?.ogImage || slideSeo?.image || undefined
 
-  return {
-    metadataBase: new URL(metadataBaseURL),
-    title: titleFromSlide,
-    description: descriptionFromSlide,
-    icons: settings?.favicon
-      ? {
-          icon: settings.favicon,
-          shortcut: settings.favicon,
-          apple: settings.favicon,
-        }
-      : undefined,
-    openGraph: {
+    return {
+      metadataBase: metadataBaseUrl(),
       title: titleFromSlide,
       description: descriptionFromSlide,
-      images: defaultOgImage ? [defaultOgImage] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: titleFromSlide,
-      description: descriptionFromSlide,
-      images: defaultOgImage ? [defaultOgImage] : undefined,
-    },
-    generator: "v0.app",
+      icons: settings?.favicon
+        ? {
+            icon: settings.favicon,
+            shortcut: settings.favicon,
+            apple: settings.favicon,
+          }
+        : undefined,
+      openGraph: {
+        title: titleFromSlide,
+        description: descriptionFromSlide,
+        images: defaultOgImage ? [defaultOgImage] : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: titleFromSlide,
+        description: descriptionFromSlide,
+        images: defaultOgImage ? [defaultOgImage] : undefined,
+      },
+    }
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[msc] generateMetadata failed", e)
+    }
+    return {
+      metadataBase: metadataBaseUrl(),
+      title: "My Studio Channel",
+      description: defaultDescription,
+    }
   }
 }
 

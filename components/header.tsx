@@ -37,8 +37,9 @@ export function Header({
   stickyHeader = true,
 }: HeaderProps) {
   const pathname = usePathname()
-  const ctaDemosHref = resolveNavHashHref(pathname, "#msc-demos")
-  const ctaContactHref = resolveNavHashHref(pathname, "#msc-contact")
+  const path = pathname ?? "/"
+  const ctaDemosHref = resolveNavHashHref(path, "#msc-demos")
+  const ctaContactHref = resolveNavHashHref(path, "#msc-contact")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
   const closeTimerRef = useRef<number | null>(null)
@@ -75,7 +76,7 @@ export function Header({
           {/* Logo - Always show full branding */}
           <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
             <div className="relative h-8 w-8 sm:h-10 sm:w-10 shrink-0">
-              <Image src={logoSrc || "/images/msc-icon.png"} alt={`${siteName} logo`} fill className="object-contain group-hover:drop-shadow-lg transition-all duration-300" />
+              <Image src={logoSrc || "/media/msc-icon.png"} alt={`${siteName} logo`} fill className="object-contain group-hover:drop-shadow-lg transition-all duration-300" />
             </div>
             <div>
               <span className="text-sm sm:text-base font-semibold tracking-tight text-foreground block">
@@ -90,7 +91,7 @@ export function Header({
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => {
-              const topHref = resolveNavHashHref(pathname, item.link)
+              const topHref = resolveNavHashHref(path, item.link)
               return (
               <div
                 key={`${item.label}-${item.link}`}
@@ -128,8 +129,8 @@ export function Header({
                 ) : (
                   <Link
                     href={topHref}
-                    replace={shouldReplaceHashLink(pathname, topHref)}
-                    scroll={scrollPropForResolvedNav(pathname, topHref)}
+                    replace={shouldReplaceHashLink(path, topHref)}
+                    scroll={scrollPropForResolvedNav(path, topHref)}
                     className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/50"
                   >
                     {item.label}
@@ -139,13 +140,13 @@ export function Header({
                 {item.submenu && item.submenu.length > 0 && openSubmenu === item.label && (
                   <div className="absolute left-0 top-full mt-2 min-w-[220px] rounded-xl border border-white/10 bg-[#111216]/95 p-2 shadow-xl backdrop-blur-md animate-in fade-in-0 zoom-in-95 duration-150">
                     {item.submenu.map((subItem) => {
-                      const subHref = resolveNavHashHref(pathname, subItem.link)
+                      const subHref = resolveNavHashHref(path, subItem.link)
                       return (
                         <Link
                           key={`${item.label}-${subItem.label}-${subItem.link}`}
                           href={subHref}
-                          replace={shouldReplaceHashLink(pathname, subHref)}
-                          scroll={scrollPropForResolvedNav(pathname, subHref)}
+                          replace={shouldReplaceHashLink(path, subHref)}
+                          scroll={scrollPropForResolvedNav(path, subHref)}
                           className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
                         >
                           {subItem.label}
@@ -168,8 +169,8 @@ export function Header({
             >
               <Link
                 href={ctaDemosHref}
-                replace={shouldReplaceHashLink(pathname, ctaDemosHref)}
-                scroll={scrollPropForResolvedNav(pathname, ctaDemosHref)}
+                replace={shouldReplaceHashLink(path, ctaDemosHref)}
+                scroll={scrollPropForResolvedNav(path, ctaDemosHref)}
               >
                 View Demos
               </Link>
@@ -177,8 +178,8 @@ export function Header({
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm hover:glow-accent transition-all duration-300" asChild>
               <Link
                 href={ctaContactHref}
-                replace={shouldReplaceHashLink(pathname, ctaContactHref)}
-                scroll={scrollPropForResolvedNav(pathname, ctaContactHref)}
+                replace={shouldReplaceHashLink(path, ctaContactHref)}
+                scroll={scrollPropForResolvedNav(path, ctaContactHref)}
               >
                 Book Consultation
                 <ChevronRight className="ml-1 h-4 w-4" />
@@ -206,13 +207,13 @@ export function Header({
         >
           <nav className="flex flex-col px-6 py-6 gap-1">
             {navItems.map((item) => {
-              const topHref = resolveNavHashHref(pathname, item.link)
+              const topHref = resolveNavHashHref(path, item.link)
               return (
               <div key={`${item.label}-${item.link}`}>
                 <Link
                   href={topHref}
-                  replace={shouldReplaceHashLink(pathname, topHref)}
-                  scroll={scrollPropForResolvedNav(pathname, topHref)}
+                  replace={shouldReplaceHashLink(path, topHref)}
+                  scroll={scrollPropForResolvedNav(path, topHref)}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors py-3 px-4 rounded-lg hover:bg-secondary/50 block"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -221,13 +222,13 @@ export function Header({
                 {item.submenu && item.submenu.length > 0 && (
                   <div className="pl-4 pb-2">
                     {item.submenu.map((subItem) => {
-                      const subHref = resolveNavHashHref(pathname, subItem.link)
+                      const subHref = resolveNavHashHref(path, subItem.link)
                       return (
                         <Link
                           key={`${item.label}-${subItem.label}-${subItem.link}`}
                           href={subHref}
-                          replace={shouldReplaceHashLink(pathname, subHref)}
-                          scroll={scrollPropForResolvedNav(pathname, subHref)}
+                          replace={shouldReplaceHashLink(path, subHref)}
+                          scroll={scrollPropForResolvedNav(path, subHref)}
                           className="text-xs text-muted-foreground/90 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-secondary/40 block"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
@@ -248,8 +249,8 @@ export function Header({
               >
                 <Link
                   href={ctaDemosHref}
-                  replace={shouldReplaceHashLink(pathname, ctaDemosHref)}
-                  scroll={scrollPropForResolvedNav(pathname, ctaDemosHref)}
+                  replace={shouldReplaceHashLink(path, ctaDemosHref)}
+                  scroll={scrollPropForResolvedNav(path, ctaDemosHref)}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   View Demos
@@ -258,8 +259,8 @@ export function Header({
               <Button className="bg-accent text-accent-foreground hover:bg-accent/90 w-full justify-center glow-accent-sm" asChild>
                 <Link
                   href={ctaContactHref}
-                  replace={shouldReplaceHashLink(pathname, ctaContactHref)}
-                  scroll={scrollPropForResolvedNav(pathname, ctaContactHref)}
+                  replace={shouldReplaceHashLink(path, ctaContactHref)}
+                  scroll={scrollPropForResolvedNav(path, ctaContactHref)}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Book Consultation

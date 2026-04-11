@@ -1,22 +1,39 @@
 ---
-description: Local runtime recovery guardrails for localhost 3000
-alwaysApply: false
-globs:
-  - scripts/**/*.ps1
-  - .cursor/docs/START-HERE.md
-  - .cursor/docs/Jedi-List.md
-  - .cursor/docs/ReCall.md
+description: After Next/Payload edits, run verify:next; recover broken localhost / .next
+alwaysApply: true
 ---
 
-# Local runtime recovery
+# Local runtime recovery and post-change verification
 
-When local `http://localhost:3000` is broken:
+## Automatic verification (Cursor)
 
-1. Run `npm run dev:fresh`.
-2. Verify:
-   - `http://localhost:3000/`
-   - `http://localhost:3000/admin`
-   - local API smoke route
-3. If `/` is 404 and `/admin` is 500 while API is 200, check for stale process occupying 3000 and restart cleanly.
-4. Prefer this minimal sequence over ad-hoc cache/command changes.
+This repo has a **Cursor `stop` hook** (`.cursor/hooks.json` → `node .cursor/hooks/verify-after-agent.mjs`). After each **completed** agent turn, it runs **`npm run verify:next`** when Git shows changes under runtime paths (`app/`, `components/`, `lib/`, etc.) **and** nothing is listening on **port 3000** (so `.next` is not deleted under a running dev server). If port 3000 is busy, it skips the build and surfaces a short follow-up reminder.
 
+## Mandatory before you finish a coding task (agents)
+
+If you changed **any** file that can affect the running app — including `app/`, `components/`, `lib/`, `collections/`, `globals/`, `middleware.ts`, `next.config.mjs`, `payload.config.ts`, `package.json`, or scripts that feed the bundle — you **must**:
+
+1. **Run** `npm run verify:next` **from the repo root** and fix errors until it exits **0**.  
+   (`verify:next` = `clean:next` + `next build`.)
+
+2. **Do not** run `next dev` immediately after `next build` without letting **`npm run dev`** wipe `.next` first — **`npm run dev` now runs `clean:next` before the dev server** so production and dev artifacts are never mixed (fixes **`Cannot find module './431.js'`** / missing chunks / **500** + React **#418**).
+
+3. **Do not** mark the task complete if `verify:next` fails.
+
+4. If you only changed **markdown under `.cursor/docs/`** or other non-runtime files, `npm run build` is optional — but when in doubt, run **`verify:next`**.
+
+5. **Do not** run **`npm run verify:next`** while **`next dev`** is already running. `verify:next` deletes **`.next`**, which corrupts the live dev server and causes **500** / missing chunks until you **stop** dev and run **`npm run dev`** again.
+
+## What the user should run when the browser breaks (Jon, local / PC)
+
+1. Stop **all** `next dev` / Node processes on port **3000** (only one server).
+2. **`npm run repair:dev`** — clean + full build + `next dev` on **3000** (best fix for vendor-chunk / static 404 issues on Windows).
+3. Or: **`npm run verify:next`**, then **`npm run dev`**.
+4. Open **`http://localhost:3000`** and **`/admin`** in a **new Incognito** window (avoids cached old chunk URLs).
+5. **Disable the Console Ninja browser extension** for this workspace — it hooks Next/Webpack and can worsen flaky dev behavior.
+
+## Smoke checks
+
+- `http://localhost:3000/`
+- `http://localhost:3000/admin`
+- Optional: `npm run verify:local` with dev already running on **3000**

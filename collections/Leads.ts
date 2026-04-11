@@ -1,7 +1,8 @@
 import type { CollectionConfig } from "payload"
+import { getPublicOrigin } from "../lib/public-origin"
 import { getNotificationConfig } from "../lib/notifications"
 
-const FALLBACK_ORIGIN = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
+const FALLBACK_ORIGIN = getPublicOrigin()
 
 /**
  * Newsletter / interest signups (future: wire a form to POST /api/leads).

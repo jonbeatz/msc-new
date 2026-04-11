@@ -23,7 +23,7 @@ import { Footer } from "@/components/footer"
 
 export default async function HomePage() {
   noStore()
-  const { heroSlides, heroStats } = await getHomepageCmsData()
+  const { heroSlides, heroStats, servicesGallery } = await getHomepageCmsData()
   const navItems = await getHeaderNavItems()
   const demoProjects = await getDemoProjects()
   const settings = await getSiteSettingsCms()
@@ -46,7 +46,7 @@ export default async function HomePage() {
           stickyHeaderEnabled={stickyHeaderEnabled}
         />
         <AboutSection />
-        <ServicesSection />
+        <ServicesSection cmsGallery={servicesGallery} />
         <OwnPlatformSection />
         <PackagesSection />
         <RequirementsSection />

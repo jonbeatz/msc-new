@@ -1,8 +1,8 @@
 "use client"
 
 import { useFormFields } from "@payloadcms/ui"
+import { getPublicOrigin } from "@/lib/public-origin"
 
-const BASE_URL = "http://localhost:3000"
 const FALLBACK_SLUG = "msc1"
 
 // ─── Shared link builder ──────────────────────────────────────────────────────
@@ -10,14 +10,13 @@ const FALLBACK_SLUG = "msc1"
 function buildHref(slug: string | undefined | null): string {
   const s = typeof slug === "string" ? slug.trim() : ""
   const resolved = s.length > 0 ? s : FALLBACK_SLUG
-  return `${BASE_URL}/${encodeURIComponent(resolved)}`
+  return `${getPublicOrigin()}/${encodeURIComponent(resolved)}`
 }
 
 // ─── Shared link renderer ─────────────────────────────────────────────────────
 
 function PageLink({ slug }: { slug: string | undefined | null }) {
   const href = buildHref(slug)
-  console.log("Current Slug:", slug, "→ href:", href)
 
   return (
     <a
@@ -83,7 +82,6 @@ export function ViewPageLinkCell({
   rowData?: Record<string, unknown>
 }) {
   const slug = rowData?.slug as string | undefined
-  console.log("Current Slug:", slug, "(list cell)")
 
   return <PageLink slug={slug} />
 }

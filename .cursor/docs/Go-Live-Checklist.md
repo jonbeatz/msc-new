@@ -51,6 +51,8 @@ Wait until build completes successfully.
 Custom prompt shortcut:
 - `Lets Push It Live`
 
+**Before / alongside upload:** confirm marketing assets are present locally under **`public/media`** (that folder is what the live site serves as **`/media/...`**). If you added or replaced files there, commit them and ensure they are included in what you deploy; missing **`public/media`** files on the server means broken images even when **`.next`** is healthy.
+
 ### Standard one-command deploy
 
 ```bash
@@ -63,6 +65,8 @@ This does:
 3. `npm run pushitup -- .next`
 4. `npm run dev:fresh` (local reset)
 
+A full **`.next`** upload is what fixes many **vendor-chunk** / missing-module errors on the host; if the browser shows **`Cannot find module './vendor-chunks/...'`** or similar after a deploy, re-run **`npm run pushitup -- .next`** (after a successful local **`npm run build`**) so chunk paths stay in sync.
+
 ### If upload reports failures
 
 If `PushItUP` ends with failures, re-upload failed paths before restart.
@@ -71,6 +75,12 @@ Common retry:
 
 ```bash
 npm run pushitup -- .next/static/chunks .next/server/chunks .next/server/webpack-runtime.js
+```
+
+Or upload the whole build output again:
+
+```bash
+npm run pushitup -- .next
 ```
 
 ---
@@ -127,7 +137,7 @@ Then restart Node app again (Stop -> wait -> Start).
 Custom prompt helper:
 - `Pre-deploy risk check for current changes` (before pushing risky fixes)
 
-If live shows `Cannot find module './vendor-chunks/...`:
+If live shows `Cannot find module './vendor-chunks/...` or other **chunk / vendor** runtime errors, the fix is a **clean rebuild + full `.next` upload** on the PC (and **`public/media`** must still be deployed with the app so **`/media/...`** assets exist on the server—verify **`public/media`** under your app path on the host if images are broken).
 
 1. Stop app in cPanel
 2. In cPanel terminal:
@@ -137,12 +147,14 @@ cd ~/mystudiochannel.com
 rm -rf .next
 ```
 
-3. On PC:
+3. On **PC (repo root)** — rebuild, then upload the full **`.next`** folder (this is the primary fix for vendor-chunk mismatches):
 
 ```bash
 npm run build
 npm run pushitup -- .next
 ```
+
+If **`/media/`** images are wrong or 404 after deploy, sync **`public/media`** to the host (same relative path under the app root) or re-run your usual upload so **`public/media`** is not missing.
 
 4. Start app in cPanel
 5. Re-test live

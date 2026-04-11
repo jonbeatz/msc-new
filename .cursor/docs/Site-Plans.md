@@ -6,39 +6,41 @@ Reference doc for choosing and implementing how the MSC Next site (`msc-new`) co
 
 ## Original goals (summary)
 
-- Next.js marketing site at `https://mystudiochannel.com/msc-new/` looks good but **does not persist data** yet.
-- Want a **free or low-cost** solution, **simple admin** (edit text, images, posts like WordPress).
-- Need to **store emails** for signups / verification-style flows.
-- Comfortable with **WordPress**; also curious about **headless WordPress**, **Payload CMS**, **Supabase**, **Neon**, **Firebase**, **Backblaze**, etc.
+- Next.js marketing site at **`https://mystudiochannel.com`** — **current `msc-new` ships as a full Next.js + Payload app** with persisted data (SQLite locally; Postgres recommended for production).
+- **Simple admin** for copy, hero, Media, bookings, and leads is handled in **Payload** today.
+- **Signups / verification** flows use Payload collections + Resend where wired.
+- Comfortable with **WordPress**; **headless WordPress** remains an optional parallel track (see **Headless-WP-Backend-Plan.md**), not a requirement for the live MSC bundle.
 - Traffic is modest (not millions of users).
 
 ---
 
-## Critical constraint: static export vs full-stack Next
+## Critical constraint: static export vs full-stack Next (resolved)
 
-**Current state (Payload Phase A):** **`output: 'export'` was removed.** The app is a **full Next.js + Payload** bundle: deploy with **`next build` + `next start`** (or a host’s Next integration), not by uploading **`out/`** alone.
+**Current state:** The migration from **static export** to a **full Next.js + Payload** bundle is **complete**. **`output: 'export'` is not used.** Deploy with **`next build`** + upload **`.next`** + **`next start`** on the host (Spaceship Node app), same as **Development.md** / **Spaceship.md**.
 
-**Historical note:** Earlier versions shipped only static files from **`out/`**. That workflow conflicts with Payload’s admin and **`/api`** routes.
+**Assets:** All site static images live under **`public/media`** and are addressed as **`/media/...`** (Payload **Media** + `npm run media:sync` / `npm run media:consolidate`). There is no parallel **`out/`**-only marketing deploy for this repo.
+
+**Historical note:** Earlier experiments shipped only files from **`out/`**; that path conflicts with Payload admin, **`/api`**, and unified **`/media/`** hosting.
 
 ---
 
 ## Option comparison (short)
 
-| Option | Admin / CMS | Typical DB | Fit with current static `out/` | Notes |
-|--------|-------------|------------|----------------------------------|--------|
-| **Headless WordPress** | WP Admin (familiar) | MySQL (often already on host) | **Strong** — fetch REST at build time and/or browser | You already have WP **live on Spaceship** and **LocalWP** locally. |
-| **Payload 3** (this repo) | Payload admin | SQLite locally; Postgres in prod | **In use** — Node host required; see Development.md | Neon/Postgres recommended for production. |
-| **Supabase** | Not a full marketing CMS by itself | Postgres | Can work with static site via client SDK | Great for **auth / signups / tables**; pair with WP or Payload for “edit all copy.” |
-| **Firebase** | Not WP-like CMS | Firestore etc. | Similar to Supabase pattern | Good for auth/notifications; still need a content story. |
+| Option | Admin / CMS | Typical DB | Fit with **current `msc-new` (Next + Payload, no `out/`)** | Notes |
+|--------|-------------|------------|-----------------------------------------------------------|--------|
+| **Headless WordPress** | WP Admin (familiar) | MySQL (often already on host) | **Optional add-on** — REST/GraphQL for extra flows or content if you split concerns | You already have WP **live on Spaceship** and **LocalWP** locally. Not required for the core MSC site today. |
+| **Payload 3** (this repo) | Payload admin | SQLite locally; Postgres in prod | **Primary** — Node host required; see Development.md | Neon/Postgres recommended for production. |
+| **Supabase** | Not a full marketing CMS by itself | Postgres | **Adjunct** — client SDK for auth/tables alongside Payload | Great for **auth / signups / tables** if you extend beyond Payload. |
+| **Firebase** | Not WP-like CMS | Firestore etc. | **Adjunct** | Good for auth/notifications; Payload remains content/booking hub. |
 | **Backblaze B2** | N/A | Object storage | N/A | **Files/backups**, not a replacement for CMS + structured app data. |
 
 ---
 
 ## Recommendation snapshot
 
-- **Simplest path aligned with “WordPress-like admin” + existing hosting:** **headless WordPress** (REST API or WPGraphQL) on your current install; Next stays static or uses client `fetch` for live actions (booking, signup).
-- **“Everything in one Next repo” + you accept Node hosting + Postgres:** **Payload + Neon** is coherent — plan a migration off pure static export.
-- **Signups / verification heavy:** consider **Supabase** (or WP endpoints) as the store for leads; can combine with headless WP for content.
+- **Shipped path for MSC:** **Payload + Next** in one repo, **Node** on Spaceship, assets in **`/media/`** — see **Spaceship.md** and **Go-Live-Checklist.md**.
+- **Optional:** **headless WordPress** for WP-native content or endpoints (**Headless-WP-Backend-Plan.md**) if you want WP and Payload to coexist for different surfaces.
+- **Signups / verification:** Payload **Leads** / **Bookings** + email adapters today; **Supabase** or WP endpoints remain optional if product needs grow.
 
 ---
 
@@ -49,19 +51,20 @@ Reference doc for choosing and implementing how the MSC Next site (`msc-new`) co
 ```mermaid
 flowchart LR
     subgraph dev [Local dev]
-        NL[Next.js]
+        NL[Next + Payload]
         WL[LocalWP wp-json]
-        NL --> WL
+        NL -. optional .-> WL
     end
     subgraph prod [Production]
-        NS[Next static out]
+        NS[Next + Payload app]
         WS[Spaceship WP wp-json]
-        NS --> WS
+        NS -. optional .-> WS
     end
 ```
 
-- **Booking / signup:** browser `fetch` to `https://yoursite.com/wp-json/msc/v1/...` (CORS must allow the Next origin if cross-domain).
-- **CMS content (hero, testimonials, etc.):** optional **build-time** fetch so copy/images update after `npm run build`; or hybrid.
+- **MSC core today:** booking and CMS content run through **Payload** (`/api/...`, admin **`/admin`**), not through **`out/`** static export.
+- **If you add WP later:** browser `fetch` to `https://yoursite.com/wp-json/msc/v1/...` (CORS must allow the Next origin if cross-domain).
+- **CMS content from WP:** optional **build-time** or runtime fetch; hero/marketing defaults and **Media** are already in Payload with assets under **`/media/`**.
 
 ### Planned WordPress side (Phase 1)
 
@@ -83,15 +86,15 @@ flowchart LR
 
 ---
 
-## Payload — implemented (Phase A)
+## Payload — implemented (Phase A, current production architecture)
 
 See [Development.md](./Development.md) for run commands, env, import map, and hydration notes.
 
-**Done:** `withPayload`, `app/(payload)` routes, `app/(site)` marketing home, **`payload.config.ts`**, SQLite adapter, **`users`**, **`media`**, **`bookings`**, **`leads`**; globals **`homepage`** (hero from Media) and **`site-settings`** (SEO). **`lib/booking.ts`** posts to **`/api/bookings`** when `NEXT_PUBLIC_MSC_BOOKING_URL=payload`. Marketing hero and metadata read from CMS when populated; otherwise built-in defaults. Admin includes a visible **Log out** nav link plus **`/admin/logout`**.
+**Done:** `withPayload`, `app/(payload)` routes, `app/(site)` marketing home, **`payload.config.ts`**, SQLite adapter, **`users`**, **`media`** (files on disk under **`public/media`**, URLs **`/media/...`**), **`bookings`**, **`leads`**; globals **`homepage`** (hero from Media) and **`site-settings`** (SEO). **`lib/booking.ts`** posts to **`/api/bookings`** when `NEXT_PUBLIC_MSC_BOOKING_URL=payload`. Marketing hero and metadata read from CMS when populated; otherwise built-in defaults. Admin includes a visible **Log out** nav link plus **`/admin/logout`**.
 
-**You do next:** copy **`.env.example` → `.env.local`**, run **`npm run dev:payload`**, in **`/admin`** open **Site → Homepage**: upload images in **Media**, add hero slides; optional **Site settings** for title/tagline. Test **`/`** and booking flow.
+**You do next:** copy **`.env.example` → `.env.local`**, run **`npm run dev:payload`**, in **`/admin`** open **Site → Homepage**: pick images from **Media**, add hero slides; optional **Site settings** for title/tagline. Add files to **`public/media`** and run **`npm run media:sync`** when bulk-importing. Test **`/`** and booking flow.
 
-**Phase B (production):** choose Node host (Vercel, Railway, VPS); switch **`payload.config.ts`** to **`@payloadcms/db-postgres`** and Neon (or other Postgres); lock down public **`bookings`** create (API key / rate limit).
+**Phase B (production DB):** switch **`payload.config.ts`** to **`@payloadcms/db-postgres`** and Neon (or other Postgres) on the live host; lock down public **`bookings`** create (API key / rate limit).
 
 ---
 
@@ -121,6 +124,7 @@ Remove Payload, restore **`output: 'export'`**, and use **headless WordPress** o
 
 | Date | Note |
 |------|------|
+| 2026-04-11 | **Architecture lock-in:** Docs updated to state **full Next.js + Payload** bundle (no static **`out/`** deploy), unified static assets in **`public/media`** / **`/media/...`**, and **`media:sync` / `media:consolidate`** as the operational scripts. Option table and recommendations aligned with **START-HERE** source order. |
 | 2026-04-08 | Created `Site-Plans.md` — consolidates backend/CMS options, static-export vs Payload, headless WP architecture, and phased plan for reference. |
 | 2026-04-08 | **Payload Phase A** — integrated in-repo (`withPayload`, `(payload)` routes, SQLite, `bookings`, booking POST); static export removed. |
 | 2026-04-08 | **Admin ops** — documented visible sidebar “Log out”, `/admin/logout`, import map path, and extension-related hydration troubleshooting (see Development.md). |

@@ -78,7 +78,7 @@ export function OwnPlatformSection() {
           <div className="relative">
             <div className="rounded-3xl overflow-hidden border border-border/50 relative aspect-[4/3]">
               <Image
-                src="/images/own-platform.jpg"
+                src="/media/own-platform.jpg"
                 alt="Professional film crew with camera and clapperboard"
                 fill
                 className="object-cover"

@@ -34,6 +34,7 @@ type FooterProps = {
 
 export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps) {
   const pathname = usePathname()
+  const path = pathname ?? "/"
 
   return (
     <footer 
@@ -48,7 +49,7 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-6 group">
               <div className="relative h-10 w-10 shrink-0">
-                <Image src={logoSrc || "/images/msc-icon.png"} alt={`${siteName} logo`} fill className="object-contain group-hover:drop-shadow-lg transition-all duration-300" />
+                <Image src={logoSrc || "/media/msc-icon.png"} alt={`${siteName} logo`} fill className="object-contain group-hover:drop-shadow-lg transition-all duration-300" />
               </div>
               <div>
                 <span className="block text-base font-semibold tracking-tight text-foreground">
@@ -69,13 +70,13 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Company</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => {
-                const href = resolveNavHashHref(pathname, link.href)
+                const href = resolveNavHashHref(path, link.href)
                 return (
                   <li key={link.label}>
                     <Link
                       href={href}
-                      replace={shouldReplaceHashLink(pathname, href)}
-                      scroll={scrollPropForResolvedNav(pathname, href)}
+                      replace={shouldReplaceHashLink(path, href)}
+                      scroll={scrollPropForResolvedNav(path, href)}
                       className="text-sm text-muted-foreground hover:text-accent transition-colors"
                     >
                       {link.label}
@@ -91,13 +92,13 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
             <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider">Resources</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => {
-                const href = resolveNavHashHref(pathname, link.href)
+                const href = resolveNavHashHref(path, link.href)
                 return (
                   <li key={link.label}>
                     <Link
                       href={href}
-                      replace={shouldReplaceHashLink(pathname, href)}
-                      scroll={scrollPropForResolvedNav(pathname, href)}
+                      replace={shouldReplaceHashLink(path, href)}
+                      scroll={scrollPropForResolvedNav(path, href)}
                       className="text-sm text-muted-foreground hover:text-accent transition-colors"
                     >
                       {link.label}

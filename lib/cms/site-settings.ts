@@ -1,6 +1,8 @@
 import { getPayload } from "payload"
 import config from "@payload-config"
 
+import { toRelativePublicMediaUrl } from "@/lib/media-url"
+
 export type SiteSettingsContent = {
   siteName: string
   tagline: string | null
@@ -13,13 +15,7 @@ export type SiteSettingsContent = {
 }
 
 function normalizeMediaSrc(pathOrUrl: string): string {
-  if (
-    pathOrUrl.startsWith("http://") ||
-    pathOrUrl.startsWith("https://")
-  ) {
-    return pathOrUrl
-  }
-  return pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`
+  return toRelativePublicMediaUrl(pathOrUrl)
 }
 
 /** Payload SQLite may expose `sticky_header` or 0/1; normalize for the marketing header. */

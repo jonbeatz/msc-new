@@ -19,6 +19,26 @@ import { SiteSettings } from "./globals/SiteSettings"
 
 const sqliteUrl = process.env.DATABASE_URL || "file:./payload.sqlite"
 
+/** Site origin for admin previews and Payload internals. Public asset URLs use relative `/media/...` via Media `afterRead`. */
+const serverURL = (
+  process.env.NEXT_PUBLIC_SERVER_URL?.trim() ||
+  process.env.PAYLOAD_PUBLIC_SERVER_URL?.trim() ||
+  "http://localhost:3000"
+).replace(/\/+$/, "")
+
+/**
+ * Cookie auth (login / refresh-token / logout) checks `Origin` against this list.
+ * If `.env` still points at production but you browse `localhost` or `127.0.0.1`, requests 403 without these.
+ * @see https://payloadcms.com/docs/authentication/cookies
+ */
+const csrf: string[] = Array.from(
+  new Set([
+    serverURL,
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ]),
+)
+
 type SiteSettingsData = {
   siteName?: string | null
   tagline?: string | null
@@ -51,6 +71,8 @@ async function getSiteSettingsFallback(req: Parameters<NonNullable<Parameters<ty
 }
 
 export default buildConfig({
+  serverURL,
+  csrf,
   email: resendAdapter({
     apiKey: process.env.RESEND_API_KEY || "",
     defaultFromAddress: "onboarding@resend.dev",
@@ -87,7 +109,8 @@ export default buildConfig({
     },
     wal: true,
   }),
-  sharp,
+  // Spaceship/cPanel: set PAYLOAD_DISABLE_SHARP=true when native sharp binaries are unavailable.
+  ...(process.env.PAYLOAD_DISABLE_SHARP === "true" ? {} : { sharp }),
   plugins: [
     seoPlugin({
       collections: ["pages"],

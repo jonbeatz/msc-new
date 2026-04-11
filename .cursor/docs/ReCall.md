@@ -75,10 +75,18 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-11 — Take a snapshot (commit + restore branch)
+
+- **`verify:next`** green, then full **`git add -A`** commit on **`mscNowLive-v3-RestorePoint`**, **`git push origin`**, restore branch **`snapshot/2026-04-11-msc-next-payload-media`** pushed for rollback. **`Restore-Points.md`** row **RP-2026-04-11-snapshot-next-payload-media**.
+
+### 2026-04-11 — Docs checkpoint (scripts ↔ Jedi-List)
+
+- **`Lets Checkpoint Docs`:** **`Jedi-List.md`** — added **`verify:next`**, new **Media (disk ↔ Payload)** table (**`media:consolidate`**, **`media:sync`**), clarified **`dev:fresh`** = **`npm run dev`**. **`Agent-Runbook.md` §0** and **`Custom-Prompts.md`** item **0** paste block now list the same script names alongside existing deploy/smoke commands. No commit/push in this checkpoint (per prompt).
+
 ### 2026-04-10 — Session closeout (docs + tomorrow’s focus)
 
 - **`Ready to begin`:** full-sync prompt in **Agent-Runbook §0** + **Custom-Prompts** (items 0, 31, 32); committed/pushed (`56a723e`); final dry-run: **`verify:local`** green.
-- **`ToDo.md`:** lightweight next-session list (email templates review, Media vs `public/images`, admin login password reveal); **START-HERE** docs map points here; backlog left empty (keep it simple).
+- **`ToDo.md`:** lightweight next-session list (email templates review, Media / `public/media`, admin login password reveal); **START-HERE** docs map points here; backlog left empty (keep it simple).
 - **Next session:** see **`ToDo.md` → Next session (2026-04-11)**.
 - **Repo note:** **`ToDo.md`** and **`START-HERE.md`** (ToDo row) may still need **`git add` / commit** if not saved to `origin` yet.
 
@@ -214,7 +222,7 @@ Create a new restore branch from the current clean state:
 ### 2026-04-07 — Dev URL at root (no `basePath`)
 
 - Removed **`basePath`** and **`assetPrefix`** from `next.config.mjs` — app runs at **`http://localhost:3000/`**.
-- Local images: **`public/images/`** → use **`/images/filename`** in components (folder tracked via `.gitkeep`).
+- Local images: **`public/media/`** → use **`/media/filename`** in components (folder tracked via `.gitkeep`).
 - Updated **Development.md**, **Run-Next-JS.md**, **ReCall** prompt, **.cursorrules**, **Nova** / **NovaMira-Design** skills.
 
 ### 2026-04-07 — Schedule dialog UX + payload shape
@@ -380,7 +388,7 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - Hero carousel cycles through all 4 images automatically.
 - Demos section switches featured video when a thumbnail is clicked.
 - Schedule a Call button opens the modal; calendar + custom gold dropdown work; mock submit shows success.
-- All images load from `public/images/`.
+- All images load from `public/media/`.
 - Zero linter errors across all components.
 
 ---
@@ -447,7 +455,7 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Checkpoint:** Added `RP-2026-04-08-hero-media-relinked` in `.cursor/docs/Restore-Points.md`.
 - **Data result:** Homepage global `heroSlides` now shows **5** slides total in admin.
 - **Migration details:** One-time temp scripts seeded/relinked the 4 original hero slides and preserved the existing custom slide; temp scripts deleted after run.
-- **Note:** Source images are in `public/images` (`tv-wall.jpg`, `show-cards.jpg`, `on-air.jpg`, `creator-solo.jpg`) and now represented in `Media`.
+- **Note:** Source images live under `public/media` as `/media/...` (`tv-wall.jpg`, `show-cards.jpg`, `on-air.jpg`, `creator-solo.jpg`, etc.) and are represented in `Media`.
 
 ### 2026-04-08 — Resend verify flow: route + UX confirmed working
 

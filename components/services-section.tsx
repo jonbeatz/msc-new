@@ -1,8 +1,14 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import Image from "next/image"
 import { Mic, Utensils, Clapperboard, Video, Smile, Sparkles, Film, Camera, Check, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
+import type { ServicesGalleryItem } from "@/lib/cms/content-types"
+
+/** Root-relative URL for files in `public/media` (handles spaces in filenames). */
+function mediaPublicSrc(filename: string): string {
+  return `/media/${encodeURIComponent(filename)}`
+}
 
 const programmingStyles = [
   { icon: Mic, label: "Interview Talk Show" },
@@ -22,57 +28,86 @@ const platformFeatures = [
   "Scalable platform design that can grow with your channel",
 ]
 
-const galleryImages = [
+/**
+ * Fallback when Site → Homepage → Services gallery has no rows yet (or partial list).
+ * Matches synced Media files under `public/media` — prefer configuring the Homepage global in Payload.
+ * Order: [0] = large featured, [1–2] = stacked smalls, [3–6] = bottom row (see grid layout below).
+ */
+const SERVICES_GALLERY_FALLBACK: ServicesGalleryItem[] = [
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202026-04-06%20123343-J2xAeqCTOar8kd1Xz2YrB7ug7RGVau.jpg",
-    alt: "MSC Engine Settings - Data & Migration panel",
-    label: "Data & Migration",
+    src: mediaPublicSrc("Screenshot 2026-04-06 123304.jpg"),
+    alt: "MSC Engine — main workspace view",
+    label: "Workspace",
   },
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202026-04-06%20123304-ON0KD84GQUlobg82W0PMVslGQITyT6.jpg",
-    alt: "MSC Engine Settings - Layout Tuning panel",
-    label: "Layout Tuning",
+    src: mediaPublicSrc("Screenshot 2026-04-06 123343.jpg"),
+    alt: "MSC Engine — Data and migration",
+    label: "Data & migration",
   },
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202026-04-06%20123623-t7h1mvyerwRVftlwpNw4ckS8jxYQ2P.jpg",
-    alt: "MSC Engine Settings - System Status panel",
-    label: "System Status",
+    src: mediaPublicSrc("Screenshot 2026-04-06 123438.jpg"),
+    alt: "MSC Engine — layout options",
+    label: "Layout",
   },
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202026-04-06%20123829-09VrzbfSvmmjuLymabUUCZf94e6zov.jpg",
-    alt: "MSC Tutorials panel",
+    src: mediaPublicSrc("Screenshot 2026-04-06 123623.jpg"),
+    alt: "MSC Engine — system status",
+    label: "System status",
+  },
+  {
+    src: mediaPublicSrc("Screenshot 2026-04-06 123829.jpg"),
+    alt: "MSC Engine — tutorials",
     label: "Tutorials",
   },
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202026-04-06%20123438-eN1sVFcpuppRNXGOzJte053aWaR16N.jpg",
-    alt: "MSC Layout Tuning - green toggles",
-    label: "Layout Tuning (Alt)",
+    src: mediaPublicSrc("Screenshot 2026-04-06 123858.jpg"),
+    alt: "MSC Engine — tools and export",
+    label: "Tools",
   },
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202026-04-06%20123858-RAT3hdKYuhO5bqiClVQ0BjZvtwHmzj.jpg",
-    alt: "MSC Data & Migration - Export & Import tools",
-    label: "Export & Import",
-  },
-  {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202026-04-06%20123929-DQ4uEII1pw6PLwjSlqxTGLOnj5nWH6.jpg",
-    alt: "MSC System Operations accordion",
-    label: "System Operations",
+    src: mediaPublicSrc("Screenshot 2026-04-06 123929.jpg"),
+    alt: "MSC Engine — operations",
+    label: "Operations",
   },
 ]
 
-export function ServicesSection() {
+function mergeServicesGallery(
+  cms: ServicesGalleryItem[] | null | undefined,
+): ServicesGalleryItem[] {
+  if (cms && cms.length > 0) {
+    if (cms.length >= SERVICES_GALLERY_FALLBACK.length) return cms
+    return [...cms, ...SERVICES_GALLERY_FALLBACK.slice(cms.length)]
+  }
+  return SERVICES_GALLERY_FALLBACK
+}
+
+type ServicesSectionProps = {
+  /** From Site → Homepage → Services gallery (Payload Media uploads). */
+  cmsGallery?: ServicesGalleryItem[] | null
+}
+
+export function ServicesSection({ cmsGallery }: ServicesSectionProps) {
+  const galleryImages = useMemo(
+    () => mergeServicesGallery(cmsGallery),
+    [cmsGallery],
+  )
+
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const openLightbox = (index: number) => setLightboxIndex(index)
   const closeLightbox = () => setLightboxIndex(null)
 
   const prev = useCallback(() => {
-    setLightboxIndex((i) => (i === null ? null : (i - 1 + galleryImages.length) % galleryImages.length))
-  }, [])
+    setLightboxIndex((i) =>
+      i === null ? null : (i - 1 + galleryImages.length) % galleryImages.length,
+    )
+  }, [galleryImages.length])
 
   const next = useCallback(() => {
-    setLightboxIndex((i) => (i === null ? null : (i + 1) % galleryImages.length))
-  }, [])
+    setLightboxIndex((i) =>
+      i === null ? null : (i + 1) % galleryImages.length,
+    )
+  }, [galleryImages.length])
 
   useEffect(() => {
     if (lightboxIndex === null) return

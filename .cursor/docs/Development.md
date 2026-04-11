@@ -12,7 +12,7 @@ Living notes for how this site is wired so humans and agents can find things qui
 - **Payload CMS 3** integrated via `@payloadcms/next` (`withPayload` in `next.config.mjs`). Admin at **`/admin`**, REST/GraphQL under **`/api/*`**.
 - **Database (local dev):** SQLite file `payload.sqlite` via `@payloadcms/db-sqlite` (`DATABASE_URL=file:./payload.sqlite`). Swap adapter in `payload.config.ts` for Postgres (e.g. Neon) when deploying.
 - **No static-only export:** `output: 'export'` was removed so Payload routes can run. Deploy as a **Node** app (`next build` + `next start`) or a platform that supports Next server routes (Vercel, Railway, etc.).
-- **Static images:** **`public/images/`** → **`/images/filename.ext`**.
+- **Static images:** **`public/media/`** → **`/media/filename.ext`**.
 
 ---
 
@@ -112,7 +112,7 @@ Admin sidebar group **Site**:
 
 **Front-end wiring:**
 
-- **`lib/cms/homepage.ts`** — `getHomepageCmsData()` for **`app/(site)/page.tsx`** → **`HeroSection`** (`cmsSlides` / `cmsStats`). If no slides are saved, **`components/hero-section.tsx`** keeps its original `/public/images` slides.
+- **`lib/cms/homepage.ts`** — `getHomepageCmsData()` for **`app/(site)/page.tsx`** → **`HeroSection`** (`cmsSlides` / `cmsStats`). If no slides are saved, **`components/hero-section.tsx`** keeps its original **`/media/...`** fallbacks (files in **`public/media`**).
 - **`lib/cms/site-settings.ts`** — used only on the server for metadata.
 
 **Images:** Hero resolves Payload media as same-origin paths (e.g. `/api/media/file/...`). **`next.config.mjs`** includes `localhost` in `images.remotePatterns` for dev if you ever use absolute URLs.

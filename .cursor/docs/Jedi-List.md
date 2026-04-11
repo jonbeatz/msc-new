@@ -54,11 +54,24 @@ Fast triage pattern:
 | **`npm run dev`** | Starts **Next.js 15** in development mode. Same as `dev:payload` in this repo. Site: [http://localhost:3000/](http://localhost:3000/). |
 | **`npm run dev:payload`** | Same as **`npm run dev`** — marketing site + Payload API + admin. Prefer this name in docs so it’s obvious Payload is included. |
 | **`npm run clean:next`** | Deletes **`.next`** and **`node_modules/.cache`** (fixes missing **`vendor-chunks/date-fns.js`**, blank CSS, broken admin). |
-| **`npm run dev:fresh`** | **`clean:next`** then **`dev:payload`** — use after **`npm run build`** if local dev looks broken. |
+| **`npm run dev:fresh`** | Same as **`npm run dev`** (**`clean:next`** then **`next dev -p 3000`**) — use after **`npm run build`** or when local dev looks broken. |
 | **`npm run build`** | Production build (`next build`). Use before `next start` or before zipping `.next` for low-memory hosts. Requires env (see **Run-Next-JS.md**). |
 | **`npm run start`** | Serves the **last build** (`next start`). Use for a local smoke test after `build`. |
 | **`npm run verify:local`** | Local pre-deploy smoke checks for `/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
 | **`npm run verify:live`** | Live smoke checks for `https://mystudiochannel.com/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
+| **`npm run verify:next`** | **`clean:next`** + **`next build`** — production build gate after app/config edits (see **`.cursor/rules/local-runtime-recovery.mdc`**). Do not run while relying on a live **`next dev`** session unless you will restart dev afterward. |
+| **Build recovery (images/assets look wrong after `build`)** | Run **`npm run clean:next`**, then **`npm run dev:fresh`**. Clears stale **`.next`** so dev serves **`/media/...`** and chunks correctly. |
+
+---
+
+## Media (disk ↔ Payload)
+
+| Command | What it does |
+|--------|----------------|
+| **`npm run media:consolidate`** | Moves stray files from repo root **`media/`** and legacy **`public/images`** (if present) into **`public/media`**; removes redundant folders. See **`scripts/consolidate-media-folders.mjs`**. |
+| **`npm run media:sync`** | Registers files already under **`public/media`** as **Media** rows in Payload (alias: **`npm run migrate:media:from-public-images`**). |
+
+**Custom prompts:** **Custom-Prompts.md** items **33–35** (**Clean my folders**, **Sync my media**, **Full media refresh**).
 
 ---
 

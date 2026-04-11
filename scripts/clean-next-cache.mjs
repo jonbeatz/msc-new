@@ -3,7 +3,11 @@ import path from "path"
 import { fileURLToPath } from "url"
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..")
-for (const rel of [".next", path.join("node_modules", ".cache")]) {
+for (const rel of [
+  ".next",
+  path.join("node_modules", ".cache"),
+  ".turbo",
+]) {
   const p = path.join(root, rel)
   try {
     fs.rmSync(p, { recursive: true, force: true })

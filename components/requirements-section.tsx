@@ -150,7 +150,7 @@ export function RequirementsSection() {
                   {/* Right: image */}
                   <div className="relative lg:w-80 h-56 lg:h-auto flex-shrink-0 overflow-hidden rounded-b-2xl lg:rounded-b-none lg:rounded-r-2xl">
                     <NextImage
-                      src="/images/podcast.jpg"
+                      src="/media/podcast.jpg"
                       alt="Professional podcaster recording in studio"
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"

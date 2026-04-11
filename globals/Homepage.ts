@@ -12,7 +12,7 @@ export const Homepage: GlobalConfig = {
   admin: {
     group: "Site",
     description:
-      "Hero carousel and stat row. Use Media to upload/replace images, then select them per slide. With SQLite and db.push disabled, if this screen 404s run: npm run migrate:sqlite:homepage-hero-secondary-cta",
+      "Hero carousel, stat row, and Services section screenshot gallery. Upload images in Media, then select them per slide or gallery row. With SQLite and db.push disabled, if this screen 404s run: npm run migrate:sqlite:homepage-hero-secondary-cta",
   },
   access: {
     read: () => true,
@@ -157,6 +157,37 @@ export const Homepage: GlobalConfig = {
           name: "highlight",
           type: "checkbox",
           defaultValue: false,
+        },
+      ],
+    },
+    {
+      name: "servicesGallery",
+      type: "array",
+      labels: {
+        singular: "Services gallery image",
+        plural: "Services gallery",
+      },
+      minRows: 0,
+      maxRows: 12,
+      admin: {
+        ...adminRowsStartCollapsed,
+        description:
+          "Homepage “Programming Styles / See What Your Channel Could Look Like” screenshot grid. Upload each file in Media, then add rows in order (first row = large + two smalls, then bottom row of four).",
+      },
+      fields: [
+        {
+          name: "image",
+          type: "upload",
+          relationTo: "media",
+          required: true,
+        },
+        {
+          name: "label",
+          type: "text",
+          admin: {
+            description:
+              "Caption shown under the image in the lightbox (e.g. Data & Migration). Alt text comes from the Media entry.",
+          },
         },
       ],
     },

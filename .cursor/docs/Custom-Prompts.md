@@ -17,7 +17,7 @@ Use these as quick "commands in plain English" for the agent.
    1) .cursor/docs/START-HERE.md — source-of-truth order, daily rules, Jon’s cPanel session links (Node.js + Terminal), fast workflow.
    2) .cursor/docs/Agent-Runbook.md — operator handshake + command locality (Local Cursor vs Live cPanel).
    3) .cursor/docs/Spaceship.md — deploy protocol: pushitup/pushit:live on PC only; cPanel = restart / optional npm install; never pushitup on host.
-   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, build, lint, verify:local, verify:live, pushit:live, test:spaceship-ftp).
+   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, test:spaceship-ftp).
    5) .cursor/docs/ReCall.md — "Current focus" + latest "Recent changes" entry.
    6) Skim .cursor/docs/Restore-Points.md — newest checkpoint row only (if any).
 
@@ -137,3 +137,12 @@ Use these as quick "commands in plain English" for the agent.
 
 32. **`I'm done for now`** (or **`Continue later`**)  
     - End-of-session closeout: short **ReCall.md** append (what shipped, next step), confirm docs saved if edited, optionally stop **Local (Cursor)** dev on port **3000**; no deploy unless you say otherwise.
+
+33. **`Clean my folders`**  
+    - Execute `npm run media:consolidate` to move stray files from repo root `media/` and from other redundant locations into `public/media` (as defined in `scripts/consolidate-media-folders.mjs`). Report moved files and confirm deletion of redundant folders.
+
+34. **`Sync my media`**  
+    - Execute `npm run media:sync` to register new physical files in `public/media` into the Payload database. This bypasses browser 'Alt Text' requirements for bulk local files. Report final file-to-database row count.
+
+35. **`Full media refresh`**  
+    - Runs **Clean my folders** followed by **Sync my media**. Verifies all UI components use `/media/` paths and confirms the project is **Ready to begin** for design or deploy.

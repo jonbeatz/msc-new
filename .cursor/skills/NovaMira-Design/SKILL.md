@@ -106,7 +106,7 @@ These stay **non-negotiable** for NovaMira public UI unless the user overrides:
 - **Images:** meaningful **`alt`**; **`loading="lazy"`** below the fold.
 - **CSS namespaces:** custom classes **`msc-`** / **`nm-`**; plugin CSS in **`msc-shows-core`** assets when the plugin owns the feature.
 - **Hydration Polish:** Use `suppressHydrationWarning` on the root `<body>` tag to handle minor server/client attribute mismatches (like dark mode classes) without crashing the React engine.
-- **Asset Loading:** Use root-relative URLs for hero and grid images (e.g. **`/images/...`** for files in `public/images/`). If `basePath` is enabled in `next.config.mjs`, do **not** bake that prefix into `src`—Next prepends it. Avoid double-prefix 404s.
+- **Asset Loading:** Use root-relative URLs for hero and grid images (e.g. **`/media/...`** for files in `public/media/`). If `basePath` is enabled in `next.config.mjs`, do **not** bake that prefix into `src`—Next prepends it. Avoid double-prefix 404s.
 
 ---
 

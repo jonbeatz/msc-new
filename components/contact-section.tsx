@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { submitBookingRequest } from "@/lib/booking"
 import { ContactScheduleQueryOpener } from "@/components/contact-schedule-query-opener"
+import { getPublicOrigin } from "@/lib/public-origin"
 
 const ScheduleCalendar = dynamic(
   () => import("@/components/ui/calendar").then((m) => ({ default: m.Calendar })),
@@ -21,7 +22,10 @@ const ScheduleCalendar = dynamic(
   }
 )
 
-const SCHEDULE_CALL_URL = "https://example.com/schedule-call-test"
+/** Optional external scheduling URL; placeholder until a real calendar link is set in env. */
+const SCHEDULE_CALL_URL =
+  process.env.NEXT_PUBLIC_SCHEDULE_CALL_URL?.trim() ||
+  "https://example.com/schedule-call-test"
 
 const contactInfo = [
   {
@@ -179,9 +183,7 @@ export function ContactSection() {
     setIsNewsletterSubmitting(true)
     try {
       const base =
-        typeof window !== "undefined"
-          ? ""
-          : process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
+        typeof window !== "undefined" ? "" : getPublicOrigin()
       const res = await fetch(`${base}/api/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

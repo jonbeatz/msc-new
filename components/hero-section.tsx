@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { HeroSlideContent, HeroStatContent } from "@/lib/cms/content-types"
 
+/** Fallback slides use `public/media` (same paths CMS Media URLs resolve to after `afterRead`). */
 const defaultSlides: HeroSlideContent[] = [
   {
-    image: "/images/tv-wall.jpg",
+    image: "/media/tv-wall.jpg",
     alt: "Professional multi-screen TV studio wall",
     isActive: true,
     eyebrow: "For Creators Who Want More",
@@ -17,7 +18,7 @@ const defaultSlides: HeroSlideContent[] = [
     sub: "We build studio-style websites that give creators the look and structure of a major network — powered by a custom plugin, built once and owned by you.",
   },
   {
-    image: "/images/show-cards.jpg",
+    image: "/media/show-cards.jpg",
     alt: "Netflix-style show cards",
     isActive: true,
     eyebrow: "Look Like a Real Network",
@@ -25,7 +26,7 @@ const defaultSlides: HeroSlideContent[] = [
     sub: "Your platform can be organized like a professional streaming network — with structured shows, episodes, and categories that rival any major broadcaster.",
   },
   {
-    image: "/images/on-air.jpg",
+    image: "/media/on-air.jpg",
     alt: "Creator on air",
     isActive: true,
     eyebrow: "Podcasters & Talk Show Hosts",
@@ -33,7 +34,7 @@ const defaultSlides: HeroSlideContent[] = [
     sub: "Launch your podcast or talk show with a professional-grade platform that rivals any major network — without monthly platform fees or subscriber charges.",
   },
   {
-    image: "/images/creator-solo.jpg",
+    image: "/media/creator-solo.jpg",
     alt: "Creator with professional cinema camera in studio",
     isActive: true,
     eyebrow: "Built for Every Creator",

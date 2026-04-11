@@ -78,7 +78,7 @@ export function AboutSection() {
           {/* Image Card - spans 5 columns - WhatWeDo.jpg */}
           <div className="lg:col-span-5 bento-card rounded-3xl overflow-hidden border border-border/50 relative min-h-[300px] lg:min-h-0">
             <Image
-              src="/images/what-we-do.jpg"
+              src="/media/what-we-do.jpg"
               alt="Professional production crew filming in studio"
               fill
               className="object-cover"

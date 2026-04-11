@@ -23,3 +23,11 @@ export type HeroStatContent = {
   label: string
   highlight: boolean
 }
+
+/** Homepage Services section screenshot grid (from Site → Homepage → Services gallery). */
+export type ServicesGalleryItem = {
+  src: string
+  alt: string
+  /** Lightbox / UI caption; Media supplies alt for accessibility. */
+  label: string
+}

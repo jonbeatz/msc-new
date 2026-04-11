@@ -117,7 +117,7 @@ Before treating a page or feature as done, confirm:
 If the active repo already uses different prefixes (e.g. legacy `nova_` / `dt_`), **do not mass-rename** without an explicit migration task. For new code in NovaMira-branded work, prefer the `msc_` / `msc-` / `nm-` rules above unless the user says otherwise.
 
 ## 6. Next.js Static Export & Deployment
-- **Config Audit:** Ensure `next.config.mjs` contains `output: 'export'` and `unoptimized: true`. Reference `public/` files with root-relative paths (e.g. **`/images/...`**). Add `basePath` / `assetPrefix` only when the deployed URL is under a subdirectory—and never duplicate that prefix inside `src`.
+- **Config Audit:** Ensure `next.config.mjs` contains `output: 'export'` and `unoptimized: true`. Reference `public/` files with root-relative paths (e.g. **`/media/...`**). Add `basePath` / `assetPrefix` only when the deployed URL is under a subdirectory—and never duplicate that prefix inside `src`.
 - **Image Optimization:** In static mode, bypass the Next.js Image loader; use `unoptimized: true` to prevent 404s on Spaceship.
 - **Deployment Protocol:**
   1. `npm install` (if node_modules is missing/corrupt).

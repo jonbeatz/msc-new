@@ -1,11 +1,10 @@
 "use client"
 
 import Link from "next/link"
+import { getPublicOrigin } from "@/lib/public-origin"
 
-/** Uses NEXT_PUBLIC_SERVER_URL (same as marketing layout). Set to https://mystudiochannel.com on production. */
-const publicSiteRoot = (
-  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
-).replace(/\/$/, "")
+/** Uses NEXT_PUBLIC_SERVER_URL (same as marketing layout). */
+const publicSiteRoot = getPublicOrigin()
 
 export function MscPayloadNavDashboard() {
 

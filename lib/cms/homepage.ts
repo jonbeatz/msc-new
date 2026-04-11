@@ -1,9 +1,19 @@
 import { getPayload } from "payload"
 import config from "@payload-config"
 
-import type { HeroSlideContent, HeroStatContent } from "./content-types"
+import { toRelativePublicMediaUrl } from "@/lib/media-url"
 
-export type { HeroSlideContent, HeroStatContent } from "./content-types"
+import type {
+  HeroSlideContent,
+  HeroStatContent,
+  ServicesGalleryItem,
+} from "./content-types"
+
+export type {
+  HeroSlideContent,
+  HeroStatContent,
+  ServicesGalleryItem,
+} from "./content-types"
 
 export type HomepageActiveSlideSeo = {
   title: string | null
@@ -11,20 +21,45 @@ export type HomepageActiveSlideSeo = {
   image: string | null
 }
 
-/** Same-origin `/api/media/...` works with `next/image`; absolute only when already provided. */
+/** Align with Media `afterRead`: always same-origin paths (e.g. `/media/...`). */
 function normalizeMediaSrc(pathOrUrl: string): string {
-  if (
-    pathOrUrl.startsWith("http://") ||
-    pathOrUrl.startsWith("https://")
-  ) {
-    return pathOrUrl
+  return toRelativePublicMediaUrl(pathOrUrl)
+}
+
+function mapServicesGallery(
+  doc: Record<string, unknown> | null | undefined,
+): ServicesGalleryItem[] | null {
+  if (!doc) return null
+  const raw = doc.servicesGallery
+  if (!Array.isArray(raw) || raw.length === 0) return null
+  const out: ServicesGalleryItem[] = []
+  for (const row of raw) {
+    if (!row || typeof row !== "object") continue
+    const img = (row as { image?: unknown }).image
+    if (typeof img !== "object" || img === null || !("url" in img)) continue
+    const media = img as unknown as { url?: string; alt?: string }
+    const url = media.url
+    if (!url) continue
+    const alt =
+      typeof media.alt === "string" ? media.alt : "Gallery image"
+    const labelRaw = (row as { label?: string }).label
+    const label =
+      typeof labelRaw === "string" && labelRaw.trim().length > 0
+        ? labelRaw.trim()
+        : "Preview"
+    out.push({
+      src: normalizeMediaSrc(url),
+      alt,
+      label,
+    })
   }
-  return pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`
+  return out.length > 0 ? out : null
 }
 
 export async function getHomepageCmsData(): Promise<{
   heroSlides: HeroSlideContent[] | null
   heroStats: HeroStatContent[] | null
+  servicesGallery: ServicesGalleryItem[] | null
 }> {
   try {
     const payload = await getPayload({ config })
@@ -35,7 +70,27 @@ export async function getHomepageCmsData(): Promise<{
 
     const rawSlides = doc?.heroSlides
     if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
-      return { heroSlides: null, heroStats: null }
+      const d = doc as Record<string, unknown>
+      const rawStatsEarly = d.heroStats
+      let heroStatsEarly: HeroStatContent[] | null = null
+      if (Array.isArray(rawStatsEarly) && rawStatsEarly.length > 0) {
+        const mapped: HeroStatContent[] = []
+        for (const s of rawStatsEarly) {
+          if (!s || typeof s !== "object") continue
+          if (typeof s.value !== "string" || typeof s.label !== "string") continue
+          mapped.push({
+            value: s.value,
+            label: s.label,
+            highlight: Boolean(s.highlight),
+          })
+        }
+        if (mapped.length > 0) heroStatsEarly = mapped
+      }
+      return {
+        heroSlides: null,
+        heroStats: heroStatsEarly,
+        servicesGallery: mapServicesGallery(d),
+      }
     }
 
     const heroSlides: HeroSlideContent[] = []
@@ -137,9 +192,10 @@ export async function getHomepageCmsData(): Promise<{
     return {
       heroSlides: heroSlides.length > 0 ? heroSlides : null,
       heroStats,
+      servicesGallery: mapServicesGallery(doc as Record<string, unknown>),
     }
   } catch {
-    return { heroSlides: null, heroStats: null }
+    return { heroSlides: null, heroStats: null, servicesGallery: null }
   }
 }
 

@@ -241,7 +241,7 @@ If you saved links like `.../terminal/index.html` or `.../nodejs-selector.html.t
 
 - `npm run pushitup -- collections/Leads.ts`
 - `npm run pushitup -- package.json package-lock.json server.js`
-- `npm run pushitup -- public/images/about-studio.jpg`
+- `npm run pushitup -- public/media/about-studio.jpg`
 
 ## `PushItUPzip` (zip-first upload)
 
