@@ -92,7 +92,7 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ### 2026-04-11 — Snapshot: MSC PRO admin branding + deploy docs (`Take a snapshot`)
 
-- **Checkpoint:** **`RP-2026-04-11-msc-pro-admin-branding`** in **`Restore-Points.md`**. **Branch:** **`mscNowLive-v4-RestorePoint`** + pushed **`snapshot/2026-04-11-msc-pro-admin-branding`** at the same commit.
+- **Checkpoint:** **`RP-2026-04-11-msc-pro-admin-branding`** in **`Restore-Points.md`**. **Branch:** **`mscNowLive-v4-RestorePoint`** @ **`6b84052`** + pushed **`snapshot/2026-04-11-msc-pro-admin-branding`** at the same commit.
 - **Verified:** **`npm run build`** green immediately before commit.
 - **Includes:** Payload admin graphics, password-field enhancement, **`pushitup:admin-ui` / `pushitup:admin-branding`**, doc sync (Jedi-List, Spaceship, Go-Live, Custom-Prompts), hooks / **`verify-next-safe`**, version **1.0.5**.
 
