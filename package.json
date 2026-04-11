@@ -18,6 +18,7 @@
     "pushitup": "powershell -ExecutionPolicy Bypass -File scripts/PushItUP.ps1",
     "pushitup:admin-ui": "powershell -ExecutionPolicy Bypass -File scripts/PushItUP.ps1 middleware.ts lib/msc-admin-version.ts components/msc-payload-nav-dashboard.tsx components/msc-payload-graphics.tsx components/msc-payload-admin-enhancements.tsx collections/Users.ts payload.config.ts 'app/(payload)/custom.scss'",
     "pushitup:admin-branding": "powershell -ExecutionPolicy Bypass -File scripts/PushItUP.ps1 components/msc-payload-graphics.tsx components/msc-payload-admin-enhancements.tsx collections/Users.ts payload.config.ts 'app/(payload)/custom.scss'",
+    "pushitup:server-config": "powershell -ExecutionPolicy Bypass -File scripts/PushItUP.ps1 server.js package.json package-lock.json .env.example",
     "pushit:live": "powershell -ExecutionPolicy Bypass -File scripts/pushit-live.ps1",
     "pushit:live:safe": "powershell -ExecutionPolicy Bypass -File scripts/pushit-live-safe.ps1",
     "PushItUPzip": "powershell -ExecutionPolicy Bypass -File scripts/PushItUPzip.ps1",

@@ -49,7 +49,7 @@ Use these as quick "commands in plain English" for the agent.
    - Rehydrates context from docs + git and gives a concise "what matters now" summary.
 
 3. **`Lets Push It Live`**  
-   - Runs `npm run pushit:live`, streams progress, then gives cPanel links + exact restart step.
+   - **Tier 2** full deploy — same as **item 38** (`npm run pushit:live`: build → admin bundle → `.next` → `dev:fresh`). Streams progress, then cPanel restart + validation.
 
 4. **`Lets Finish`**  
    - End-of-day closeout without forced deploy: status, docs update, confirm commit/push, stop local services.
@@ -151,4 +151,18 @@ Use these as quick "commands in plain English" for the agent.
    - **Local (Cursor / repo root):** explain the usual cause (**`.next`** deleted while **`next dev`** was still running — often **`verify:next`** or **`clean:next`** in a second terminal). Run **`npm run dev:recover`** (or **`npm run repair:dev`**). For production checks when dev might be on port **3000**, use **`npm run verify:next:safe`** instead of raw **`verify:next`**. Remind: Cursor hooks block **`verify:next`** when **3000** is busy.
 
 37. **`Push my branding`**  
-   - **Local (Cursor / repo root):** runs **`npm run pushitup:admin-branding`**, which FTPS only the Payload admin look-and-feel sources: **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`** (docs for login eyeball / virtual password), **`payload.config.ts`**, **`app/(payload)/custom.scss`**. Use when you changed admin branding, SCSS, or graphics hooks and want a **small targeted upload** instead of listing paths by hand. **Important:** React/admin UI changes still need a **production build** and **`.next`** on the host to match — run **`npm run build`** then **`npm run pushitup -- .next`**, or use **`npm run pushit:live`** (which runs **`pushitup:admin-ui`**, now including these same branding files, plus full **`.next`**). After any upload, **Live (cPanel)** — Restart the Node.js app for `mystudiochannel.com`.
+   - **Tier 1 — Fast FTP (look and feel only).** **Local (Cursor / repo root):** runs **`npm run pushitup:admin-branding`** — **`PushItUP.ps1`** uploads **only** these paths: **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. No production build in this command: use for quick SCSS/config/docs tweaks when you accept that **bundled** admin UI may not change until you run **Tier 2**. If you changed React behavior that affects the compiled admin bundle, run **`Lets Push It Live`** (item **38**) instead. After upload, **Live (cPanel)** — Restart the Node.js app for `mystudiochannel.com`.
+
+38. **`Lets Push It Live`**  
+   - **Tier 2 — Full build + ship (admin logic, pages, full UI).** **Local (Cursor / repo root):** runs **`npm run pushit:live`** — the master pipeline: **`npm run build`** → **`npm run pushitup:admin-ui`** (middleware, version, nav, full branding bundle, `payload.config`, SCSS, etc.) → **`npm run pushitup -- .next`** → **`npm run dev:fresh`**. This is what you say when you need the live site and **`/admin`** to match a fresh **Next** production output. Then **Live (cPanel)** — Restart Node; validate **`/`** and **`/admin`** (Incognito). Same intent as **item 3** above.
+
+39. **`Push server config`**  
+   - **Tier 3 — Hosting / Node runtime contract.** **Local (Cursor / repo root):** runs **`npm run pushitup:server-config`** — FTPS **`server.js`**, **`package.json`**, **`package-lock.json`**, and **`.env.example`**. Use when dependencies, engine constraints, or startup wiring changed; then **Live (cPanel → Terminal)** — `source` nodevenv, **`cd`** app root, **`npm install --legacy-peer-deps`**, then **Restart** the Node app (see **Go-Live-Checklist.md** §5). Do **not** run **`pushitup`** on the host.
+
+40. **`Fix Local`**  
+   - **Intent:** Deep recovery of the **Local (Cursor / repo root)** environment when **`/`** or **`/admin`** show white screen, **500**, missing **vendor-chunks**, or **404** on **`/_next/static/...`**.  
+   - **Execution:** Run **`npm run dev:recover`** (`scripts/restart-dev.ps1`: stops any process on port **3000**, then **`npm run dev`**, which runs **`clean:next`** and starts **`next dev -p 3000`** — a **clean dev compile**, not `npm run build`). Wait until the terminal shows **Ready** (e.g. **Ready in …ms**).  
+   - **Self-verification (required):** After **Ready**, the agent must probe **`http://localhost:3000/`** and **`http://localhost:3000/admin`** (e.g. **`Invoke-WebRequest`** / **`curl`** / fetch) and record **HTTP status codes**.  
+   - **Reporting:** Report both status codes. If **both are 200**, tell **Jon** to **hard-refresh** the browser or use an **Incognito** tab (old chunk URLs can cache).  
+   - **Safety:** If **`npm run dev:recover`** or compile fails with a **build/TypeScript error**, read the log, **fix the code once**, and **retry the same recovery sequence exactly once**. If it still fails, stop and ask Jon for help (do not loop blindly).  
+   - **Related:** **Item 36** (lighter explanation of stale **`.next`**); **`Jedi-List.md`** → when **`/`** or **`/admin`** breaks first.

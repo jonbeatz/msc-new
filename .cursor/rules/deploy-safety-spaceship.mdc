@@ -20,3 +20,11 @@ When discussing or running deploy operations:
 4. If upload reports failures, retry failed paths before restart.
 5. If live shows `vendor-chunks` module errors, treat it as mixed/incomplete `.next` and perform clean server `.next` replace flow.
 
+## Tier scripts (must match `package.json`)
+
+- **Tier 1:** `npm run pushitup:admin-branding` — **Custom-Prompts** item **37**.
+- **Tier 2:** `npm run pushit:live` (build → `pushitup:admin-ui` → `pushitup -- .next` → `dev:fresh`) — items **3** / **38**.
+- **Tier 3:** `npm run pushitup:server-config` — item **39**.
+
+Full reference: **Jedi-List.md** (Deploy uploaders), **Spaceship.md**, **Go-Live-Checklist.md**.
+

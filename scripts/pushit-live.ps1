@@ -1,4 +1,4 @@
-# One-shot: production build + FTPS upload of admin UI bundle markers + full .next
+# Tier 2 / master deploy: production build + FTPS admin-ui bundle + full .next + local dev:fresh
 # Run from repo root: npm run pushit:live
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot

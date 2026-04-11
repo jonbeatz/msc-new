@@ -18,7 +18,7 @@ Follow **in order**. Repo root on your PC is the folder that contains **`package
 |---|--------|------|
 | 1 | **PC — Cursor terminal** | `npm run build` — wait until the build finishes. |
 | 2 | **PC** | **MSC PRO ENGINE / Payload admin:** If you changed **admin UI, version label, branding, or Payload config/SCSS**, run **`npm run pushitup:admin-ui`**. This is the **primary** FTPS command for shipping the **MSC PRO ENGINE** look and feel (gold sidebar, dashboard/logout nav, login + sidebar graphics, password-field enhancement, `Users` collection notes, and Payload config). It uploads: **`middleware.ts`**, **`lib/msc-admin-version.ts`**, **`components/msc-payload-nav-dashboard.tsx`**, **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. For a **smaller** upload when only the branding subset changed, use **`npm run pushitup:admin-branding`** (same list minus middleware, version file, and nav dashboard — see **`package.json`**). |
-| 3 | **PC** | If you changed **deps or server config**: `npm run pushitup -- package.json package-lock.json server.js patches middleware.ts` (add/remove paths to match what you edited). |
+| 3 | **PC** | **Tier 3 — hosting / package:** If **`package.json`**, lockfile, **`server.js`**, or **`.env.example`** changed, run **`npm run pushitup:server-config`** (matches **`package.json`** script). For **`patches/`** or **`middleware.ts`**, add **`npm run pushitup -- patches`** / **`middleware.ts`** (or a single combined **`pushitup -- …`** line) as needed. |
 | 4 | **PC** | `npm run pushitup -- .next` — wait for **“PushItUP complete”** and the file count. |
 | 5 | **cPanel → Setup Node.js App** | **Restart** the app (or **Stop** → wait a few seconds → **Start**). |
 | 6 | **Browser** | Open **`https://mystudiochannel.com`** in **Incognito** (or hard refresh) so you are not seeing an old cached page. |
@@ -80,7 +80,7 @@ Use this when **Cursor fixed something locally** and you want it on **mystudioch
 | Step | Where | What |
 |------|--------|------|
 | 1 | **Your PC** (repo root) | `npm run build` — produces a fresh **`.next`** (host often **cannot** build: Wasm OOM). |
-| 2 | **Your PC** | `npm run pushitup -- package.json package-lock.json server.js patches middleware.ts` (always safe) **+** `npm run pushitup -- .next` (**whole folder — no zip, no unzip in cPanel**). |
+| 2 | **Your PC** | **`npm run pushitup:server-config`** for core hosting files, **or** `npm run pushitup -- package.json package-lock.json server.js patches middleware.ts` when you need a wider list **+** `npm run pushitup -- .next` (**whole folder — no zip, no unzip in cPanel**). |
 | 3 | **cPanel → Terminal** | Paste the block under **“Terminal after upload”** below (activates Node venv, `cd` to app, `npm install` if deps changed). |
 | 4 | **cPanel → Node.js Selector** (`ReStartIt`) | **RESTART** — or **STOP** → wait 2–3s → **START**. Do this **after** uploads (and Terminal step if you ran it). |
 

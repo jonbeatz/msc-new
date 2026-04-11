@@ -46,40 +46,33 @@ Wait until build completes successfully.
 
 ---
 
-## 2) Upload to Spaceship (PC)
+## 2) Upload to Spaceship (PC) — tiered deploy
 
-Custom prompt shortcut:
-- `Lets Push It Live`
+**Shortcuts (see `Custom-Prompts.md`):** **`Push my branding`** (item **37**) · **`Lets Push It Live`** (items **3** / **38**) · **`Push server config`** (item **39**).
 
 **Before / alongside upload:** confirm marketing assets are present locally under **`public/media`** (that folder is what the live site serves as **`/media/...`**). If you added or replaced files there, commit them and ensure they are included in what you deploy; missing **`public/media`** files on the server means broken images even when **`.next`** is healthy.
 
-### Standard one-command deploy
+### Deploy tiers (pick one path)
+
+| Tier | Name | Command (Local / repo root) | What it ships | When to use |
+|------|------|----------------------------|---------------|-------------|
+| **1** | **Branding — Fast FTP** | `npm run pushitup:admin-branding` | **Only:** `components/msc-payload-graphics.tsx`, `components/msc-payload-admin-enhancements.tsx`, `collections/Users.ts`, `payload.config.ts`, `app/(payload)/custom.scss` | Quick look-and-feel / config / SCSS tweaks; **no** `build` or `.next` in this step. |
+| **2** | **Admin logic / pages — Full build + UI + `.next`** | `npm run pushit:live` | **`npm run build`** → **`npm run pushitup:admin-ui`** (middleware, `lib/msc-admin-version.ts`, nav dashboard, full branding files, `Users`, `payload.config`, `custom.scss`) → **`npm run pushitup -- .next`** → **`npm run dev:fresh`** | Default for anything that must match compiled Next output (routes, React admin UI, most code changes). **Master** deploy. |
+| **3** | **Hosting — server / package config** | `npm run pushitup:server-config` | **`server.js`**, **`package.json`**, **`package-lock.json`**, **`.env.example`** | Deps, lockfile, startup file, or documented env template changed; follow **§5** for **`npm install`** on the host. |
+
+**Tier 2** is the **full** pipeline: it uploads both the **admin source bundle** and the **entire `.next`** output so the live app and **`/admin`** stay consistent.
+
+**Tier 1** does **not** run `build` — use **Tier 2** when the admin bundle or site needs to reflect new compiled code.
+
+### Standard one-command deploy (Tier 2)
 
 ```bash
 npm run pushit:live
 ```
 
-This does:
-1. `npm run build`
-2. `npm run pushitup:admin-ui` (includes Payload admin sources: middleware, version label, nav, **branding** — see list below)
-3. `npm run pushitup -- .next`
-4. `npm run dev:fresh` (local reset)
+This is exactly: **`build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`dev:fresh`** (see `scripts/pushit-live.ps1`).
 
-**Admin branding + config (included in step 2 via `pushitup:admin-ui`):** upload these from **Local (Cursor / repo root)** so login/sidebar graphics, SCSS, auth collection notes, and Payload config stay in sync with the live app:
-
-- `components/msc-payload-graphics.tsx`
-- `components/msc-payload-admin-enhancements.tsx`
-- `collections/Users.ts` (login eyeball / virtual password docs)
-- `payload.config.ts`
-- `app/(payload)/custom.scss`
-
-**Branding-only FTP (no full go-live):** when you only touched admin look-and-feel and want a smaller upload than the whole pipeline, **Local (Cursor / repo root):**
-
-```bash
-npm run pushitup:admin-branding
-```
-
-That runs `pushitup` for exactly the five paths above. You still need **`npm run build`** + **`npm run pushitup -- .next`** (or **`npm run pushit:live`**) for React/admin bundle changes to match on the server; use **Custom-Prompts** shortcut **`Push my branding`** (item **37**) for the agent to run the targeted script and remind you of build + cPanel restart.
+**`pushitup:admin-ui`** includes (among others): `middleware.ts`, `lib/msc-admin-version.ts`, `components/msc-payload-nav-dashboard.tsx`, branding components, `collections/Users.ts`, `payload.config.ts`, `app/(payload)/custom.scss`.
 
 A full **`.next`** upload is what fixes many **vendor-chunk** / missing-module errors on the host; if the browser shows **`Cannot find module './vendor-chunks/...'`** or similar after a deploy, re-run **`npm run pushitup -- .next`** (after a successful local **`npm run build`**) so chunk paths stay in sync.
 
@@ -135,6 +128,7 @@ npm run verify:live
 
 Custom prompt helper:
 - `Lets Push It Live (Safe)` (good before dependency-sensitive deploys)
+- **`Push server config`** (item **39**) to upload **`package.json`**, **`package-lock.json`**, **`server.js`**, **`.env.example`** before install
 
 Use cPanel Terminal only if `package.json`, lockfile, or `patches/` changed.
 
@@ -180,7 +174,7 @@ If **`/media/`** images are wrong or 404 after deploy, sync **`public/media`** t
 ## Ground rules
 
 - Run `pushitup` on PC terminal, not cPanel Terminal.
-- For app/admin code changes, prefer full build + full `.next` upload.
+- For app/admin code changes, prefer **Tier 2** (`pushit:live`): full build + full `.next` upload.
 - Do not partially upload random files in `.next` unless recovering failed chunk uploads.
 
 ---
@@ -190,9 +184,10 @@ If **`/media/`** images are wrong or 404 after deploy, sync **`public/media`** t
 Use this if you want to run go-live mostly by prompt commands:
 
 1. `Lets run system check`
-2. `Lets Push It Live (Safe)` (or `Lets Push It Live` if you already checked) — **`pushit:live`** already uploads admin branding files via **`pushitup:admin-ui`** (see list in **§2**).
-3. Restart Node app in cPanel (Stop -> wait -> Start)
+2. Choose tier:
+   - **Branding-only FTP:** `Push my branding` (item **37**) → restart Node in cPanel.
+   - **Full app + admin:** `Lets Push It Live` (items **3** / **38**) or `Lets Push It Live (Safe)` — then restart Node.
+   - **Deps / server files:** `Push server config` (item **39**) → cPanel Terminal **`npm install --legacy-peer-deps`** → restart Node.
+3. Restart Node app in cPanel when you uploaded anything that affects runtime (Stop -> wait -> Start)
 4. `Lets Verify Live`
 5. Optional: `Lets Checkpoint Docs` (docs only) or `Lets Checkpoint Docs + Commit`
-
-**Admin branding only (no full deploy):** use **`Push my branding`** (**`Custom-Prompts.md`** item **37**) — runs **`npm run pushitup:admin-branding`**, then follow the reminder to **`npm run build`** + **`.next`** upload and cPanel restart if React/admin code changed.
