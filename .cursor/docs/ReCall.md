@@ -75,6 +75,13 @@ Create a new restore branch from the current clean state:
 
 ## Recent changes (latest first)
 
+### 2026-04-10 — Session closeout (docs + tomorrow’s focus)
+
+- **`Ready to begin`:** full-sync prompt in **Agent-Runbook §0** + **Custom-Prompts** (items 0, 31, 32); committed/pushed (`56a723e`); final dry-run: **`verify:local`** green.
+- **`ToDo.md`:** lightweight next-session list (email templates review, Media vs `public/images`, admin login password reveal); **START-HERE** docs map points here; backlog left empty (keep it simple).
+- **Next session:** see **`ToDo.md` → Next session (2026-04-11)**.
+- **Repo note:** **`ToDo.md`** and **`START-HERE.md`** (ToDo row) may still need **`git add` / commit** if not saved to `origin` yet.
+
 ### 2026-04-10 — Checkpoint: demos polish, ESLint, admin v1.0.4 live, operator docs
 
 - **Demos:** `components/demos-section.tsx` — valid focusable rail (no `<button>` wrapping `<a>`), same-tab links for non-HTTP URLs, selection sync when CMS list changes; `lib/cms/projects.ts` fallback images aligned with hero assets.

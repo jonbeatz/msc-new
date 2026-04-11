@@ -62,6 +62,7 @@ Project rules layout:
 | `Jedi-List.md` | Commands and script meanings | Daily |
 | `Restore-Points.md` | Known-good checkpoints + rollback notes | Daily (after milestones) |
 | `ReCall.md` | Session history and resume context | Optional |
+| `ToDo.md` | Next ideas / tomorrow’s focus (lightweight; not a full backlog) | Optional |
 | `Development.md` | Architecture and deep implementation details | Optional |
 | `Run-Next-JS.md` | Local run/build/deploy summary | Optional |
 | `Site-Plans.md` | Product/site planning notes | Archive/Optional |
