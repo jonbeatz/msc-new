@@ -156,7 +156,9 @@ These `cpsess...` links can expire. If they do, log in at:
 
 ## What to tell a new agent
 
-**Full session sync (recommended):** say **`Ready to begin`** — see **`Agent-Runbook.md` → §0 Ready to begin (full sync)**. The agent reads the core docs, rules, and git/local state before work.
+**Full session sync (recommended):** say **`Ready to begin`** or paste the block from **`Custom-Prompts.md` → item 0** — same content as **`Agent-Runbook.md` → §0 Ready to begin (full sync)**. The agent reads core docs, rules, and git/local health before coding; first reply should start with **`Ok Jon - Ready to begin.`** (see **Agent-Runbook** handshake).
+
+**Known-good resume tip:** newest row **`RP-2026-04-12-branch-tip-ready-tomorrow`** in **`Restore-Points.md`** (branch **`mscNowLive-v4-RestorePoint`**, tip SHA **`b92d1be`**).
 
 **Minimal bootstrap:** paste this:
 

@@ -60,6 +60,7 @@ You must actually read these files (not from memory) in this order:
 Also load project constraints:
 - Read .cursorrules if present.
 - List and skim .cursor/rules/*.mdc — at minimum include operator/cPanel rules (e.g. jon-operator-cpanel.mdc): Jon’s bookmarks, always label Local vs Live when giving commands.
+- Note: **`npm run parity:ftp`** writes **`parity-ftp-report.md`** at repo root for drift review; the file is **gitignored** (regenerate anytime; do not expect it in `git status` as untracked).
 
 Then run Local (Cursor) checks from repo root:
 - git branch --show-current && git status -sb

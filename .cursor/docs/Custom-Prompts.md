@@ -24,6 +24,7 @@ Use these as quick "commands in plain English" for the agent.
    Also load project constraints:
    - Read .cursorrules if present.
    - List and skim .cursor/rules/*.mdc — at minimum include operator/cPanel rules (e.g. jon-operator-cpanel.mdc): Jon’s bookmarks, always label Local vs Live when giving commands.
+   - Note: **`npm run parity:ftp`** writes **`parity-ftp-report.md`** locally; it is **gitignored** (safe to regenerate; it will not show as an untracked file).
 
    Then run Local (Cursor) checks from repo root:
    - git branch --show-current && git status -sb

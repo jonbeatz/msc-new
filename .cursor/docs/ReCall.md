@@ -81,14 +81,22 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Current focus
 
-- **Payload CMS:** `Homepage` + `Site settings` globals drive hero + SEO; **Media** for images; **Leads** collection ready for a future form (`POST /api/leads`).
-- **Booking:** Schedule modal captures **IANA time zone** (`Intl...timeZone`) and persists to Payload `bookings.timeZone`; admin alert email includes **Time zone** line.
+- **Payload CMS:** **`globals/Homepage`** drives marketing hero rows (images from **Media**); **`globals/Site settings`** for SEO/branding; **Leads** / **Bookings** with Resend flows; there is **no** separate **`HeroSlides`** collection (removed — data lives on Homepage + Media).
+- **Email:** Shared styling/helpers in **`lib/email-brand.ts`** and **`lib/email-templates.ts`** (used by collection hooks and dev preview where applicable).
+- **Booking:** Schedule modal captures **IANA time zone** (`Intl...timeZone`) and persists to **`bookings.timeZone`**; admin alert email includes **Time zone** line.
 - **Nav / hashes:** **`lib/hash-nav.ts`** + **`resolveNavHashHref`** in **`header`** / **`footer`**; **`HomeHashScroll`** on **`/`**; see **Development.md** → *Marketing header*.
-- Next: wire more sections to Payload, or **headless WordPress Phase 1** (`msc-api` plugin — not in repo yet); production: Postgres + lock down public APIs.
+- **Next ideas:** wire more sections to Payload, or **headless WordPress Phase 1** (`msc-api` plugin — not in repo yet); production hardening (Postgres, API lockdown) when you prioritize it.
 
 ---
 
 ## Recent changes (latest first)
+
+### 2026-04-12 — Docs + restore tip synced for tomorrow (`Ready to begin`)
+
+- **Restore-Points:** New row **`RP-2026-04-12-branch-tip-ready-tomorrow`** — tip **`mscNowLive-v4-RestorePoint`** @ **`b92d1be`**; **Files worth diffing** list deduped; **`HeroSlides`** removed from checklist (superseded by **Homepage** + **Media**).
+- **ReCall:** **Current focus** updated for hero/Media/email helpers; this entry confirms **Custom-Prompts** item **0** / **Agent-Runbook §0** are the canonical **Ready to begin** paste for the next session.
+- **Parity report:** **`parity-ftp-report.md`** is **gitignored** (**`b92d1be`**); **`npm run parity:ftp`** still writes it locally for drift checks.
+- **Live:** Tier 2 deploy (**`npm run pushit:live`**) was run earlier this date; confirm cPanel **Node restart** + Incognito smoke if you have not already.
 
 ### 2026-04-11 — Snapshot: MSC PRO admin branding + deploy docs (`Take a snapshot`)
 
@@ -536,7 +544,7 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 ### 2026-04-12 — Session closeout (I'm done for now)
 
 - **Shipped:** **`ff47fe5`** — docs checkpoint (Tier 2 + **`parity:ftp`**, **`PushItUP`**, **`pushit-live`**, tooling scripts). **`38dd8f8`** — remove **`HeroSlides`**, homepage/Media-driven hero, email **`lib/email-*`**, **`payload-types.ts`**, section/app updates, seeds.
-- **Git:** **`mscNowLive-v4-RestorePoint`** matches **`origin`**; only untracked **`parity-ftp-report.md`** (optional; generated FTP diff — add to **`.gitignore`** or delete locally if you do not want it).
+- **Git:** **`mscNowLive-v4-RestorePoint`** matches **`origin`**; **`parity-ftp-report.md`** later added to **`.gitignore`** (**`b92d1be`**).
 - **Next session:** **`npm run dev:payload`** (or **`npm run dev`**) from repo root; read **ReCall** + **START-HERE** if resuming cold.
 - **Local:** Freed port **3000** via **`scripts/kill-dev-port.mjs`** so the next dev boot is clean.
 
