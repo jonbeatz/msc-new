@@ -91,6 +91,13 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Recent changes (latest first)
 
+### 2026-04-12 — Session closeout (I'm done for now) — evening
+
+- **Chats:** Confirmed **docs + “Ready to begin”** readiness for next session; answered **Composer 2** vs **Composer 2 Fast** — same rough token use for a task; **standard Composer 2** is **lower cost per token** than **Fast** on usage-based pricing (see Cursor **Composer 2** blog); **Fast** is the default for latency.
+- **Git:** **`mscNowLive-v4-RestorePoint`** @ **`5201318`**, clean and pushed to **`origin`**.
+- **Next session:** **`Ready to begin`** (**`Custom-Prompts`** item **0** / **`Agent-Runbook`** §0) → **`npm run dev:fresh`** or **`npm run dev:payload`** from repo root if **`/`** / **`/admin`** need a boot.
+- **Local:** Freed port **3000** via **`scripts/kill-dev-port.mjs`** when a listener was present.
+
 ### 2026-04-12 — Docs + restore tip synced for tomorrow (`Ready to begin`)
 
 - **Restore-Points:** New row **`RP-2026-04-12-branch-tip-ready-tomorrow`** — branch **`mscNowLive-v4-RestorePoint`** (pull latest); **Files worth diffing** list deduped; **`HeroSlides`** removed from checklist (superseded by **Homepage** + **Media**).
