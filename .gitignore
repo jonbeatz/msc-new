@@ -32,6 +32,7 @@ payload.sqlite-*
 .vscode/cpanel-bookmarks.txt
 
 # local deploy artifacts / logs (keep out of Git; large binaries)
+parity-ftp-report.md
 .next-deploy.zip
 node_modules.zip
 stderr.log
