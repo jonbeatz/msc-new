@@ -96,7 +96,6 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 - **Restore-Points:** New row **`RP-2026-04-12-branch-tip-ready-tomorrow`** — branch **`mscNowLive-v4-RestorePoint`** (pull latest); **Files worth diffing** list deduped; **`HeroSlides`** removed from checklist (superseded by **Homepage** + **Media**).
 - **ReCall:** **Current focus** updated for hero/Media/email helpers; this entry confirms **Custom-Prompts** item **0** / **Agent-Runbook §0** are the canonical **Ready to begin** paste for the next session.
 - **Parity report:** **`parity-ftp-report.md`** is **gitignored** (**`b92d1be`**); **`npm run parity:ftp`** still writes it locally for drift checks.
-- **Live:** Tier 2 deploy (**`npm run pushit:live`**) was run earlier this date; confirm cPanel **Node restart** + Incognito smoke if you have not already.
 
 ### 2026-04-11 — Snapshot: MSC PRO admin branding + deploy docs (`Take a snapshot`)
 
