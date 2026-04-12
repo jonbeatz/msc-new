@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { Users, Tv, BookOpen, Headphones, ArrowUpRight } from "lucide-react"
+import { onHashAnchorClick } from "@/lib/utils"
 
 const features = [
   {
@@ -65,8 +66,9 @@ export function AboutSection() {
             </p>
 
             <div className="mt-8 flex items-center gap-4">
-              <a 
-                href="#msc-process" 
+              <a
+                href="#msc-process"
+                onClick={(e) => onHashAnchorClick(e, "#msc-process")}
                 className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 transition-colors"
               >
                 Learn more about our process

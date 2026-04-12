@@ -44,7 +44,7 @@ export async function getSiteSettingsCms(): Promise<SiteSettingsContent | null> 
     if (!doc || typeof doc.siteName !== "string" || !doc.siteName.trim()) {
       return null
     }
-    const d = doc as Record<string, unknown>
+    const d = doc as unknown as Record<string, unknown>
     return {
       siteName: doc.siteName.trim(),
       tagline:

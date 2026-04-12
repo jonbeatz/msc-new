@@ -12,7 +12,7 @@ export const Homepage: GlobalConfig = {
   admin: {
     group: "Site",
     description:
-      "Hero carousel, stat row, and Services section screenshot gallery. Upload images in Media, then select them per slide or gallery row. With SQLite and db.push disabled, if this screen 404s run: npm run migrate:sqlite:homepage-hero-secondary-cta",
+      "Hero carousel, stat row, and Services section screenshot gallery. Upload images in Media, then select them per slide or gallery row. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta and npm run migrate:sqlite:homepage-services-gallery",
   },
   access: {
     read: () => true,

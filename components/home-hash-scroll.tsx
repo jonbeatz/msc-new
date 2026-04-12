@@ -4,19 +4,17 @@ import { useEffect } from "react"
 import { usePathname } from "next/navigation"
 
 import { canonicalFragmentIdFromHref } from "@/lib/hash-nav"
+import { handleScroll } from "@/lib/utils"
 
 function scrollToElementId(id: string) {
   if (!id) return
-  const el = document.getElementById(id)
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
+  handleScroll(`#${id}`)
 }
 
 /**
  * After client navigation to `/` with a hash (e.g. from `/msc1` via `/#msc-demos`),
- * scroll to the target section. Normalizes "dirty" URLs with stacked `#` fragments
- * via `replaceState` so the bar shows a single hash.
+ * scroll to the target section with sticky-header offset and strip `#` from the URL
+ * (see {@link handleScroll} in `lib/utils.ts`).
  */
 export function HomeHashScroll() {
   const pathname = usePathname()
@@ -28,14 +26,6 @@ export function HomeHashScroll() {
       const href = window.location.href
       const id = canonicalFragmentIdFromHref(href)
       if (!id) return
-
-      const segments = href.slice(href.indexOf("#") + 1).split("#").filter(Boolean)
-      const needsClean = segments.length > 1
-      const nextUrl = `${window.location.pathname}${window.location.search}#${id}`
-      if (needsClean) {
-        window.history.replaceState(null, "", nextUrl)
-      }
-
       scrollToElementId(id)
     }
 
@@ -49,11 +39,6 @@ export function HomeHashScroll() {
       const href = window.location.href
       const id = canonicalFragmentIdFromHref(href)
       if (!id) return
-      const segments = href.slice(href.indexOf("#") + 1).split("#").filter(Boolean)
-      if (segments.length > 1) {
-        const nextUrl = `${window.location.pathname}${window.location.search}#${id}`
-        window.history.replaceState(null, "", nextUrl)
-      }
       scrollToElementId(id)
     }
     window.addEventListener("hashchange", onHashChange)

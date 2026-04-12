@@ -5,7 +5,7 @@ import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { DemoProject } from "@/lib/cms/projects"
-import { cn } from "@/lib/utils"
+import { cn, onHashAnchorClick } from "@/lib/utils"
 
 /** Same-tab for hashes and internal paths; new tab only for off-site URLs. */
 function demoLinkProps(url: string): { target?: string; rel?: string } {
@@ -79,7 +79,10 @@ export function DemosSection({
             </p>
           </div>
           <Button variant="outline" className="border-border/50 text-foreground hover:bg-secondary/50 w-fit glass" asChild>
-            <a href="#msc-demos">
+            <a
+              href="#msc-demos"
+              onClick={(e) => onHashAnchorClick(e, "#msc-demos")}
+            >
               View All Demos
               <ArrowUpRight className="ml-2 h-4 w-4" />
             </a>

@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, type MouseEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Menu, X, ChevronDown, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn, handleScroll } from "@/lib/utils"
 import {
+  canonicalFragmentIdFromHref,
   resolveNavHashHref,
   scrollPropForResolvedNav,
   shouldReplaceHashLink,
@@ -57,6 +58,31 @@ export function Header({
       }
     }
   }, [])
+
+  const closeNavDropdowns = () => {
+    setOpenSubmenu(null)
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }
+
+  /** Same-page `#section` links on `/`: smooth scroll + offset + clean URL; closes Services/Resources dropdowns. */
+  const onHashNavLinkClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    resolvedHref: string,
+  ) => {
+    if (path !== "/") return
+    const h = resolvedHref.trim()
+    if (/^https?:\/\//i.test(h) || h.startsWith("mailto:")) return
+    if (!h.includes("#")) return
+    if (!h.startsWith("#")) return
+    const id = canonicalFragmentIdFromHref(h)
+    if (!id) return
+    e.preventDefault()
+    closeNavDropdowns()
+    handleScroll(`#${id}`)
+  }
 
   return (
     <header
@@ -132,6 +158,7 @@ export function Header({
                     replace={shouldReplaceHashLink(path, topHref)}
                     scroll={scrollPropForResolvedNav(path, topHref)}
                     className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/50"
+                    onClick={(e) => onHashNavLinkClick(e, topHref)}
                   >
                     {item.label}
                   </Link>
@@ -148,6 +175,7 @@ export function Header({
                           replace={shouldReplaceHashLink(path, subHref)}
                           scroll={scrollPropForResolvedNav(path, subHref)}
                           className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
+                          onClick={(e) => onHashNavLinkClick(e, subHref)}
                         >
                           {subItem.label}
                         </Link>
@@ -171,6 +199,7 @@ export function Header({
                 href={ctaDemosHref}
                 replace={shouldReplaceHashLink(path, ctaDemosHref)}
                 scroll={scrollPropForResolvedNav(path, ctaDemosHref)}
+                onClick={(e) => onHashNavLinkClick(e, ctaDemosHref)}
               >
                 View Demos
               </Link>
@@ -180,6 +209,7 @@ export function Header({
                 href={ctaContactHref}
                 replace={shouldReplaceHashLink(path, ctaContactHref)}
                 scroll={scrollPropForResolvedNav(path, ctaContactHref)}
+                onClick={(e) => onHashNavLinkClick(e, ctaContactHref)}
               >
                 Book Consultation
                 <ChevronRight className="ml-1 h-4 w-4" />
@@ -215,7 +245,10 @@ export function Header({
                   replace={shouldReplaceHashLink(path, topHref)}
                   scroll={scrollPropForResolvedNav(path, topHref)}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors py-3 px-4 rounded-lg hover:bg-secondary/50 block"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    onHashNavLinkClick(e, topHref)
+                    setIsMobileMenuOpen(false)
+                  }}
                 >
                   {item.label}
                 </Link>
@@ -230,7 +263,10 @@ export function Header({
                           replace={shouldReplaceHashLink(path, subHref)}
                           scroll={scrollPropForResolvedNav(path, subHref)}
                           className="text-xs text-muted-foreground/90 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-secondary/40 block"
-                          onClick={() => setIsMobileMenuOpen(false)}
+                          onClick={(e) => {
+                            onHashNavLinkClick(e, subHref)
+                            setIsMobileMenuOpen(false)
+                          }}
                         >
                           {subItem.label}
                         </Link>
@@ -251,7 +287,10 @@ export function Header({
                   href={ctaDemosHref}
                   replace={shouldReplaceHashLink(path, ctaDemosHref)}
                   scroll={scrollPropForResolvedNav(path, ctaDemosHref)}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    onHashNavLinkClick(e, ctaDemosHref)
+                    setIsMobileMenuOpen(false)
+                  }}
                 >
                   View Demos
                 </Link>
@@ -261,7 +300,10 @@ export function Header({
                   href={ctaContactHref}
                   replace={shouldReplaceHashLink(path, ctaContactHref)}
                   scroll={scrollPropForResolvedNav(path, ctaContactHref)}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    onHashNavLinkClick(e, ctaContactHref)
+                    setIsMobileMenuOpen(false)
+                  }}
                 >
                   Book Consultation
                   <ChevronRight className="ml-1 h-4 w-4" />

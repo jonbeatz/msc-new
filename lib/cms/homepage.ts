@@ -70,7 +70,7 @@ export async function getHomepageCmsData(): Promise<{
 
     const rawSlides = doc?.heroSlides
     if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
-      const d = doc as Record<string, unknown>
+      const d = doc as unknown as Record<string, unknown>
       const rawStatsEarly = d.heroStats
       let heroStatsEarly: HeroStatContent[] | null = null
       if (Array.isArray(rawStatsEarly) && rawStatsEarly.length > 0) {
@@ -192,7 +192,7 @@ export async function getHomepageCmsData(): Promise<{
     return {
       heroSlides: heroSlides.length > 0 ? heroSlides : null,
       heroStats,
-      servicesGallery: mapServicesGallery(doc as Record<string, unknown>),
+      servicesGallery: mapServicesGallery(doc as unknown as Record<string, unknown>),
     }
   } catch {
     return { heroSlides: null, heroStats: null, servicesGallery: null }

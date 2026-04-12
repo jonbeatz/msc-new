@@ -39,13 +39,7 @@ const nextConfig = {
     unoptimized: true,
     remotePatterns,
   },
-  /** Dev-only: disable webpack persistent cache to avoid stale chunk graphs (missing `./vendor-chunks/*.js`). */
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.cache = false
-    }
-    return config
-  },
 }
+// Avoid `webpack: (c) => { c.cache = false }` in dev — it can break Payload admin vendor-chunks on Windows.
 
 export default withPayload(nextConfig)

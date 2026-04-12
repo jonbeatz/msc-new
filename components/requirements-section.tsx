@@ -4,7 +4,7 @@ import { useState } from "react"
 import NextImage from "next/image"
 import type { LucideIcon } from "lucide-react"
 import { Image, Film, Video, Globe, Server, CheckCircle2, ArrowRight, Sparkles } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, onHashAnchorClick } from "@/lib/utils"
 
 type RequirementCard = {
   id: number
@@ -213,6 +213,7 @@ export function RequirementsSection() {
             <div className="flex-shrink-0 flex justify-center md:justify-end">
               <a
                 href="#msc-contact"
+                onClick={(e) => onHashAnchorClick(e, "#msc-contact")}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-accent-foreground font-medium hover:bg-accent/90 transition-all duration-300 glow-accent-sm hover:glow-accent"
               >
                 Get Started

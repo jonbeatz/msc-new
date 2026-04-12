@@ -8,8 +8,8 @@ function paragraph(text: string): LexicalNode {
     type: "paragraph",
     version: 1,
     indent: 0,
-    format: "",
-    direction: "ltr",
+    format: "" as const,
+    direction: "ltr" as const,
     children: [
       {
         type: "text",
@@ -29,8 +29,8 @@ function heading(text: string, tag: "h2" | "h3"): LexicalNode {
     type: "heading",
     version: 1,
     indent: 0,
-    format: "",
-    direction: "ltr",
+    format: "" as const,
+    direction: "ltr" as const,
     tag,
     children: [
       {
@@ -58,8 +58,8 @@ function list(items: string[]): LexicalNode {
       version: 1,
       value: 1,
       indent: 0,
-      format: "",
-      direction: "ltr",
+      format: "" as const,
+      direction: "ltr" as const,
       children: [
         {
           type: "text",
@@ -80,9 +80,9 @@ function richTextDocument(nodes: LexicalNode[]) {
     root: {
       type: "root",
       version: 1,
-      format: "",
+      format: "" as const,
       indent: 0,
-      direction: "ltr",
+      direction: "ltr" as const,
       children: nodes,
     },
   }

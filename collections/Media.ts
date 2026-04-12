@@ -4,6 +4,17 @@ import type { CollectionConfig } from "payload"
 
 import { toRelativePublicMediaUrl } from "@/lib/media-url"
 
+/**
+ * Developer reference (not shown in admin UI):
+ * - Uploads are stored under `public/media` (`upload.staticDir`).
+ * - `afterRead` rewrites `url` (and size URLs) to site-relative `/media/...` for consistent same-origin delivery.
+ * - To register files that were added on disk without using the admin uploader, run from repo root:
+ *   `npm run media:sync` (alias: `npm run migrate:media:from-public-images`), or `npm run media:rebuild`
+ *   for batched / low-memory sync (`scripts/rebuild-media.mjs`).
+ * - `upload.filesRequiredOnCreate: false` allows Payload rows to be created when syncing existing files (see migrate script).
+ * - Hero, header/footer logo, Services gallery, Pages, and Projects consume Media relationships elsewhere.
+ */
+
 function rewriteMediaDocUrls(doc: Record<string, unknown>): void {
   if (typeof doc.url === "string" && doc.url.length > 0) {
     doc.url = toRelativePublicMediaUrl(doc.url)
@@ -24,7 +35,7 @@ export const Media: CollectionConfig = {
   slug: "media",
   admin: {
     description:
-      "Central media library (site-wide). Files live in public/media and are addressed as /media/... (afterRead URL rewrite). Add files on disk, then run npm run media:sync (or migrate:media:from-public-images) to create matching Media rows for Payload. Hero, header/footer logo, Services, Pages, and Projects pick files here.",
+      "Manage and organize the central media library for My Studio Channel. Uploaded assets are automatically optimized for use across the platform.",
   },
   access: {
     read: () => true,

@@ -2,6 +2,7 @@
 
 import { Check, Sparkles, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { onHashAnchorClick } from "@/lib/utils"
 
 const packages = [
   {
@@ -149,7 +150,10 @@ export function PackagesSection() {
                   }`}
                   asChild
                 >
-                  <a href="#msc-contact">
+                  <a
+                    href="#msc-contact"
+                    onClick={(e) => onHashAnchorClick(e, "#msc-contact")}
+                  >
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </a>

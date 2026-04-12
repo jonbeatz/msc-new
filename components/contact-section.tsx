@@ -84,6 +84,9 @@ export function ContactSection() {
   const goldPrimary = "#D4AF37"
   const goldNoticeClass =
     "rounded-xl border border-[#D4AF37]/45 bg-[#D4AF37]/18 px-4 py-3 text-sm font-medium text-[#FCEFC8] shadow-[0_0_0_1px_rgba(212,175,55,0.18),0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+  /** Inline newsletter success — status look, not a primary CTA */
+  const newsletterSuccessStatusClass =
+    "mt-3 rounded-xl border border-[#FFD700]/35 bg-[rgba(255,215,0,0.1)] px-4 py-3 text-center text-sm font-medium text-muted-foreground"
 
   const [isOpen, setIsOpen] = useState(false)
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false)
@@ -373,7 +376,7 @@ export function ContactSection() {
               </button>
 
               {newsletterSuccess && (
-                <p className={`mt-3 text-center ${goldNoticeClass}`}>
+                <p role="status" className={newsletterSuccessStatusClass}>
                   {newsletterSuccess}
                 </p>
               )}

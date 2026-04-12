@@ -75,8 +75,15 @@ async function run() {
     }
   }
 
-  let created = 0
-  let updated = 0
+  const projectItems: Array<{
+    title: string
+    subtitle: string
+    category: string
+    image: number
+    demoUrl: string
+    isFeatured: boolean
+    isVisible: boolean
+  }> = []
 
   for (let i = 0; i < STARTER_PROJECTS.length; i += 1) {
     const starter = STARTER_PROJECTS[i]
@@ -86,53 +93,38 @@ async function run() {
         .map((name) => mediaByFilename.get(name))
         .find(Boolean) ?? mediaDocs[i % mediaDocs.length]?.id
 
-    if (!matchedMediaId) {
+    if (matchedMediaId === undefined || matchedMediaId === null) {
       throw new Error(`No media available for starter project "${starter.title}".`)
     }
 
-    const existing = await payload.find({
-      collection: "projects",
-      depth: 0,
-      limit: 1,
-      pagination: false,
-      where: {
-        title: {
-          equals: starter.title,
-        },
-      },
-    })
+    const imageId =
+      typeof matchedMediaId === "number"
+        ? matchedMediaId
+        : Number(matchedMediaId)
+    if (!Number.isFinite(imageId)) {
+      throw new Error(`Invalid media id for "${starter.title}".`)
+    }
 
-    const data = {
+    projectItems.push({
       title: starter.title,
       subtitle: starter.subtitle,
       category: starter.category,
-      image: matchedMediaId,
+      image: imageId,
       demoUrl: starter.demoUrl,
       isFeatured: starter.isFeatured,
       isVisible: true,
-    }
-
-    const existingDoc = existing.docs[0]
-    if (existingDoc) {
-      await payload.update({
-        collection: "projects",
-        id: existingDoc.id,
-        data,
-        depth: 0,
-      })
-      updated += 1
-    } else {
-      await payload.create({
-        collection: "projects",
-        data,
-        depth: 0,
-      })
-      created += 1
-    }
+    })
   }
 
+  await payload.updateGlobal({
+    slug: "projects-home",
+    data: {
+      projectItems,
+    },
+  })
+
   console.log(
-    `[seed-projects] Complete. Created ${created}, updated ${updated}, total configured ${STARTER_PROJECTS.length}.`
+    `[seed-projects] Updated global projects-home with ${projectItems.length} project row(s).`,
   )
 }
 
@@ -142,4 +134,3 @@ run()
     console.error("[seed-projects] Failed:", error)
     process.exit(1)
   })
-

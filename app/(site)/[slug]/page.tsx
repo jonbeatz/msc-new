@@ -97,7 +97,7 @@ async function getPageBySlug(slug: string): Promise<PageDoc | null> {
     const raw = result.docs?.[0]
     if (!raw || typeof raw !== "object") return null
 
-    const record = raw as Record<string, unknown>
+    const record = raw as unknown as Record<string, unknown>
     const rawMeta =
       record.meta && typeof record.meta === "object"
         ? (record.meta as Record<string, unknown>)

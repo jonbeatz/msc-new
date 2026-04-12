@@ -1,4 +1,8 @@
 import type { Access, CollectionConfig } from "payload"
+import {
+  buildBookingConfirmedEmailHtml,
+  buildNewBookingAlertEmailHtml,
+} from "../lib/email-templates"
 import { getNotificationConfig } from "../lib/notifications"
 
 const adminOnly: Access = ({ req: { user } }) => Boolean(user)
@@ -75,102 +79,19 @@ export const Bookings: CollectionConfig = {
           }
         )
 
-        const userHTML = `
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="color-scheme" content="dark light" />
-    <meta name="supported-color-schemes" content="dark light" />
-    <style>
-      :root { color-scheme: dark; supported-color-schemes: dark; }
-      body, table, td, p, h1 { color: #f3f4f6 !important; }
-      a, a:link, a:visited, a:hover, a:active {
-        color: #D4AF37 !important;
-        text-decoration: none !important;
-      }
-      a[x-apple-data-detectors], .apple-link a {
-        color: #D4AF37 !important;
-        text-decoration: none !important;
-      }
-    </style>
-  </head>
-  <body bgcolor="#0b0b0f" style="margin:0;padding:0;background:#0b0b0f !important;font-family:Inter,Segoe UI,Arial,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#0b0b0f" style="padding:24px;background:#0b0b0f !important;">
-      <tr>
-        <td align="center" bgcolor="#0b0b0f">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#15151c" style="max-width:560px;background:#15151c !important;border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden;">
-            <tr>
-              <td style="padding:28px 28px 18px;">
-                <div style="display:inline-block;background:rgba(245,184,65,0.12);color:#f5b841;border:1px solid rgba(245,184,65,0.35);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">
-                  Booking Confirmed
-                </div>
-                <h1 style="margin:14px 0 10px;color:#f3f4f6;font-size:24px;line-height:1.3;">You're booked, ${doc.name}</h1>
-                <p style="margin:0;color:#a3a3ad;font-size:15px;line-height:1.6;">
-                  Thanks for scheduling with My Studio Channel. We received your request for:
-                </p>
-                <p style="margin:12px 0 0;color:#f5b841;font-size:16px;font-weight:700;line-height:1.5;">
-                  ${appointmentLabel}
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`.trim()
+        const userHTML = buildBookingConfirmedEmailHtml({
+          name: doc.name,
+          appointmentLabel,
+        })
 
-        const adminHTML = `
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="color-scheme" content="dark light" />
-    <meta name="supported-color-schemes" content="dark light" />
-    <style>
-      :root { color-scheme: dark; supported-color-schemes: dark; }
-      body, table, td, p, h1 { color: #f3f4f6 !important; }
-      a, a:link, a:visited, a:hover, a:active {
-        color: #D4AF37 !important;
-        text-decoration: none !important;
-      }
-      a[x-apple-data-detectors], .apple-link a {
-        color: #D4AF37 !important;
-        text-decoration: none !important;
-      }
-    </style>
-  </head>
-  <body bgcolor="#0b0b0f" style="margin:0;padding:0;background:#0b0b0f !important;font-family:Inter,Segoe UI,Arial,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#0b0b0f" style="padding:24px;background:#0b0b0f !important;">
-      <tr>
-        <td align="center" bgcolor="#0b0b0f">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#15151c" style="max-width:620px;background:#15151c !important;border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden;">
-            <tr>
-              <td style="padding:28px;">
-                <div style="display:inline-block;background:rgba(245,184,65,0.12);color:#f5b841;border:1px solid rgba(245,184,65,0.35);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;">
-                  New Booking Alert
-                </div>
-                <h1 style="margin:14px 0 10px;color:#f3f4f6;font-size:24px;line-height:1.3;">New consultation request</h1>
-                <p style="margin:6px 0;color:#d4d4dc;font-size:14px;"><strong>Name:</strong> ${doc.name}</p>
-                <p style="margin:6px 0;color:#d4d4dc;font-size:14px;">
-                  <strong>Email:</strong>
-                  <a href="mailto:${doc.email}" style="color:#D4AF37 !important;text-decoration:none !important;">${doc.email}</a>
-                </p>
-                <p style="margin:6px 0;color:#d4d4dc;font-size:14px;"><strong>Phone:</strong> ${doc.phone || "Not provided"}</p>
-                <p style="margin:6px 0;color:#d4d4dc;font-size:14px;"><strong>Appointment:</strong> ${appointmentLabel}</p>
-                <p style="margin:6px 0;color:#d4d4dc;font-size:14px;"><strong>Time zone:</strong> ${doc.timeZone || "Not captured"}</p>
-                <p style="margin:12px 0 0;color:#d4d4dc;font-size:14px;"><strong>Message:</strong><br/>${doc.message || "No message provided."}</p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`.trim()
+        const adminHTML = buildNewBookingAlertEmailHtml({
+          name: doc.name,
+          email: doc.email,
+          phone: doc.phone || "Not provided",
+          appointmentLabel,
+          timeZone: doc.timeZone || "Not captured",
+          message: doc.message || "No message provided.",
+        })
 
         const notifications = await getNotificationConfig(req)
 

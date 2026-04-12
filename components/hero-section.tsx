@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from "react"
 import Image from "next/image"
 import { ArrowRight, Play, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn, onHashAnchorClick } from "@/lib/utils"
 import type { HeroSlideContent, HeroStatContent } from "@/lib/cms/content-types"
 
 /** Fallback slides use `public/media` (same paths CMS Media URLs resolve to after `afterRead`). */
@@ -104,6 +104,9 @@ export function HeroSection({
   }
 
   const slide = slides[current]
+  const primaryCtaHref = slide.ctaLink?.trim() || "#msc-contact"
+  const secondaryCtaHref =
+    slide.secondaryCtaLink?.trim() || "#msc-demos"
 
   return (
     <section
@@ -182,7 +185,10 @@ export function HeroSection({
               className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300"
               asChild
             >
-              <a href={slide.ctaLink || "#msc-contact"}>
+              <a
+                href={primaryCtaHref}
+                onClick={(e) => onHashAnchorClick(e, primaryCtaHref)}
+              >
                 Start With a Consultation
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
@@ -193,7 +199,10 @@ export function HeroSection({
               className="border-white/20 text-foreground hover:bg-white/10 h-14 px-8 text-base font-medium backdrop-blur-sm"
               asChild
             >
-              <a href={slide.secondaryCtaLink || "#msc-demos"}>
+              <a
+                href={secondaryCtaHref}
+                onClick={(e) => onHashAnchorClick(e, secondaryCtaHref)}
+              >
                 <Play className="mr-2 h-5 w-5 fill-current" />
                 {slide.secondaryCtaLabel?.trim() || "View Demos"}
               </a>
