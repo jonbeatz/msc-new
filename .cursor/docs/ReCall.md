@@ -533,3 +533,10 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Tier 2 copy aligned** across **Jedi-List**, **Custom-Prompts** (items **3**, **38**), **Go-Live-Checklist**, **Spaceship**, **START-HERE** (push to live), **Agent-Runbook** (script list): **`pushit:live`** = build → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`pushitup -- payload.sqlite`** → **`pushitup -- public/media`** → **`dev:fresh`**; cPanel path **`cd /home/wjehbnzcoy/mystudiochannel.com`**.
 - **Jedi-List:** **`test:spaceship-ftp`** row updated (**PushItUP** honors **`remotePath`** when LIST fails).
 
+### 2026-04-12 — Session closeout (I'm done for now)
+
+- **Shipped:** **`ff47fe5`** — docs checkpoint (Tier 2 + **`parity:ftp`**, **`PushItUP`**, **`pushit-live`**, tooling scripts). **`38dd8f8`** — remove **`HeroSlides`**, homepage/Media-driven hero, email **`lib/email-*`**, **`payload-types.ts`**, section/app updates, seeds.
+- **Git:** **`mscNowLive-v4-RestorePoint`** matches **`origin`**; only untracked **`parity-ftp-report.md`** (optional; generated FTP diff — add to **`.gitignore`** or delete locally if you do not want it).
+- **Next session:** **`npm run dev:payload`** (or **`npm run dev`**) from repo root; read **ReCall** + **START-HERE** if resuming cold.
+- **Local:** Freed port **3000** via **`scripts/kill-dev-port.mjs`** so the next dev boot is clean.
+
