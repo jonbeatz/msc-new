@@ -93,7 +93,7 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ### 2026-04-12 — Docs + restore tip synced for tomorrow (`Ready to begin`)
 
-- **Restore-Points:** New row **`RP-2026-04-12-branch-tip-ready-tomorrow`** — tip **`mscNowLive-v4-RestorePoint`** @ **`b92d1be`**; **Files worth diffing** list deduped; **`HeroSlides`** removed from checklist (superseded by **Homepage** + **Media**).
+- **Restore-Points:** New row **`RP-2026-04-12-branch-tip-ready-tomorrow`** — tip **`mscNowLive-v4-RestorePoint`** @ **`929cf04`**; **Files worth diffing** list deduped; **`HeroSlides`** removed from checklist (superseded by **Homepage** + **Media**).
 - **ReCall:** **Current focus** updated for hero/Media/email helpers; this entry confirms **Custom-Prompts** item **0** / **Agent-Runbook §0** are the canonical **Ready to begin** paste for the next session.
 - **Parity report:** **`parity-ftp-report.md`** is **gitignored** (**`b92d1be`**); **`npm run parity:ftp`** still writes it locally for drift checks.
 - **Live:** Tier 2 deploy (**`npm run pushit:live`**) was run earlier this date; confirm cPanel **Node restart** + Incognito smoke if you have not already.
