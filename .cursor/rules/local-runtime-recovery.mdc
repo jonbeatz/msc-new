@@ -1,9 +1,35 @@
 ---
-description: After Next/Payload edits, run verify:next; recover broken localhost / .next
+description: After Next/Payload edits, verify build + localhost; recover broken .next
 alwaysApply: true
 ---
 
 # Local runtime recovery and post-change verification
+
+## Mandatory: ERR_CONNECTION_REFUSED / white screen (Fix Local — Custom-Prompts Item 40)
+
+If the operator reports **`ERR_CONNECTION_REFUSED`**, a **white screen** on **`/`** or **`/admin`**, or that **nothing is listening on port 3000**, the agent **must immediately** execute the **Fix Local (Item 40)** sequence from **`.cursor/docs/Custom-Prompts.md`** — e.g. **`npm run dev:recover`**, or **`node scripts/kill-dev-port.mjs && npx rimraf .next node_modules/.cache .turbo && npm run dev`** when an explicit cache wipe is needed.
+
+**Constraint:** Do **not** only list these steps in chat. **Run** the terminal commands from the repo root, **wait** until the log shows **Ready** (or report the error), then **verify** with **`curl`** / **`Invoke-WebRequest`** / fetch against **`http://127.0.0.1:3000/`** and **`http://127.0.0.1:3000/admin`** (use **127.0.0.1** first if **`localhost`** is unreliable) and **report the HTTP status codes**.
+
+## Auto-reset (broken dev / vendor-chunks / port conflict)
+
+If the user reports **500** on **`/`** or **`/admin`**, **missing `vendor-chunks/*`** (e.g. `date-fns.js`, `escape-html.js`), **`/_next/static/*` 404s**, or **`EADDRINUSE`** on port **3000**, **do not only suggest a command**. From the repo root, **run**:
+
+```bash
+npm run dev:reset
+```
+
+That runs **`kill-dev-port`** → **`clean:next`** → **`npm run dev`** (same stack as normal dev). Report what the command printed (e.g. **Ready**, **Compiled**) or any error. If **`dev:reset`** is unsafe to run (e.g. user explicitly needs another process on **3000**), say so once and offer **`repair:dev`** instead.
+
+## What Jon can say (optional shorthand)
+
+You do **not** need to repeat “the site is broken” for every task. These phrases tell the agent to run the **postflight** steps below:
+
+- **“Postflight local”** or **“Verify localhost”** — run `verify:next` (or `verify:next:safe` if port 3000 is busy), then HTTP smoke for `/` and `/admin` when possible.
+- **“Hard recovery”** — run **`npm run repair:dev`** playbook (free port, clean, build, dev).
+- **Broken localhost / vendor-chunks** — the agent should **`npm run dev:reset`** without waiting to be asked (see **Auto-reset** above).
+
+The agent should follow this file **without** you asking, after tasks that touch runtime code (see below).
 
 ## Execute local recovery — do not only tell Jon to run it
 
@@ -20,7 +46,7 @@ If you changed **any** file that can affect the running app — including `app/`
 1. **Run** `npm run verify:next` **from the repo root** and fix errors until it exits **0**.  
    (`verify:next` = `clean:next` + `next build`.) On **Windows**, if **`next dev`** might still be on port **3000**, use **`npm run verify:next:safe`** instead (frees **3000** first) so you never delete **`.next`** under a running dev server.
 
-2. **Do not** run `next dev` immediately after `next build` without letting **`npm run dev`** wipe `.next` first — **`npm run dev` now runs `clean:next` before the dev server** so production and dev artifacts are never mixed (fixes **`Cannot find module './431.js'`** / missing chunks / **500** + React **#418**).
+2. **`npm run dev`** now runs **`node scripts/kill-dev-port.mjs`** before **`clean:next`**, so a stale process is less likely to leave half-built **`vendor-chunks/*`** (e.g. missing **`escape-html.js`**) and **500** on **`/admin`**. Do not strip that ordering.
 
 3. **Do not** mark the task complete if `verify:next` fails.
 
@@ -28,15 +54,24 @@ If you changed **any** file that can affect the running app — including `app/`
 
 5. **Do not** run **`npm run verify:next`** or **`npm run clean:next`** while **`next dev`** is already running. They delete **`.next`**, which corrupts the live dev server and causes **500**, **`/_next/static/chunks/fallback/*`** failures, and missing chunks until you **stop** dev and run **`npm run dev`** again (or **`npm run dev:recover`**). The repo’s **Cursor `beforeShellExecution` hook** blocks these commands when port **3000** is in use; use **`npm run verify:next:safe`** instead.
 
+## HTTP smoke after build (agents — close the loop)
+
+After **`npm run build`** succeeds, prefer proving **`/`** and **`/admin`** respond:
+
+- If **port 3000 is free**: start **`npx next dev -p 3000`** in the background, wait until the log shows **Ready** (or **Compiled** for `/admin`), then run **`curl -s -o NUL -w "%{http_code}" http://127.0.0.1:3000/`** and the same for **`http://127.0.0.1:3000/admin`**. Expect **200**. Stop the background dev process if you started it only for this check.
+- If **port 3000 is already in use** (Jon’s dev server): run **`npm run verify:local`** from the repo root **once** (expects dev already listening). If it fails, report the failing URL and suggest **`npm run repair:dev`** after Jon stops the old process.
+
+Do not skip the build step in favor of only HTTP checks.
+
 ## When the browser breaks (agent playbook — run these for Jon)
 
 **Agents:** execute in order until **`/`** and **`/admin`** respond (or you hit a real code error). **Jon** only opens the browser if needed; do not leave recovery as “Jon should run …”.
 
-1. Free **port 3000** if multiple listeners (kill stale Node) — **run** the same steps **`restart-dev.ps1`** uses, or **`npm run dev:recover`**.
-2. **`npm run dev:recover`** first — same as **`restart:dev`**: free **3000**, then **`npm run dev`** (includes **`clean:next`**). Fastest fix for white screen / **500** / **`/_next/static/chunks/fallback/*`** after a bad **`verify:next`** overlap.
+1. Free **port 3000** if multiple listeners (kill stale Node) — **run** **`node scripts/kill-dev-port.mjs`** or the same steps **`restart-dev.ps1`** uses, or **`npm run dev:recover`**.
+2. **`npm run dev:recover`** first — same as **`restart:dev`**: free **3000**, then **`npm run dev`** (includes **kill-dev-port** + **`clean:next`**). Fastest fix for white screen / **500** / **`/_next/static/chunks/fallback/*`** after a bad overlap.
 3. If still broken: **`npm run repair:dev`** — clean + full build + dev on **3000** (Windows).
 4. For build gates when dev might be up: **`npm run verify:next:safe`** — never raw **`verify:next`** while **3000** is busy.
-5. Optionally **`npm run verify:local`** once dev is listening.
+5. Optionally **`npm run verify:local`** once dev is listening on **3000**.
 6. Remind Jon (only if relevant): Incognito for **`/`** and **`/admin`**, and **Console Ninja** disabled for this workspace — you still **ran** the server-side recovery yourself.
 
 ## Smoke checks

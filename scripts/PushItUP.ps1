@@ -148,7 +148,15 @@ function Upload-FileToFtp {
   $uri = "$BaseFtpUrl/$(Escape-FtpPath -PathText $RemoteFilePath)"
   $request = New-FtpRequest -Uri $uri -Method ([System.Net.WebRequestMethods+Ftp]::UploadFile) -Credential $Credential -UseSsl $UseSsl -UsePassive $UsePassive
 
-  $bytes = [System.IO.File]::ReadAllBytes($LocalFile)
+  # ReadAllBytes fails if Payload/dev has payload.sqlite open; shared read matches normal copy behavior.
+  $fs = [System.IO.File]::Open($LocalFile, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+  try {
+    $len = $fs.Length
+    $bytes = New-Object byte[] $len
+    [void]$fs.Read($bytes, 0, $len)
+  } finally {
+    $fs.Dispose()
+  }
   $request.ContentLength = $bytes.Length
 
   $stream = $request.GetRequestStream()
@@ -182,8 +190,13 @@ if ([string]::IsNullOrWhiteSpace($ftpServer) -or [string]::IsNullOrWhiteSpace($u
 $baseFtpUrl = "ftp://$ftpServer`:$ftpPort"
 $credential = New-Object System.Net.NetworkCredential($username, $password)
 
-$candidateRemoteBase = if ([string]::IsNullOrWhiteSpace($remoteBaseFromConfig)) { "/" } else { $remoteBaseFromConfig }
-$remoteBase = if (Test-FtpDirectory -BaseFtpUrl $baseFtpUrl -DirPath $candidateRemoteBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive) { $candidateRemoteBase } else { "/" }
+$candidateRemoteBase = if ([string]::IsNullOrWhiteSpace($remoteBaseFromConfig)) { "/" } else { $remoteBaseFromConfig.Trim() }
+# Always honor sftp.json remotePath. LIST on an absolute cPanel path often fails when the session is chrooted;
+# falling back to "/" uploaded into the wrong tree (e.g. payload.sqlite failed while .next appeared to work).
+$remoteBase = $candidateRemoteBase
+if ($remoteBase -ne "/" -and -not (Test-FtpDirectory -BaseFtpUrl $baseFtpUrl -DirPath $remoteBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive)) {
+  Write-Output "Warning: remotePath '$remoteBase' did not respond to FTPS LIST; using configured path anyway (typical on chrooted FTP)."
+}
 
 if ($null -eq $Targets -or $Targets.Count -eq 0) {
   $Targets = @(".next")
@@ -250,6 +263,7 @@ foreach ($item in $uploadItems) {
   try {
     Upload-FileToFtp -BaseFtpUrl $baseFtpUrl -LocalFile $item.LocalPath -RemoteFilePath $remotePathUnderBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive
   } catch {
+    Write-Output "Upload error $($item.RemotePath): $($_.Exception.Message)"
     $failed.Add($item)
   }
 
@@ -269,6 +283,7 @@ if ($failed.Count -gt 0) {
     try {
       Upload-FileToFtp -BaseFtpUrl $baseFtpUrl -LocalFile $item.LocalPath -RemoteFilePath $remotePathUnderBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive
     } catch {
+      Write-Output "Retry upload error $($item.RemotePath): $($_.Exception.Message)"
       $retryFailed.Add($item)
     }
   }

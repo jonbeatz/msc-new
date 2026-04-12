@@ -526,3 +526,10 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 - **Social tags:** OpenGraph + Twitter metadata now mirror the same active-slide SEO values.
 - **Helper:** new `getHomepageActiveSlideSeo()` in `lib/cms/homepage.ts`.
 
+### 2026-04-12 — Docs checkpoint (Tier 2 + `parity:ftp`)
+
+- **Trigger:** Custom-Prompts item **22** (`Lets Checkpoint Docs`) — sync docs to **`package.json`**, no required commit.
+- **Scripts:** Added **`npm run parity:ftp`** → **`scripts/ftp-parity-check.ps1`**; output **`parity-ftp-report.md`**.
+- **Tier 2 copy aligned** across **Jedi-List**, **Custom-Prompts** (items **3**, **38**), **Go-Live-Checklist**, **Spaceship**, **START-HERE** (push to live), **Agent-Runbook** (script list): **`pushit:live`** = build → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`pushitup -- payload.sqlite`** → **`pushitup -- public/media`** → **`dev:fresh`**; cPanel path **`cd /home/wjehbnzcoy/mystudiochannel.com`**.
+- **Jedi-List:** **`test:spaceship-ftp`** row updated (**PushItUP** honors **`remotePath`** when LIST fails).
+

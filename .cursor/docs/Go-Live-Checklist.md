@@ -57,10 +57,10 @@ Wait until build completes successfully.
 | Tier | Name | Command (Local / repo root) | What it ships | When to use |
 |------|------|----------------------------|---------------|-------------|
 | **1** | **Branding — Fast FTP** | `npm run pushitup:admin-branding` | **Only:** `components/msc-payload-graphics.tsx`, `components/msc-payload-admin-enhancements.tsx`, `collections/Users.ts`, `payload.config.ts`, `app/(payload)/custom.scss` | Quick look-and-feel / config / SCSS tweaks; **no** `build` or `.next` in this step. |
-| **2** | **Admin logic / pages — Full build + UI + `.next`** | `npm run pushit:live` | **`npm run build`** → **`npm run pushitup:admin-ui`** (middleware, `lib/msc-admin-version.ts`, nav dashboard, full branding files, `Users`, `payload.config`, `custom.scss`) → **`npm run pushitup -- .next`** → **`npm run dev:fresh`** | Default for anything that must match compiled Next output (routes, React admin UI, most code changes). **Master** deploy. |
+| **2** | **Admin logic / pages — Full build + UI + `.next` + DB + media** | `npm run pushit:live` | **`npm run build`** → **`npm run pushitup:admin-ui`** → **`npm run pushitup -- .next`** → **`npm run pushitup -- payload.sqlite`** → **`npm run pushitup -- public/media`** → **`npm run dev:fresh`** | Default for anything that must match compiled Next output and ship the local SQLite + on-disk **`public/media`** (routes, React admin UI, CMS data, `/media/*` assets). **Master** deploy. |
 | **3** | **Hosting — server / package config** | `npm run pushitup:server-config` | **`server.js`**, **`package.json`**, **`package-lock.json`**, **`.env.example`** | Deps, lockfile, startup file, or documented env template changed; follow **§5** for **`npm install`** on the host. |
 
-**Tier 2** is the **full** pipeline: it uploads both the **admin source bundle** and the **entire `.next`** output so the live app and **`/admin`** stay consistent.
+**Tier 2** is the **full** pipeline: it uploads the **admin source bundle**, the **entire `.next`** output, **`payload.sqlite`**, and **`public/media`** so the live app, **`/admin`**, CMS data, and **`/media/...`** files stay consistent.
 
 **Tier 1** does **not** run `build` — use **Tier 2** when the admin bundle or site needs to reflect new compiled code.
 
@@ -70,7 +70,7 @@ Wait until build completes successfully.
 npm run pushit:live
 ```
 
-This is exactly: **`build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`dev:fresh`** (see `scripts/pushit-live.ps1`).
+This is exactly: **`build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`pushitup -- payload.sqlite`** → **`pushitup -- public/media`** → **`dev:fresh`** (see `scripts/pushit-live.ps1`).
 
 **`pushitup:admin-ui`** includes (among others): `middleware.ts`, `lib/msc-admin-version.ts`, `components/msc-payload-nav-dashboard.tsx`, branding components, `collections/Users.ts`, `payload.config.ts`, `app/(payload)/custom.scss`.
 

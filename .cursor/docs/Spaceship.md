@@ -61,7 +61,7 @@ source ~/nodevenv/mystudiochannel.com/*/bin/activate
 
 **Rule of thumb:** changed **`.ts` / `.tsx`** that affect the site or admin → **full build + full `.next` upload**.
 
-### One command: `npm run pushit:live` (build + admin bundle files + `.next`)
+### One command: `npm run pushit:live` (build + admin bundle + `.next` + DB + `public/media`)
 
 From the **repo root** on your PC:
 
@@ -69,7 +69,7 @@ From the **repo root** on your PC:
 npm run pushit:live
 ```
 
-This runs **`npm run build`**, **`npm run pushitup:admin-ui`**, **`npm run pushitup -- .next`**, then **`npm run dev:fresh`** (to keep local stable after deploy), and prints a reminder to **Restart** the Node app in cPanel. It does **not** run **`npm install`** on the server or upload **`package.json`** unless you changed deps — add those steps manually when needed.
+This runs **`npm run build`**, **`npm run pushitup:admin-ui`**, **`npm run pushitup -- .next`**, **`npm run pushitup -- payload.sqlite`**, **`npm run pushitup -- public/media`**, then **`npm run dev:fresh`** (to reset local dev after deploy), and prints reminders (including **cPanel Terminal** **`cd /home/wjehbnzcoy/mystudiochannel.com`** + sqlite URL fix + **`pkill`**). It does **not** run **`npm install`** on the server or upload **`package.json`** unless you changed deps — add those steps manually when needed.
 
 ---
 

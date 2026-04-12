@@ -17,7 +17,7 @@ Use these as quick "commands in plain English" for the agent.
    1) .cursor/docs/START-HERE.md — source-of-truth order, daily rules, Jon’s cPanel session links (Node.js + Terminal), fast workflow.
    2) .cursor/docs/Agent-Runbook.md — operator handshake + command locality (Local Cursor vs Live cPanel).
    3) .cursor/docs/Spaceship.md — deploy protocol: pushitup/pushit:live on PC only; cPanel = restart / optional npm install; never pushitup on host.
-   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, dev:recover, verify:next:safe, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, test:spaceship-ftp).
+   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, dev:recover, verify:next:safe, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, parity:ftp, test:spaceship-ftp).
    5) .cursor/docs/ReCall.md — "Current focus" + latest "Recent changes" entry.
    6) Skim .cursor/docs/Restore-Points.md — newest checkpoint row only (if any).
 
@@ -49,7 +49,7 @@ Use these as quick "commands in plain English" for the agent.
    - Rehydrates context from docs + git and gives a concise "what matters now" summary.
 
 3. **`Lets Push It Live`**  
-   - **Tier 2** full deploy — same as **item 38** (`npm run pushit:live`: build → admin bundle → `.next` → `dev:fresh`). Streams progress, then cPanel restart + validation.
+   - **Tier 2** full deploy — same as **item 38** (`npm run pushit:live`: build → admin bundle → `.next` → **`payload.sqlite`** → **`public/media`** → `dev:fresh`). Requires a local **`payload.sqlite`** at repo root. Then **Live (cPanel Terminal)** — URL fix + `pkill` (see item **38**); **Node.js Selector → Restart**; Incognito validation.
 
 4. **`Lets Finish`**  
    - End-of-day closeout without forced deploy: status, docs update, confirm commit/push, stop local services.
@@ -154,15 +154,18 @@ Use these as quick "commands in plain English" for the agent.
    - **Tier 1 — Fast FTP (look and feel only).** **Local (Cursor / repo root):** runs **`npm run pushitup:admin-branding`** — **`PushItUP.ps1`** uploads **only** these paths: **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. No production build in this command: use for quick SCSS/config/docs tweaks when you accept that **bundled** admin UI may not change until you run **Tier 2**. If you changed React behavior that affects the compiled admin bundle, run **`Lets Push It Live`** (item **38**) instead. After upload, **Live (cPanel)** — Restart the Node.js app for `mystudiochannel.com`.
 
 38. **`Lets Push It Live`**  
-   - **Tier 2 — Full build + ship (admin logic, pages, full UI).** **Local (Cursor / repo root):** runs **`npm run pushit:live`** — the master pipeline: **`npm run build`** → **`npm run pushitup:admin-ui`** (middleware, version, nav, full branding bundle, `payload.config`, SCSS, etc.) → **`npm run pushitup -- .next`** → **`npm run dev:fresh`**. This is what you say when you need the live site and **`/admin`** to match a fresh **Next** production output. Then **Live (cPanel)** — Restart Node; validate **`/`** and **`/admin`** (Incognito). Same intent as **item 3** above.
+   - **Tier 2 — Full build + DB + media ship (“zero footprint” sync).** **Local (Cursor / repo root):** **`npm run pushit:live`** runs: **`npm run build`** → **`npm run pushitup:admin-ui`** → **`npm run pushitup -- .next`** → **`npm run pushitup -- payload.sqlite`** → **`npm run pushitup -- public/media`** → **`npm run dev:fresh`**. Aborts if **`payload.sqlite`** is missing locally (local DB is the source of truth). **Live (cPanel → Terminal):** **`cd /home/wjehbnzcoy/mystudiochannel.com`** (or your app root); **`sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"`**; **`pkill -u $(whoami) node`**. **Live (cPanel UI):** **Node.js Selector → Restart** `mystudiochannel.com`. **Verification:** **`/`** and **`/admin`** in Incognito; **Media** should match **`public/media`** on disk. Same intent as **item 3** above.
 
 39. **`Push server config`**  
    - **Tier 3 — Hosting / Node runtime contract.** **Local (Cursor / repo root):** runs **`npm run pushitup:server-config`** — FTPS **`server.js`**, **`package.json`**, **`package-lock.json`**, and **`.env.example`**. Use when dependencies, engine constraints, or startup wiring changed; then **Live (cPanel → Terminal)** — `source` nodevenv, **`cd`** app root, **`npm install --legacy-peer-deps`**, then **Restart** the Node app (see **Go-Live-Checklist.md** §5). Do **not** run **`pushitup`** on the host.
 
 40. **`Fix Local`**  
    - **Intent:** Deep recovery of the **Local (Cursor / repo root)** environment when **`/`** or **`/admin`** show white screen, **500**, missing **vendor-chunks**, or **404** on **`/_next/static/...`**.  
-   - **Execution:** Run **`npm run dev:recover`** (`scripts/restart-dev.ps1`: stops any process on port **3000**, then **`npm run dev`**, which runs **`clean:next`** and starts **`next dev -p 3000`** — a **clean dev compile**, not `npm run build`). Wait until the terminal shows **Ready** (e.g. **Ready in …ms**).  
-   - **Self-verification (required):** After **Ready**, the agent must probe **`http://localhost:3000/`** and **`http://localhost:3000/admin`** (e.g. **`Invoke-WebRequest`** / **`curl`** / fetch) and record **HTTP status codes**.  
+   - **Execution:** From repo root, run one of the following (all are a **clean dev compile**, not `npm run build`):  
+     - **`npm run dev:recover`** — `scripts/restart-dev.ps1`: stops anything on port **3000**, then **`npm run dev`** (**`kill-dev-port`** → **`clean:next`** → **`next dev -p 3000`**).  
+     - **`node scripts/kill-dev-port.mjs && rimraf .next node_modules/.cache .turbo && npm run dev`** — same intent with an explicit wipe of **`.next`**, **`node_modules/.cache`**, and **`.turbo`** before dev. If **`rimraf`** is not on your PATH, use **`npx rimraf`** in place of **`rimraf`**.  
+     Wait until the terminal shows **Ready** (e.g. **Ready in …ms**).  
+   - **Self-verification (required):** After **Ready**, the agent must probe **`http://localhost:3000/`** and **`http://localhost:3000/admin`** (e.g. **`Invoke-WebRequest`** / **`curl`** / fetch) and record **HTTP status codes**. If localhost fails, prioritize probing **`http://127.0.0.1:3000`** (and **`/admin`**) to bypass Windows **`localhost`** / DNS resolution issues.  
    - **Reporting:** Report both status codes. If **both are 200**, tell **Jon** to **hard-refresh** the browser or use an **Incognito** tab (old chunk URLs can cache).  
    - **Safety:** If **`npm run dev:recover`** or compile fails with a **build/TypeScript error**, read the log, **fix the code once**, and **retry the same recovery sequence exactly once**. If it still fails, stop and ask Jon for help (do not loop blindly).  
    - **Related:** **Item 36** (lighter explanation of stale **`.next`**); **`Jedi-List.md`** → when **`/`** or **`/admin`** breaks first.

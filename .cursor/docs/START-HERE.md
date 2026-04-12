@@ -98,9 +98,9 @@ That pattern almost always means **`.next` was deleted or overwritten while `nex
 
 From repo root on PC:
 
-1. Run `npm run pushit:live`
+1. Run `npm run pushit:live` (ships **`.next`**, **`payload.sqlite`**, and **`public/media`** per **Spaceship.md**).
 2. Wait for build/upload completion.
-3. In cPanel, restart Node app (Stop -> wait -> Start).
+3. In cPanel, run any **Terminal** steps the script printed (sqlite URL fix / `pkill` if applicable), then restart the Node app (Stop → wait → Start).
 4. Validate live in Incognito.
 
 Important: `pushitup` runs on PC, not cPanel Terminal.
