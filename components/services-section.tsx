@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import Image from "next/image"
-import { Mic, Utensils, Clapperboard, Video, Smile, Sparkles, Film, Camera, Check, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
+import { Check, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
 import type { ServicesGalleryItem } from "@/lib/cms/content-types"
 
 /** Root-relative URL for files in `public/media` (handles spaces in filenames). */
@@ -10,16 +10,64 @@ function mediaPublicSrc(filename: string): string {
   return `/media/${encodeURIComponent(filename)}`
 }
 
-const programmingStyles = [
-  { icon: Mic, label: "Interview Talk Show" },
-  { icon: Video, label: "Daytime Talk Show" },
-  { icon: Smile, label: "Panel Talk Show" },
-  { icon: Sparkles, label: "Late-Night Show" },
-  { icon: Camera, label: "Lifestyle Show" },
-  { icon: Clapperboard, label: "DIY Creative" },
-  { icon: Utensils, label: "Cooking Show" },
-  { icon: Film, label: "Drama Series" },
+const PROGRAMMING_STYLE_COUNT = 7
+
+/**
+ * Fallback when Site → Homepage → Programming styles has no rows yet (or partial).
+ * Genre-forward stills from `public/media` — replace by uploading in Payload → Homepage.
+ */
+const PROGRAMMING_STYLES_FALLBACK: ServicesGalleryItem[] = [
+  {
+    src: mediaPublicSrc("demo-talkshow.jpg"),
+    alt: "Talk show programming style",
+    label: "Talk Show",
+  },
+  {
+    src: mediaPublicSrc("demo-podcast.jpg"),
+    alt: "Podcast programming style",
+    label: "Podcast",
+  },
+  {
+    src: mediaPublicSrc("demo-cooking.jpg"),
+    alt: "Cooking show programming style",
+    label: "Cooking",
+  },
+  {
+    src: mediaPublicSrc("demo-documentary.jpg"),
+    alt: "Documentary programming style",
+    label: "Documentary",
+  },
+  {
+    src: mediaPublicSrc("show-cards.jpg"),
+    alt: "Network-style programming grid",
+    label: "Network Style",
+  },
+  {
+    src: mediaPublicSrc("on-air.jpg"),
+    alt: "Live studio programming",
+    label: "Live & Studio",
+  },
+  {
+    src: mediaPublicSrc("camera-crew.jpg"),
+    alt: "Production programming",
+    label: "Production",
+  },
 ]
+
+function mergeProgrammingStyles(
+  cms: ServicesGalleryItem[] | null | undefined,
+): ServicesGalleryItem[] {
+  if (cms && cms.length >= PROGRAMMING_STYLE_COUNT) {
+    return cms.slice(0, PROGRAMMING_STYLE_COUNT)
+  }
+  if (cms && cms.length > 0) {
+    return [
+      ...cms,
+      ...PROGRAMMING_STYLES_FALLBACK.slice(cms.length),
+    ].slice(0, PROGRAMMING_STYLE_COUNT)
+  }
+  return PROGRAMMING_STYLES_FALLBACK
+}
 
 const platformFeatures = [
   "Network-style layout that organizes your shows like a professional channel",
@@ -82,11 +130,21 @@ function mergeServicesGallery(
 }
 
 type ServicesSectionProps = {
-  /** From Site → Homepage → Services gallery (Payload Media uploads). */
+  /** Site → Homepage → Programming styles (7 images). */
+  cmsProgrammingStyles?: ServicesGalleryItem[] | null
+  /** Site → Homepage → Channel preview bento (7 images in layout). */
   cmsGallery?: ServicesGalleryItem[] | null
 }
 
-export function ServicesSection({ cmsGallery }: ServicesSectionProps) {
+export function ServicesSection({
+  cmsProgrammingStyles,
+  cmsGallery,
+}: ServicesSectionProps) {
+  const programmingTiles = useMemo(
+    () => mergeProgrammingStyles(cmsProgrammingStyles),
+    [cmsProgrammingStyles],
+  )
+
   const galleryImages = useMemo(
     () => mergeServicesGallery(cmsGallery),
     [cmsGallery],
@@ -145,19 +203,34 @@ export function ServicesSection({ cmsGallery }: ServicesSectionProps) {
           </p>
         </div>
 
-        {/* Programming Styles - Bento Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:gap-4 mb-20">
-          {programmingStyles.map((style) => (
-            <div
-              key={style.label}
-              className="bento-card group p-5 rounded-2xl border border-border/50 bg-card/30 hover:bg-card/50 hover:border-accent/30 transition-all duration-300 text-center"
-            >
-              <div className="h-12 w-12 rounded-xl bg-secondary/50 border border-border/50 flex items-center justify-center mx-auto mb-3 group-hover:bg-accent/10 group-hover:border-accent/20 transition-all duration-300">
-                <style.icon className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors" />
+        {/* Programming Styles — CMS-driven images; mobile: horizontal snap scroll; xl: single row of 7 */}
+        <div
+          className="mb-20 -mx-6 px-6 md:mx-0 md:px-0"
+          aria-label="Programming styles we support"
+        >
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 [-webkit-overflow-scrolling:touch] scrollbar-thin md:grid md:grid-cols-2 md:gap-3 md:overflow-visible md:snap-none md:pb-0 lg:grid-cols-4 xl:grid-cols-7 xl:gap-4">
+            {programmingTiles.map((tile, index) => (
+              <div
+                key={`${tile.src}-${index}`}
+                className="flex w-[min(82vw,18rem)] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/30 md:w-auto"
+              >
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src={tile.src}
+                    alt={tile.alt}
+                    fill
+                    sizes="(max-width: 768px) 82vw, (max-width: 1024px) 25vw, 12vw"
+                    className="object-cover object-center"
+                  />
+                </div>
+                <div className="border-t border-border/40 bg-black/20 px-2 py-2.5 text-center backdrop-blur-sm">
+                  <span className="text-xs font-medium leading-tight text-foreground sm:text-sm">
+                    {tile.label}
+                  </span>
+                </div>
               </div>
-              <span className="text-sm font-medium text-foreground">{style.label}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Platform Preview Section */}

@@ -2,11 +2,10 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { ArrowRight, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { resolveNavHashHref, scrollPropForResolvedNav } from "@/lib/hash-nav"
-import { scheduleConsultationHomeHref } from "@/lib/schedule-open"
+import { useContactModal } from "@/components/contact-modal-context"
 
 export type PageHeroPrimary = {
   show: boolean
@@ -45,7 +44,7 @@ export function PageHeroBanner({
   secondary,
   overline,
 }: PageHeroBannerProps) {
-  const router = useRouter()
+  const { openContactModal } = useContactModal()
 
   const primaryResolved =
     primary.action === "link" && primary.link && primary.link.trim().length > 0
@@ -121,7 +120,7 @@ export function PageHeroBanner({
                   type="button"
                   size="lg"
                   className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300 cursor-pointer"
-                  onClick={() => router.push(scheduleConsultationHomeHref())}
+                  onClick={() => openContactModal()}
                 >
                   Start With a Consultation
                   <ArrowRight className="ml-2 h-5 w-5" />

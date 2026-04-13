@@ -6,6 +6,7 @@ import { getSiteSettingsCms } from "@/lib/cms/site-settings"
 import { getHomepageActiveSlideSeo } from "@/lib/cms/homepage"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { HomeHashScroll } from "@/components/home-hash-scroll"
+import { SiteToolingProvider } from "@/components/site-tooling-provider"
 import { getPublicOrigin } from "@/lib/public-origin"
 
 /** CMS-backed routes: no full route cache; no fetch/Data cache defaults that could stale Payload reads on shared hosting. */
@@ -22,11 +23,7 @@ const defaultDescription =
   "We build studio-style websites that give creators the look and structure of a major network—powered by a custom plugin and professional video setup."
 
 function metadataBaseUrl(): URL {
-  try {
-    return new URL(getPublicOrigin())
-  } catch {
-    return new URL("http://localhost:3000")
-  }
+  return new URL(getPublicOrigin())
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -92,7 +89,7 @@ export default function SiteRootLayout({
   return (
     <html lang="en" className={montserrat.variable} suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
-        {children}
+        <SiteToolingProvider>{children}</SiteToolingProvider>
         <HomeHashScroll />
         <ScrollToTop />
         {process.env.NODE_ENV === "production" &&

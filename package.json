@@ -1,6 +1,6 @@
 {
   "name": "my-project",
-  "version": "0.1.0",
+  "version": "1.0.7",
   "private": true,
   "scripts": {
     "dev": "node scripts/kill-dev-port.mjs && npm run clean:next && next dev -p 3000",
@@ -25,12 +25,15 @@
     "pushit:live:safe": "powershell -ExecutionPolicy Bypass -File scripts/pushit-live-safe.ps1",
     "PushItUPzip": "powershell -ExecutionPolicy Bypass -File scripts/PushItUPzip.ps1",
     "pushitupzip": "powershell -ExecutionPolicy Bypass -File scripts/PushItUPzip.ps1",
+    "pushitup:ftp-smoke": "powershell -ExecutionPolicy Bypass -File scripts/PushItUP.ps1 ftp-path-smoke-test.txt",
+    "verify:ftp-smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-ftp-smoke-remote.ps1",
     "test:spaceship-ftp": "powershell -ExecutionPolicy Bypass -File scripts/Test-SpaceshipFtp.ps1",
     "parity:ftp": "powershell -ExecutionPolicy Bypass -File scripts/ftp-parity-check.ps1",
     "verify:local": "powershell -ExecutionPolicy Bypass -File scripts/verify-local.ps1",
     "verify:live": "powershell -ExecutionPolicy Bypass -File scripts/verify-live.ps1",
     "lint": "next lint",
     "seed:demo-page": "payload run scripts/seed-demo-page.ts",
+    "seed:legal-pages": "npx tsx scripts/seed-legal-pages.ts",
     "generate:types": "node scripts/generate-payload-types.mjs",
     "migrate:media:from-public-images": "node scripts/migrate-public-images-to-media.mjs",
     "media:sync": "node scripts/migrate-public-images-to-media.mjs",
@@ -44,7 +47,10 @@
     "migrate:sqlite:site-settings-sticky-header": "python scripts/migrate-sqlite-site-settings-sticky-header.py",
     "migrate:sqlite:homepage-hero-secondary-cta": "python scripts/migrate-sqlite-homepage-hero-secondary-cta.py",
     "migrate:sqlite:homepage-services-gallery": "python scripts/migrate-sqlite-homepage-services-gallery.py",
+    "migrate:sqlite:homepage-programming-styles": "python scripts/migrate-sqlite-homepage-programming-styles.py",
+    "migrate:sqlite:locked-docs-hero-slides-fk": "python scripts/migrate-sqlite-locked-docs-hero-slides-fk.py",
     "migrate:sqlite:blocks-id-to-text": "python scripts/migrate-sqlite-blocks-id-to-text.py",
+    "migrate:sqlite:fix-bookings-table": "python scripts/fix-sqlite-bookings-table.py",
     "postinstall": "patch-package"
   },
   "dependencies": {

@@ -416,4 +416,3 @@ export default async function DynamicPage({ params }: RouteProps) {
     </>
   )
 }
-

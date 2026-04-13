@@ -1,10 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { getPublicOrigin } from "@/lib/public-origin"
+import { getPublicOriginClient } from "@/lib/public-origin"
 
-/** Uses NEXT_PUBLIC_SERVER_URL (same as marketing layout). */
-const publicSiteRoot = getPublicOrigin()
+/** Client-safe origin (NEXT_PUBLIC only) — avoids SSR vs browser hydration mismatch. */
+const publicSiteRoot = getPublicOriginClient()
 
 export function MscPayloadNavDashboard() {
 

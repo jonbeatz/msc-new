@@ -9,6 +9,8 @@ const adminOnly: Access = ({ req: { user } }) => Boolean(user)
 
 export const Bookings: CollectionConfig = {
   slug: "bookings",
+  /** Avoid locked-documents side effects on bulk delete (SQLite + admin bulk `where[id][in]`). */
+  lockDocuments: false,
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "email", "phone", "appointmentDate", "createdAt"],
@@ -19,7 +21,7 @@ export const Bookings: CollectionConfig = {
     create: () => true,
     read: adminOnly,
     update: adminOnly,
-    delete: adminOnly,
+    delete: ({ req: { user } }) => !!user,
   },
   fields: [
     { name: "name", type: "text", required: true },

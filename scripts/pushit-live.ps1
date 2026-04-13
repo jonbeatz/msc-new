@@ -3,7 +3,7 @@
 #
 # Steps: build → admin-ui bundle → .next → payload.sqlite → public/media → dev:fresh (local).
 #
-# Live (cPanel → Terminal), after upload — app path (matches .vscode/sftp.json remotePath):
+# Live (cPanel → Terminal), after upload — real shell path (NOT the same as FTPS remotePath in .vscode/sftp.json):
 #   cd /home/wjehbnzcoy/mystudiochannel.com
 #   sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"
 #   pkill -u $(whoami) node

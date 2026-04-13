@@ -2,6 +2,7 @@
 
 import { Mic, Video, GraduationCap, Users, Tv, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useContactModal } from "@/components/contact-modal-context"
 
 const creatorTypes = [
   {
@@ -32,6 +33,8 @@ const creatorTypes = [
 ]
 
 export function BuiltForCreatorsSection() {
+  const { openContactModal } = useContactModal()
+
   return (
     <section 
       id="msc-creators" 
@@ -84,11 +87,13 @@ export function BuiltForCreatorsSection() {
             <p className="text-sm text-muted-foreground mb-4">
               Book a consultation to discuss your vision.
             </p>
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm w-fit" asChild>
-              <a href="#msc-contact">
-                Start Now
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
+            <Button
+              type="button"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm w-fit"
+              onClick={() => openContactModal()}
+            >
+              Start Now
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>

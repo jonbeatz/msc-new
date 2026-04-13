@@ -186,8 +186,24 @@ Used by local deploy scripts (`PushItUP`, `PushItUPzip`):
 - Server: `server9.shared.spaceship.host`
 - Protocol: FTP with explicit FTPS
 - Port: `21`
-- Username: `jonbeatz@mystudiochannel.com`
-- Remote base used by script: `/` (auto-fallback if configured path is invalid)
+- Username: `jonbeatz@mystudiochannel.com` — use the **same** FTP account in FileZilla when checking paths; a different login can show a different tree.
+
+### FTPS `remotePath` (`.vscode/sftp.json`) — **not** the same as cPanel **`cd`**
+
+`PushItUP` **prepends** `remotePath` to every uploaded path. On Spaceship, the FTPS login is usually **already chrooted to the Node app directory** (FileZilla shows **`/`** or **`/mystudiochannel.com`** with **`package.json`**, **`server.js`**, and **`.next`** in that folder).
+
+| Where you work | Path | Result |
+|----------------|------|--------|
+| **cPanel / SSH** | `cd /home/wjehbnzcoy/mystudiochannel.com` | Correct **shell** path for `sqlite3`, `pkill`, `npm install`. |
+| **FTPS `remotePath` (this host)** | **`/`** | Uploads land **in the app root** next to `package.json`. |
+| **Wrong `remotePath`** | `/home/wjehbnzcoy/mystudiochannel.com/` | Nested under FTP root → **`…/home/wjehbnzcoy/…`** — **not** where Node runs. |
+| **Wrong `remotePath`** | `/mystudiochannel.com/` | Double folder → **`/mystudiochannel.com/mystudiochannel.com/…`**. |
+
+**After any `remotePath` change:** run **`npm run pushitup:ftp-smoke`**, then in FileZilla confirm **`ftp-path-smoke-test.txt`** sits **next to `package.json`** (same folder as **`.next`**). Automated check: **`npm run verify:ftp-smoke`** (read-only `LIST` + marker file).
+
+**FileZilla:** avoid **Synchronize / mirror** from a PC folder that **does not include `.next`** — the client can **delete** the server’s **`.next`** to “match” your laptop.
+
+**LIST / 550:** `PushItUP` may still upload when `LIST` on `remotePath` fails; use the smoke commands above, not LIST alone, to confirm the target directory.
 
 ### Credential handling
 
@@ -289,6 +305,32 @@ cPanel reverse proxy can leak internal origin (`0.0.0.0`) unless redirect handli
 
 - Verification redirects were fixed to use relative redirects in `collections/Leads.ts`.
 
+## 4) SQLite: `malformed database schema (bookings_…_idx) - no such table: main.bookings`
+
+**Symptoms:** **`sqlite3`** fails on **`payload.sqlite`**; **`/admin`** shows a Next.js server exception; **`/`** may still render from cache or routes that avoid that table.
+
+**Cause A — orphan indexes:** The **`bookings`** table is missing but indexes such as **`bookings_updated_at_idx`** still exist in **`sqlite_master`**.
+
+**Cause B — WAL mismatch:** Replacing only **`payload.sqlite`** while leaving old **`payload.sqlite-wal`** / **`payload.sqlite-shm`** can confuse SQLite.
+
+**Fix (preferred — clean WAL + fresh DB file):**
+
+1. **Live (cPanel UI):** **Stop** the Node.js app for **`mystudiochannel.com`**.
+2. **Live (cPanel → Terminal):** `cd` to your app root (e.g. **`cd /home/wjehbnzcoy/mystudiochannel.com`** — use **your** home user segment).
+3. Remove WAL sidecars, then re-upload DB from PC:
+   - `rm -f payload.sqlite-wal payload.sqlite-shm`
+   - **Local (Cursor):** `npm run pushitup -- payload.sqlite`
+4. **Start** the Node app again.
+5. Then run the media URL update if you use it:  
+   `sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"`
+
+**Fix (repair in place — if you cannot re-upload):** With Node **stopped**, from app root either:
+
+- **Python:** `python3 scripts/fix-sqlite-bookings-table.py ./payload.sqlite` (copy the script to the server or paste from repo), **or**
+- **sqlite3:** `sqlite3 ./payload.sqlite < scripts/fix-sqlite-bookings-table.sql` (same — path to the **`.sql`** file on the server).
+
+**Local:** `npm run migrate:sqlite:fix-bookings-table` runs **`scripts/fix-sqlite-bookings-table.py`** on repo-root **`payload.sqlite`**.
+
 ---
 
 ## Standard deploy flows
@@ -371,17 +413,22 @@ At minimum in Node app settings:
 - `NODE_ENV=production`
 - `PAYLOAD_SECRET=<secret>`
 - `DATABASE_URL=file:./payload.sqlite` (or production DB when migrated)
-- `NEXT_PUBLIC_SERVER_URL=https://mystudiochannel.com`
+- **`NEXT_PUBLIC_SERVER_URL=https://mystudiochannel.com`** — should match the live marketing origin (baked into client bundles at **build** time on PC).
+- **`PAYLOAD_PUBLIC_SERVER_URL=https://mystudiochannel.com`** (recommended on cPanel) — **runtime** server URL; **first** in **`getPublicOrigin()`** / **`payload.config.ts`** when set, so verification emails track the live host even if **`NEXT_PUBLIC_*`** was wrong at build.
 
 Optional:
 
 - `RESEND_API_KEY=...`
+- **`MSC_CANONICAL_SITE_ORIGIN`** — override the code default fallback domain when both public URL env vars are unset (default **`https://mystudiochannel.com`**).
+- **`PAYLOAD_CSRF_EXTRA_ORIGINS`** — comma-separated extra allowed origins for Payload cookie/CSRF checks (e.g. staging host).
+
+**Local dev (PC):** **`NEXT_PUBLIC_SERVER_URL`** in **`.env.local`** must include the origin you use in the browser (so admin login CSRF matches). See **Jedi-List** → *Public site URL*.
 
 ---
 
 ## Verification email behavior notes
 
-- Email verify links use public origin based on `NEXT_PUBLIC_SERVER_URL`.
+- Verify links use **`lib/public-origin.ts`** **`resolvePublicUrl()`** → **`PAYLOAD_PUBLIC_SERVER_URL`** first, then **`NEXT_PUBLIC_SERVER_URL`**, then canonical fallback (see **Jedi-List**).
 - Verify endpoint lives at:
   - `/api/leads/verify/:token`
 - Redirect target after verification:

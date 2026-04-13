@@ -66,6 +66,19 @@ Fast triage pattern:
 
 ---
 
+## Public site URL (env — keep Payload + Next aligned)
+
+| Variable | Role |
+|----------|------|
+| **`NEXT_PUBLIC_SERVER_URL`** | Inlined on client + server. **Local:** set in **`.env.local`** to your dev origin so admin **View site** and Payload **CSRF** match the browser. **Production build:** set to **`https://mystudiochannel.com`** (or rely on fallback below). |
+| **`PAYLOAD_PUBLIC_SERVER_URL`** | Runtime on cPanel/Node; **first** in **`getPublicOrigin()`** / emails / **`payload.config.ts`** **`serverURL`** when set. |
+| **`MSC_CANONICAL_SITE_ORIGIN`** | Optional override for the code fallback when both URLs above are unset (default **`https://mystudiochannel.com`** in **`lib/site-origin-defaults.ts`**). |
+| **`PAYLOAD_CSRF_EXTRA_ORIGINS`** | Optional comma-separated extra origins for Payload CSRF (staging, etc.). |
+
+**Code:** **`lib/public-origin.ts`** — **`getPublicOrigin()`** (server / emails), **`getPublicOriginClient()`** (admin **Client Components** only — avoids hydration mismatch). **`buildPayloadCsrfOriginList()`** builds CSRF from env (no hardcoded dev hosts).
+
+---
+
 ## Media (disk ↔ Payload)
 
 | Command | What it does |
@@ -95,7 +108,7 @@ Fast triage pattern:
 
 ## Admin deploy version (visual check)
 
-After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.4` → `1.0.5`). The sidebar shows **`v1.0.x`** near **Log out** so you can confirm the new build is live. Ship that file (and the rest of the **MSC PRO ENGINE** admin bundle) with **`npm run pushitup:admin-ui`** — see **Deploy uploaders** table above.
+After **Payload admin** or **CMS panel** changes ship to production, bump **`MSC_ADMIN_VERSION`** in **`lib/msc-admin-version.ts`** (e.g. `1.0.6` → `1.0.7`). The sidebar shows **`v1.0.x`** near **Log out** so you can confirm the new build is live. Ship that file (and the rest of the **MSC PRO ENGINE** admin bundle) with **`npm run pushitup:admin-ui`** — see **Deploy uploaders** table above.
 
 ---
 
@@ -125,6 +138,7 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 | **`npm run migrate:sqlite:site-settings-sticky-header`** | `scripts/migrate-sqlite-site-settings-sticky-header.py` — sticky header field on site settings global. |
 | **`npm run migrate:sqlite:homepage-hero-secondary-cta`** | `scripts/migrate-sqlite-homepage-hero-secondary-cta.py` — homepage hero secondary CTA columns. |
 | **`npm run migrate:sqlite:blocks-id-to-text`** | `scripts/migrate-sqlite-blocks-id-to-text.py` — block table PKs **INTEGER → TEXT** for Payload 3 object IDs. |
+| **`npm run migrate:sqlite:fix-bookings-table`** | `scripts/fix-sqlite-bookings-table.py` — fixes **`malformed database schema (bookings_…_idx) - no such table: main.bookings`** (orphan **`bookings`** indexes). See **Spaceship.md** § shared-host **4)**. |
 
 **Before risky migrations:** back up **`payload.sqlite`** (see **Restore-Points.md**).
 
@@ -146,7 +160,9 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 | **`npm run pushit:live:safe`** | Runs **`verify:local`** preflight first; if all checks pass, runs full **`pushit:live`** flow. Use when you want extra guardrails. |
 | **`npm run pushitupzip`** (or **`npm run PushItUPzip`**) | **`scripts/PushItUPzip.ps1`** — zips each target under **`.pushitupzips/`**, then uploads. For **`.next`**, the file is **`next-build.zip`** (not **`.next.zip`**, so cPanel shows it). Remote path: **`.pushitupzips/next-build.zip`** under your FTPS root. Example: `npm run pushitupzip -- .next` |
 | **`npm run test:spaceship-ftp`** | **`scripts/Test-SpaceshipFtp.ps1`** — read-only FTPS check using **`.vscode/sftp.json`** (login + LIST). Does not upload. **PushItUP** uses configured **`remotePath`** even when LIST on that path fails (chroot); see **Spaceship.md**. |
-| **`npm run parity:ftp`** | **`scripts/ftp-parity-check.ps1`** — compares local **`.next`**, **`public/media`**, **`payload.sqlite`** vs FTPS under **`.vscode/sftp.json`** `remotePath`; writes **`parity-ftp-report.md`** at repo root (**gitignored** — open the file locally after the run). Run after a big deploy to spot drift (compare **`.next`** only after **`npm run build`**, not while **`next dev`** owns **`.next`**). |
+| **`npm run pushitup:ftp-smoke`** | Uploads repo-root **`ftp-path-smoke-test.txt`** only — use after changing **`.vscode/sftp.json`** **`remotePath`** to confirm files land **next to `package.json`** on the server (see **Spaceship.md** § FTP). |
+| **`npm run verify:ftp-smoke`** | **`scripts/verify-ftp-smoke-remote.ps1`** — read-only **`LIST`** at configured **`remotePath`** and exits **0** only if **`ftp-path-smoke-test.txt`** is present (same session as **PushItUP**). |
+| **`npm run parity:ftp`** | **`scripts/ftp-parity-check.ps1`** — compares local **`.next`**, **`public/media`**, **`payload.sqlite`** vs FTPS under **`.vscode/sftp.json`** `remotePath`; writes **`parity-ftp-report.md`** at repo root (**gitignored** — open the file locally after the run). Run after a big deploy to spot drift (compare **`.next`** only after **`npm run build`**, not while **`next dev`** owns **`.next`**). Wrong **`remotePath`** makes parity compare the wrong tree — run **`verify:ftp-smoke`** first if unsure. |
 
 Default workflow: **`npm run pushit:live`** (build + admin-ui + full `.next` + **`payload.sqlite`** + **`public/media`** + local `dev:fresh`) then restart Node in cPanel.  
 Use **`pushitupzip`** only when explicitly needed (bandwidth/workaround scenario documented in **Spaceship.md**).

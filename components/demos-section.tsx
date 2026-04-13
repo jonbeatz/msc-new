@@ -22,14 +22,9 @@ function demoLinkProps(url: string): { target?: string; rel?: string } {
 
 type DemosSectionProps = {
   demos: DemoProject[]
-  /** Offset anchor scroll: `h-20` header + ~40px breathing; off when header is static. */
-  stickyHeaderEnabled?: boolean
 }
 
-export function DemosSection({
-  demos,
-  stickyHeaderEnabled = true,
-}: DemosSectionProps) {
+export function DemosSection({ demos }: DemosSectionProps) {
   const [activeDemoId, setActiveDemoId] = useState<string>(demos[0]?.id ?? "")
   const activeDemo = useMemo(() => {
     return demos.find((demo) => demo.id === activeDemoId) ?? demos[0]
@@ -56,10 +51,7 @@ export function DemosSection({
       {/* Use padding (not margin) for vertical rhythm so this section’s background fills the gap — margin would show `main`’s darker bg as a strip */}
       <div
         id="msc-demos"
-        className={cn(
-          "relative z-10 mx-auto max-w-7xl px-6 lg:px-8 pointer-events-auto",
-          stickyHeaderEnabled && "scroll-mt-30",
-        )}
+        className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 pointer-events-auto"
       >
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">

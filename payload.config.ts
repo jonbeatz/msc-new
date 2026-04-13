@@ -16,28 +16,19 @@ import { Homepage } from "./globals/Homepage"
 import { HeaderGlobal } from "./globals/Header"
 import { ProjectsGlobal } from "./globals/Projects"
 import { SiteSettings } from "./globals/SiteSettings"
+import { buildPayloadCsrfOriginList, getPublicOrigin } from "./lib/public-origin"
 
 const sqliteUrl = process.env.DATABASE_URL || "file:./payload.sqlite"
 
-/** Site origin for admin previews and Payload internals. Public asset URLs use relative `/media/...` via Media `afterRead`. */
-const serverURL = (
-  process.env.NEXT_PUBLIC_SERVER_URL?.trim() ||
-  process.env.PAYLOAD_PUBLIC_SERVER_URL?.trim() ||
-  "http://localhost:3000"
-).replace(/\/+$/, "")
+/** Same resolution as {@link getPublicOrigin} — HMR/production stay aligned with Next metadata and emails. */
+const serverURL = getPublicOrigin()
 
 /**
- * Cookie auth (login / refresh-token / logout) checks `Origin` against this list.
- * If `.env` still points at production but you browse `localhost` or `127.0.0.1`, requests 403 without these.
+ * Cookie auth `Origin` allowlist. Built only from env-derived origins (plus `PAYLOAD_CSRF_EXTRA_ORIGINS`);
+ * local dev: set `NEXT_PUBLIC_SERVER_URL` in `.env.local` if you browse a non-production host.
  * @see https://payloadcms.com/docs/authentication/cookies
  */
-const csrf: string[] = Array.from(
-  new Set([
-    serverURL,
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-  ]),
-)
+const csrf: string[] = buildPayloadCsrfOriginList(serverURL)
 
 type SiteSettingsData = {
   siteName?: string | null
@@ -72,6 +63,10 @@ async function getSiteSettingsFallback(req: Parameters<NonNullable<Parameters<ty
 
 export default buildConfig({
   serverURL,
+  /** Must match `app/(payload)/admin/` URL segment; keeps RootPage `currentRoute` aligned with Next routes. */
+  routes: {
+    admin: "/admin",
+  },
   csrf,
   email: resendAdapter({
     apiKey: process.env.RESEND_API_KEY || "",
@@ -80,6 +75,11 @@ export default buildConfig({
   }),
   admin: {
     user: Users.slug,
+    /**
+     * Extra admin CSS is not injected from `buildConfig` in Payload 3 + Next.
+     * Load global overrides from `styles/admin.css` and `app/(payload)/custom.scss`
+     * (both imported in `app/(payload)/layout.tsx`, after `@payloadcms/next/css`).
+     */
     // Lock admin to dark UI (no light / system toggle).
     theme: "dark",
     // Brave/Chrome extensions often inject attributes on <html> (e.g. webcrx).
@@ -111,7 +111,11 @@ export default buildConfig({
     outputFile: path.resolve(process.cwd(), "payload-types.ts"),
   },
   db: sqliteAdapter({
-    push: false,
+    // Default false (cPanel / prod). Local: if SQLite errors mention missing tables
+    // (e.g. `hero_slides`) or deletes fail with FK errors, run once:
+    // `npm run migrate:sqlite:locked-docs-hero-slides-fk` — or set `PAYLOAD_DB_PUSH=true`
+    // in `.env.local` so the adapter can align tables, then remove it.
+    push: process.env.PAYLOAD_DB_PUSH === "true",
     client: {
       url: sqliteUrl,
       authToken: process.env.DATABASE_AUTH_TOKEN,

@@ -2,9 +2,17 @@
 
 import { Check, Sparkles, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { onHashAnchorClick } from "@/lib/utils"
+import { getPackageCheckoutUrl, type PackageCheckoutKey } from "@/lib/package-paypal-urls"
 
-const packages = [
+const packages: Array<{
+  name: string
+  price: string
+  description: string
+  bestFor: string
+  featured: boolean
+  features: string[]
+  checkoutKey: PackageCheckoutKey
+}> = [
   {
     name: "Creator Launch",
     price: "$5,800",
@@ -22,6 +30,7 @@ const packages = [
       "Built on WordPress + Divi",
       "Tutorial walkthrough after launch",
     ],
+    checkoutKey: "creator-launch",
   },
   {
     name: "Studio Pro",
@@ -38,6 +47,7 @@ const packages = [
       "Faster streaming performance",
       "Advanced video playback controls",
     ],
+    checkoutKey: "studio-pro",
   },
   {
     name: "Network Platform",
@@ -55,6 +65,7 @@ const packages = [
       "Structured video categories",
       "Scalable platform structure",
     ],
+    checkoutKey: "network-platform",
   },
 ]
 
@@ -151,8 +162,9 @@ export function PackagesSection() {
                   asChild
                 >
                   <a
-                    href="#msc-contact"
-                    onClick={(e) => onHashAnchorClick(e, "#msc-contact")}
+                    href={getPackageCheckoutUrl(pkg.checkoutKey)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />

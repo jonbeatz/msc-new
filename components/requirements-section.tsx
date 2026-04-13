@@ -4,7 +4,9 @@ import { useState } from "react"
 import NextImage from "next/image"
 import type { LucideIcon } from "lucide-react"
 import { Image, Film, Video, Globe, Server, CheckCircle2, ArrowRight, Sparkles } from "lucide-react"
-import { cn, onHashAnchorClick } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { useContactModal } from "@/components/contact-modal-context"
+import { Button } from "@/components/ui/button"
 
 type RequirementCard = {
   id: number
@@ -68,6 +70,7 @@ const requirements: RequirementCard[] = [
 
 export function RequirementsSection() {
   const [activeItem, setActiveItem] = useState<number | null>(null)
+  const { openContactModal } = useContactModal()
 
   return (
     <section 
@@ -211,14 +214,14 @@ export function RequirementsSection() {
               </div>
             </div>
             <div className="flex-shrink-0 flex justify-center md:justify-end">
-              <a
-                href="#msc-contact"
-                onClick={(e) => onHashAnchorClick(e, "#msc-contact")}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-accent-foreground font-medium hover:bg-accent/90 transition-all duration-300 glow-accent-sm hover:glow-accent"
+              <Button
+                type="button"
+                className="inline-flex items-center gap-2 px-6 py-3 h-auto rounded-xl bg-accent text-accent-foreground font-medium hover:bg-accent/90 transition-all duration-300 glow-accent-sm hover:glow-accent"
+                onClick={() => openContactModal()}
               >
                 Get Started
                 <ArrowRight className="h-4 w-4" />
-              </a>
+              </Button>
             </div>
           </div>
         </div>

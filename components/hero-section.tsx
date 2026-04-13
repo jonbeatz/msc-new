@@ -6,6 +6,18 @@ import { ArrowRight, Play, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn, onHashAnchorClick } from "@/lib/utils"
 import type { HeroSlideContent, HeroStatContent } from "@/lib/cms/content-types"
+import { useContactModal } from "@/components/contact-modal-context"
+
+/** Primary CTA opens the contact modal when the slide targets `#msc-contact` (or default empty). */
+function heroPrimaryOpensContactModal(href: string): boolean {
+  const t = href.trim()
+  if (!t) return true
+  if (/^mailto:/i.test(t)) return false
+  if (/^https?:\/\//i.test(t)) return false
+  const hashIdx = t.indexOf("#")
+  const frag = hashIdx >= 0 ? t.slice(hashIdx) : t.startsWith("#") ? t : ""
+  return frag === "#msc-contact"
+}
 
 /** Fallback slides use `public/media` (same paths CMS Media URLs resolve to after `afterRead`). */
 const defaultSlides: HeroSlideContent[] = [
@@ -76,6 +88,7 @@ export function HeroSection({
     [cmsStats],
   )
 
+  const { openContactModal } = useContactModal()
   const [current, setCurrent] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
 
@@ -105,6 +118,7 @@ export function HeroSection({
 
   const slide = slides[current]
   const primaryCtaHref = slide.ctaLink?.trim() || "#msc-contact"
+  const primaryUsesContactModal = heroPrimaryOpensContactModal(primaryCtaHref)
   const secondaryCtaHref =
     slide.secondaryCtaLink?.trim() || "#msc-demos"
 
@@ -180,19 +194,31 @@ export function HeroSection({
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300"
-              asChild
-            >
-              <a
-                href={primaryCtaHref}
-                onClick={(e) => onHashAnchorClick(e, primaryCtaHref)}
+            {primaryUsesContactModal ? (
+              <Button
+                type="button"
+                size="lg"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300"
+                onClick={() => openContactModal()}
               >
                 Start With a Consultation
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </a>
-            </Button>
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300"
+                asChild
+              >
+                <a
+                  href={primaryCtaHref}
+                  onClick={(e) => onHashAnchorClick(e, primaryCtaHref)}
+                >
+                  Start With a Consultation
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </a>
+              </Button>
+            )}
             <Button
               size="lg"
               variant="outline"

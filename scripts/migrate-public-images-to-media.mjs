@@ -75,7 +75,12 @@ function serverUrlFromPayload(payload) {
   if (typeof u === "string" && u.length > 0) {
     return u.replace(/\/+$/, "")
   }
-  return "http://localhost:3000"
+  return (
+    process.env.NEXT_PUBLIC_SERVER_URL?.trim()?.replace(/\/+$/, "") ||
+    process.env.PAYLOAD_PUBLIC_SERVER_URL?.trim()?.replace(/\/+$/, "") ||
+    process.env.MSC_CANONICAL_SITE_ORIGIN?.trim()?.replace(/\/+$/, "") ||
+    "https://mystudiochannel.com"
+  )
 }
 
 function apiFileUrl(serverURL, filename) {

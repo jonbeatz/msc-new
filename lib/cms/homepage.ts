@@ -26,11 +26,14 @@ function normalizeMediaSrc(pathOrUrl: string): string {
   return toRelativePublicMediaUrl(pathOrUrl)
 }
 
-function mapServicesGallery(
+/** Maps Homepage array fields with `image` + optional `label` (programmingStyles, servicesGallery). */
+function mapMediaLabelGallery(
   doc: Record<string, unknown> | null | undefined,
+  key: "programmingStyles" | "servicesGallery",
+  defaultLabel: string,
 ): ServicesGalleryItem[] | null {
   if (!doc) return null
-  const raw = doc.servicesGallery
+  const raw = doc[key]
   if (!Array.isArray(raw) || raw.length === 0) return null
   const out: ServicesGalleryItem[] = []
   for (const row of raw) {
@@ -46,7 +49,7 @@ function mapServicesGallery(
     const label =
       typeof labelRaw === "string" && labelRaw.trim().length > 0
         ? labelRaw.trim()
-        : "Preview"
+        : defaultLabel
     out.push({
       src: normalizeMediaSrc(url),
       alt,
@@ -59,6 +62,7 @@ function mapServicesGallery(
 export async function getHomepageCmsData(): Promise<{
   heroSlides: HeroSlideContent[] | null
   heroStats: HeroStatContent[] | null
+  programmingStyles: ServicesGalleryItem[] | null
   servicesGallery: ServicesGalleryItem[] | null
 }> {
   try {
@@ -89,7 +93,8 @@ export async function getHomepageCmsData(): Promise<{
       return {
         heroSlides: null,
         heroStats: heroStatsEarly,
-        servicesGallery: mapServicesGallery(d),
+        programmingStyles: mapMediaLabelGallery(d, "programmingStyles", "Programming style"),
+        servicesGallery: mapMediaLabelGallery(d, "servicesGallery", "Preview"),
       }
     }
 
@@ -189,13 +194,24 @@ export async function getHomepageCmsData(): Promise<{
       if (mapped.length > 0) heroStats = mapped
     }
 
+    const d = doc as unknown as Record<string, unknown>
     return {
       heroSlides: heroSlides.length > 0 ? heroSlides : null,
       heroStats,
-      servicesGallery: mapServicesGallery(doc as unknown as Record<string, unknown>),
+      programmingStyles: mapMediaLabelGallery(
+        d,
+        "programmingStyles",
+        "Programming style",
+      ),
+      servicesGallery: mapMediaLabelGallery(d, "servicesGallery", "Preview"),
     }
   } catch {
-    return { heroSlides: null, heroStats: null, servicesGallery: null }
+    return {
+      heroSlides: null,
+      heroStats: null,
+      programmingStyles: null,
+      servicesGallery: null,
+    }
   }
 }
 

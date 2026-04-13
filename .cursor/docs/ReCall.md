@@ -81,15 +81,22 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Current focus
 
-- **Payload CMS:** **`globals/Homepage`** drives marketing hero rows (images from **Media**); **`globals/Site settings`** for SEO/branding; **Leads** / **Bookings** with Resend flows; there is **no** separate **`HeroSlides`** collection (removed — data lives on Homepage + Media).
-- **Email:** Shared styling/helpers in **`lib/email-brand.ts`** and **`lib/email-templates.ts`** (used by collection hooks and dev preview where applicable).
-- **Booking:** Schedule modal captures **IANA time zone** (`Intl...timeZone`) and persists to **`bookings.timeZone`**; admin alert email includes **Time zone** line.
-- **Nav / hashes:** **`lib/hash-nav.ts`** + **`resolveNavHashHref`** in **`header`** / **`footer`**; **`HomeHashScroll`** on **`/`**; see **Development.md** → *Marketing header*.
-- **Next ideas:** wire more sections to Payload, or **headless WordPress Phase 1** (`msc-api` plugin — not in repo yet); production hardening (Postgres, API lockdown) when you prioritize it.
+- **Payload CMS:** **`globals/Homepage`** + **Media**; **`globals/Site settings`**; **Leads** / **Bookings** (delete preflight for auth **`leads`** + Resend); static **Pages** under **`app/(site)/pages/`**; legal **`/privacy-policy`**, **`/terms-of-service`**.
+- **Public URLs:** **`lib/public-origin.ts`** + **`lib/site-origin-defaults.ts`** — **`PAYLOAD_PUBLIC_SERVER_URL`** / **`NEXT_PUBLIC_SERVER_URL`** / **`MSC_CANONICAL_SITE_ORIGIN`**; **`getPublicOriginClient()`** for admin Client Components; **`payload.config.ts`** **`serverURL`** + env-built **CSRF**.
+- **Marketing site:** Header/footer in-page hash scroll (mobile drawer defer); **`HomeHashScroll`**; **`middleware`** pathname-only rewrites (host-agnostic).
+- **Version:** **`v1.0.7`** — bump **`lib/msc-admin-version.ts`** when shipping more admin-facing changes.
+- **Next ideas:** **`pushit:live`** to refresh production with this checkpoint; optional Postgres / API hardening later.
 
 ---
 
 ## Recent changes (latest first)
+
+### 2026-04-13 — Checkpoint: docs + commit (`Lets Checkpoint Docs + Commit`)
+
+- **Committed:** broad WIP merge — env URL protocol, **`v1.0.7`**, admin hydration fix, Leads SQLite delete preflight, marketing anchor scroll polish, legal pages + **`pages`** route group, contact modal, FTPS/SQLite tooling, **`.env.example`** updates.
+- **Docs synced:** **Jedi-List** (*Public site URL* table), **START-HERE** (env blurb + resume tip), **Spaceship** (production env baseline + verify-email note), **Restore-Points** **`RP-2026-04-13-checkpoint-v107-env-nav-leads`**, this **ReCall** block.
+- **No deploy** in this flow — run **`npm run pushit:live`** when ready, then cPanel Node restart.
+- **Verify before deploy:** **`npm run verify:next:safe`**, **`npm run verify:local`** (dev on **3000**).
 
 ### 2026-04-12 — Session closeout (I'm done for now) — evening
 

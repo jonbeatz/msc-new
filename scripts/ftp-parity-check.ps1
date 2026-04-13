@@ -1,4 +1,5 @@
-# 1:1 parity: local .next, public/media, payload.sqlite vs FTPS remote (sftp.json).
+# 1:1 parity: local .next, public/media, payload.sqlite vs FTPS remote (sftp.json remotePath).
+# Wrong remotePath => parity compares the wrong server tree. Run: npm run verify:ftp-smoke (see Spaceship.md § FTP).
 # Usage (repo root): powershell -ExecutionPolicy Bypass -File scripts/ftp-parity-check.ps1
 $ErrorActionPreference = "Stop"
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12

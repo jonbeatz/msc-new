@@ -191,8 +191,9 @@ $baseFtpUrl = "ftp://$ftpServer`:$ftpPort"
 $credential = New-Object System.Net.NetworkCredential($username, $password)
 
 $candidateRemoteBase = if ([string]::IsNullOrWhiteSpace($remoteBaseFromConfig)) { "/" } else { $remoteBaseFromConfig.Trim() }
-# Always honor sftp.json remotePath. LIST on an absolute cPanel path often fails when the session is chrooted;
-# falling back to "/" uploaded into the wrong tree (e.g. payload.sqlite failed while .next appeared to work).
+# Always honor sftp.json remotePath. On Spaceship FTPS the session is usually chrooted to the app root — use "/"
+# (see Spaceship.md). Wrong values: "/home/USER/mystudiochannel.com/" (nested home/... on server) or
+# "/mystudiochannel.com/" (double mystudiochannel.com folder). LIST on remotePath may still fail (550); STOR can work.
 $remoteBase = $candidateRemoteBase
 if ($remoteBase -ne "/" -and -not (Test-FtpDirectory -BaseFtpUrl $baseFtpUrl -DirPath $remoteBase -Credential $credential -UseSsl $useSsl -UsePassive $usePassive)) {
   Write-Output "Warning: remotePath '$remoteBase' did not respond to FTPS LIST; using configured path anyway (typical on chrooted FTP)."

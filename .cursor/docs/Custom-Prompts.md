@@ -17,7 +17,7 @@ Use these as quick "commands in plain English" for the agent.
    1) .cursor/docs/START-HERE.md — source-of-truth order, daily rules, Jon’s cPanel session links (Node.js + Terminal), fast workflow.
    2) .cursor/docs/Agent-Runbook.md — operator handshake + command locality (Local Cursor vs Live cPanel).
    3) .cursor/docs/Spaceship.md — deploy protocol: pushitup/pushit:live on PC only; cPanel = restart / optional npm install; never pushitup on host.
-   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, dev:recover, verify:next:safe, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, parity:ftp, test:spaceship-ftp).
+   4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, dev:recover, verify:next:safe, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, parity:ftp, test:spaceship-ftp, pushitup:ftp-smoke, verify:ftp-smoke).
    5) .cursor/docs/ReCall.md — "Current focus" + latest "Recent changes" entry.
    6) Skim .cursor/docs/Restore-Points.md — newest checkpoint row only (if any).
 
@@ -128,10 +128,11 @@ Use these as quick "commands in plain English" for the agent.
     - Alias for running `verify:live` and returning pass/fail only.
 
 29. **`Lets test FTP`**  
-    - Runs `test:spaceship-ftp` for a quick FTPS login/list check and reports ready/not-ready.
+    - Runs `test:spaceship-ftp` for a quick FTPS login/list check and reports ready/not-ready.  
+    - If uploads landed in the wrong tree (double **`mystudiochannel.com`**, or **`home/wjehbnzcoy/...`** under FTP), read **Spaceship.md** § **FTP connection profile** — **`remotePath`** is **not** the same as cPanel **`cd /home/wjehbnzcoy/mystudiochannel.com`**. After fixing **`remotePath`**, run **`npm run pushitup:ftp-smoke`** and confirm **`ftp-path-smoke-test.txt`** sits next to **`package.json`** in FileZilla; **`npm run verify:ftp-smoke`** confirms from the PC.
 
 30. **`Lets run system check`**  
-    - Runs local + live + FTP + repo-status checks and returns one consolidated readiness report.
+    - Runs local + live + FTP + repo-status checks and returns one consolidated readiness report. Optional: include **`npm run verify:ftp-smoke`** when validating deploy paths (exits non-zero if the marker file is missing on the server).
 
 31. **`Ready to begin`**  
     - Same full-sync flow as **item 0** above (and **`Agent-Runbook.md` §0**): read **START-HERE**, **Agent-Runbook**, **Spaceship**, **Jedi-List**, **ReCall** (+ skim **Restore-Points**), **`.cursorrules`** + **`.cursor/rules`**, then **Local (Cursor)** git status, healthy **`localhost:3000`** (free port **3000** / **`dev:fresh`** if needed), optional **`verify:local`**; reply in sections **A–G**; handshake **`Ok Jon - Ready to begin`**; **no deploy**. Say **`Ready to begin.`** in chat or paste the block under **item 0**.
@@ -155,7 +156,8 @@ Use these as quick "commands in plain English" for the agent.
    - **Tier 1 — Fast FTP (look and feel only).** **Local (Cursor / repo root):** runs **`npm run pushitup:admin-branding`** — **`PushItUP.ps1`** uploads **only** these paths: **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. No production build in this command: use for quick SCSS/config/docs tweaks when you accept that **bundled** admin UI may not change until you run **Tier 2**. If you changed React behavior that affects the compiled admin bundle, run **`Lets Push It Live`** (item **38**) instead. After upload, **Live (cPanel)** — Restart the Node.js app for `mystudiochannel.com`.
 
 38. **`Lets Push It Live`**  
-   - **Tier 2 — Full build + DB + media ship (“zero footprint” sync).** **Local (Cursor / repo root):** **`npm run pushit:live`** runs: **`npm run build`** → **`npm run pushitup:admin-ui`** → **`npm run pushitup -- .next`** → **`npm run pushitup -- payload.sqlite`** → **`npm run pushitup -- public/media`** → **`npm run dev:fresh`**. Aborts if **`payload.sqlite`** is missing locally (local DB is the source of truth). **Live (cPanel → Terminal):** **`cd /home/wjehbnzcoy/mystudiochannel.com`** (or your app root); **`sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"`**; **`pkill -u $(whoami) node`**. **Live (cPanel UI):** **Node.js Selector → Restart** `mystudiochannel.com`. **Verification:** **`/`** and **`/admin`** in Incognito; **Media** should match **`public/media`** on disk. Same intent as **item 3** above.
+   - **Tier 2 — Full build + DB + media ship (“zero footprint” sync).** **Local (Cursor / repo root):** **`npm run pushit:live`** runs: **`npm run build`** → **`npm run pushitup:admin-ui`** → **`npm run pushitup -- .next`** → **`npm run pushitup -- payload.sqlite`** → **`npm run pushitup -- public/media`** → **`npm run dev:fresh`**. Aborts if **`payload.sqlite`** is missing locally (local DB is the source of truth). **Live (cPanel → Terminal):** **`cd /home/wjehbnzcoy/mystudiochannel.com`** (or your app root); **`sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"`**; **`pkill -u $(whoami) node`**. **Live (cPanel UI):** **Node.js Selector → Restart** `mystudiochannel.com`. **Verification:** **`/`** and **`/admin`** in Incognito; **Media** should match **`public/media`** on disk. Same intent as **item 3** above.  
+   - **Before** trusting a big **`.next`** upload, ensure **`.vscode/sftp.json`** **`remotePath`** matches **Spaceship.md** (usually **`/`** for FTPS — not the same string as the **`cd`** line above); **`npm run verify:ftp-smoke`** should pass.
 
 39. **`Push server config`**  
    - **Tier 3 — Hosting / Node runtime contract.** **Local (Cursor / repo root):** runs **`npm run pushitup:server-config`** — FTPS **`server.js`**, **`package.json`**, **`package-lock.json`**, and **`.env.example`**. Use when dependencies, engine constraints, or startup wiring changed; then **Live (cPanel → Terminal)** — `source` nodevenv, **`cd`** app root, **`npm install --legacy-peer-deps`**, then **Restart** the Node app (see **Go-Live-Checklist.md** §5). Do **not** run **`pushitup`** on the host.

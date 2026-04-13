@@ -7,6 +7,8 @@ for (const rel of [
   ".next",
   path.join("node_modules", ".cache"),
   ".turbo",
+  // Payload / tooling caches (safe to delete; recreated on dev/build)
+  ".payload",
 ]) {
   const p = path.join(root, rel)
   try {

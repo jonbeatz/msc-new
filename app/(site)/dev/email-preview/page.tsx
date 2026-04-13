@@ -5,9 +5,7 @@ import {
   buildNewLeadAlertAdminHtml,
   buildVerifyLeadEmailHtml,
 } from "@/lib/email-templates"
-import { getPublicOrigin } from "@/lib/public-origin"
-
-const previewOrigin = getPublicOrigin()
+import { getPublicOrigin, resolvePublicUrl } from "@/lib/public-origin"
 
 /** Order matches Payload: verify → booking user → booking admin → lead admin */
 const templates = [
@@ -15,7 +13,7 @@ const templates = [
     title: "1/4 — Stay in the Loop (verify email)",
     height: 520,
     html: buildVerifyLeadEmailHtml(
-      new URL("/api/leads/verify/preview-token", previewOrigin).toString()
+      resolvePublicUrl("/api/leads/verify/preview-token")
     ),
   },
   {
@@ -50,6 +48,8 @@ export default function EmailPreviewPage() {
     notFound()
   }
 
+  const publicOrigin = getPublicOrigin()
+
   return (
     <main style={{ padding: "2rem", background: "#0b0b0f", minHeight: "100vh", color: "#f3f4f6" }}>
       <h1 style={{ fontSize: "1.75rem", marginBottom: "1rem" }}>Email template preview</h1>
@@ -59,7 +59,10 @@ export default function EmailPreviewPage() {
         <code style={{ color: "#d4d4dc" }}>lib/email-templates.ts</code>.
       </p>
       <p style={{ color: "#7b7b87", marginBottom: "1.5rem", fontSize: "0.9rem" }}>
-        Verify link sample uses your public origin ({previewOrigin}).
+        Verify link sample uses <code style={{ color: "#d4d4dc" }}>resolvePublicUrl</code> from{" "}
+        <code style={{ color: "#d4d4dc" }}>NEXT_PUBLIC_SERVER_URL</code> /{" "}
+        <code style={{ color: "#d4d4dc" }}>PAYLOAD_PUBLIC_SERVER_URL</code> →{" "}
+        <strong style={{ color: "#e5e5eb" }}>{publicOrigin}</strong>
       </p>
       <div style={{ display: "grid", gap: "1.5rem" }}>
         {templates.map((item) => (

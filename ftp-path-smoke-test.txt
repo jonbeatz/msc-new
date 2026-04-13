@@ -1,0 +1,2 @@
+FTP path smoke test — must sit next to package.json on the server (same folder as .next), not under mystudiochannel.com/mystudiochannel.com/.
+Re-upload: npm run pushitup:ftp-smoke

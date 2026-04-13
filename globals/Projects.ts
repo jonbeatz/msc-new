@@ -12,6 +12,7 @@ export const ProjectsGlobal: GlobalConfig = {
   },
   access: {
     read: () => true,
+    update: ({ req }) => Boolean(req.user),
   },
   fields: [
     {

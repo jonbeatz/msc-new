@@ -178,7 +178,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Central media library (site-wide). Files live in public/media and are addressed as /media/... (afterRead URL rewrite). Add files on disk, then run npm run media:sync (or migrate:media:from-public-images) to create matching Media rows for Payload. Hero, header/footer logo, Services, Pages, and Projects pick files here.
+ * Manage and organize the central media library for My Studio Channel. Uploaded assets are automatically optimized for use across the platform.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -421,14 +421,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'bookings';
-        value: number | Booking;
-      } | null)
-    | ({
-        relationTo: 'leads';
-        value: number | Lead;
       } | null)
     | ({
         relationTo: 'pages';
@@ -693,7 +685,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Hero carousel, stat row, and Services section screenshot gallery. Upload images in Media, then select them per slide or gallery row. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta and npm run migrate:sqlite:homepage-services-gallery
+ * Hero carousel, stat row, Programming Styles image row (7), and Channel preview screenshot gallery (7). Upload images in Media, then select them per row. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta, migrate:sqlite:homepage-programming-styles, and migrate:sqlite:homepage-services-gallery
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
@@ -753,7 +745,20 @@ export interface Homepage {
       }[]
     | null;
   /**
-   * Homepage “Programming Styles / See What Your Channel Could Look Like” screenshot grid. Upload each file in Media, then add rows in order (first row = large + two smalls, then bottom row of four).
+   * Images under “Programming Styles We Support” — exactly seven tiles (genre / format). Order left-to-right on desktop; optional label under each image. Alt text comes from each Media entry.
+   */
+  programmingStyles?:
+    | {
+        image: number | Media;
+        /**
+         * Short caption under the image (e.g. Interview Talk Show).
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Homepage “See What Your Channel Could Look Like” bento grid. Upload each file in Media, then add rows in order (first row = large + two smalls, then bottom row of four). Separate from Programming Styles above.
    */
   servicesGallery?:
     | {
@@ -921,6 +926,13 @@ export interface HomepageSelect<T extends boolean = true> {
         value?: T;
         label?: T;
         highlight?: T;
+        id?: T;
+      };
+  programmingStyles?:
+    | T
+    | {
+        image?: T;
+        label?: T;
         id?: T;
       };
   servicesGallery?:

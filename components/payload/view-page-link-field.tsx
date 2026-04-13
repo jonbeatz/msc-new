@@ -1,7 +1,7 @@
 "use client"
 
 import { useFormFields } from "@payloadcms/ui"
-import { getPublicOrigin } from "@/lib/public-origin"
+import { getPublicOriginClient } from "@/lib/public-origin"
 
 const FALLBACK_SLUG = "msc1"
 
@@ -10,7 +10,7 @@ const FALLBACK_SLUG = "msc1"
 function buildHref(slug: string | undefined | null): string {
   const s = typeof slug === "string" ? slug.trim() : ""
   const resolved = s.length > 0 ? s : FALLBACK_SLUG
-  return `${getPublicOrigin()}/${encodeURIComponent(resolved)}`
+  return `${getPublicOriginClient()}/${encodeURIComponent(resolved)}`
 }
 
 // ─── Shared link renderer ─────────────────────────────────────────────────────

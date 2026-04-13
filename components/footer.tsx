@@ -9,6 +9,8 @@ import {
   scrollPropForResolvedNav,
   shouldReplaceHashLink,
 } from "@/lib/hash-nav"
+import { onHashAnchorClick } from "@/lib/utils"
+import { MSC_ADMIN_VERSION } from "@/lib/msc-admin-version"
 const footerLinks = {
   company: [
     { label: "About", href: "#msc-about" },
@@ -78,6 +80,11 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
                       replace={shouldReplaceHashLink(path, href)}
                       scroll={scrollPropForResolvedNav(path, href)}
                       className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                      onClick={(e) => {
+                        if (path === "/" && href.startsWith("#")) {
+                          onHashAnchorClick(e, href)
+                        }
+                      }}
                     >
                       {link.label}
                     </Link>
@@ -100,6 +107,11 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
                       replace={shouldReplaceHashLink(path, href)}
                       scroll={scrollPropForResolvedNav(path, href)}
                       className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                      onClick={(e) => {
+                        if (path === "/" && href.startsWith("#")) {
+                          onHashAnchorClick(e, href)
+                        }
+                      }}
                     >
                       {link.label}
                     </Link>
@@ -131,6 +143,9 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
         <div className="mt-16 pt-8 border-t border-border/50">
           <p className="text-sm text-muted-foreground text-center">
             &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
+          </p>
+          <p className="mt-2 text-center text-xs text-muted-foreground/80 tabular-nums">
+            Release v{MSC_ADMIN_VERSION}
           </p>
         </div>
       </div>

@@ -86,6 +86,11 @@ If an agent over-reads history/planning docs, tell it:
 
 If local breaks with missing vendor chunks (`date-fns`, etc.), run `npm run dev:fresh` again.
 
+### Public site URL (`.env.local` + production)
+
+- **Local:** set **`NEXT_PUBLIC_SERVER_URL`** in **`.env.local`** to your dev origin (see **`.env.example`**) so Payload admin **CSRF** and **View site** match what you open in the browser.
+- **Production:** set **`NEXT_PUBLIC_SERVER_URL`** and/or **`PAYLOAD_PUBLIC_SERVER_URL`** on the host (see **Spaceship.md**). If both are missing at build/runtime, the app falls back to **`https://mystudiochannel.com`** (override with **`MSC_CANONICAL_SITE_ORIGIN`**). Details: **`Jedi-List.md`** → *Public site URL*.
+
 ### Why the browser shows a white page + `/_next/static/chunks/fallback/*` (500)
 
 That pattern almost always means **`.next` was deleted or overwritten while `next dev` was still running** — for example **`npm run verify:next`** or **`npm run clean:next`** in a **second** terminal while the dev server was up. The dev server then serves broken chunks and error fallbacks.
@@ -104,6 +109,8 @@ From repo root on PC:
 4. Validate live in Incognito.
 
 Important: `pushitup` runs on PC, not cPanel Terminal.
+
+**FTPS target folder:** **`.vscode/sftp.json`** **`remotePath`** must match **Spaceship.md** (this host: **`/`**). The shell path **`cd /home/wjehbnzcoy/mystudiochannel.com`** is only for **cPanel Terminal**, not for **`remotePath`**. After any **`remotePath`** edit, run **`npm run verify:ftp-smoke`** (or **`pushitup:ftp-smoke`** + check FileZilla) so **`.next`** does not upload into a nested junk tree.
 
 ---
 
@@ -126,7 +133,7 @@ These `cpsess...` links can expire. If they do, log in at:
 ## Top 7 rules (avoid pain)
 
 1. Do not run `pushitup` in cPanel Terminal.
-2. For app/admin code changes: full `npm run build` + full `.next` upload.
+2. For app/admin code changes: full `npm run build` + full `.next` upload. Keep **`.vscode/sftp.json`** **`remotePath`** aligned with **Spaceship.md** (FTPS **`/`** vs cPanel **`cd`**); run **`npm run verify:ftp-smoke`** if anything about the upload target folder is uncertain.
 3. Do not partially upload random files inside `.next`.
 4. If you delete server `.next`, immediately re-upload `.next` from PC.
 5. Only run server `npm install --legacy-peer-deps` when `package.json`, lockfile, or `patches/` changed.
@@ -158,7 +165,7 @@ These `cpsess...` links can expire. If they do, log in at:
 
 **Full session sync (recommended):** say **`Ready to begin`** or paste the block from **`Custom-Prompts.md` → item 0** — same content as **`Agent-Runbook.md` → §0 Ready to begin (full sync)**. The agent reads core docs, rules, and git/local health before coding; first reply should start with **`Ok Jon - Ready to begin.`** (see **Agent-Runbook** handshake).
 
-**Known-good resume tip:** newest row **`RP-2026-04-12-branch-tip-ready-tomorrow`** in **`Restore-Points.md`** — stay on **`mscNowLive-v4-RestorePoint`** and **`git pull`** for latest.
+**Known-good resume tip:** newest dated row in **`Restore-Points.md`** (e.g. **`RP-2026-04-13-*`**) — stay on **`mscNowLive-v4-RestorePoint`** and **`git pull`** for latest.
 
 **Minimal bootstrap:** paste this:
 

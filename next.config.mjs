@@ -6,8 +6,11 @@ if (process.platform === "win32" && process.env.WATCHPACK_POLLING == null) {
   process.env.WATCHPACK_POLLING = "true"
 }
 
+const canonicalSiteFallback =
+  process.env.MSC_CANONICAL_SITE_ORIGIN?.trim() || "https://mystudiochannel.com"
+
 const publicOrigin =
-  process.env.NEXT_PUBLIC_SERVER_URL?.trim() || "http://localhost:3000"
+  process.env.NEXT_PUBLIC_SERVER_URL?.trim() || canonicalSiteFallback
 
 const remotePatterns = [
   {

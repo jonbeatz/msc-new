@@ -3,10 +3,8 @@
 import dynamic from "next/dynamic"
 import { Suspense, useCallback, useEffect, useState } from "react"
 import { ArrowRight, Mail, Phone, Calendar, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { submitBookingRequest } from "@/lib/booking"
+import { ContactMessageForm } from "@/components/contact-message-form"
 import { ContactScheduleQueryOpener } from "@/components/contact-schedule-query-opener"
 import { getPublicOrigin } from "@/lib/public-origin"
 
@@ -387,34 +385,7 @@ export function ContactSection() {
               <h3 className="text-xl font-bold text-foreground mb-2">Send a Message</h3>
               <p className="text-sm text-muted-foreground mb-8">Fill out the form below and we&apos;ll get back to you within 24 hours.</p>
 
-              <form className="space-y-4 sm:space-y-6">
-                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-xs sm:text-sm font-medium text-foreground mb-2">First Name</label>
-                    <Input id="firstName" placeholder="John" className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 h-10 sm:h-12 rounded-xl" />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-xs sm:text-sm font-medium text-foreground mb-2">Last Name</label>
-                    <Input id="lastName" placeholder="Doe" className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 h-10 sm:h-12 rounded-xl" />
-                  </div>
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-foreground mb-2">Email Address</label>
-                  <Input id="email" type="email" placeholder="john@example.com" className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 h-10 sm:h-12 rounded-xl" />
-                </div>
-                <div>
-                  <label htmlFor="subject" className="block text-xs sm:text-sm font-medium text-foreground mb-2">Subject</label>
-                  <Input id="subject" placeholder="What's this about?" className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 h-10 sm:h-12 rounded-xl" />
-                </div>
-                <div>
-                  <label htmlFor="message" className="block text-xs sm:text-sm font-medium text-foreground mb-2">Message</label>
-                  <Textarea id="message" placeholder="Tell us about your project..." rows={4} className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 resize-none rounded-xl" />
-                </div>
-                <Button type="submit" className="w-full bg-secondary/50 text-foreground hover:bg-secondary/80 border border-border/50 h-12 sm:h-14 text-sm sm:text-base font-semibold">
-                  Send Message
-                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
-              </form>
+              <ContactMessageForm idPrefix="contact" />
             </div>
           </div>
         </div>

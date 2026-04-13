@@ -21,7 +21,10 @@ Run these from your PC terminal in repo root:
 npm run verify:local
 npm run verify:live
 npm run test:spaceship-ftp
+npm run verify:ftp-smoke
 ```
+
+**FTPS path sanity:** **`cd /home/wjehbnzcoy/mystudiochannel.com`** (cPanel Terminal) is correct for shell commands only. **`.vscode/sftp.json`** **`remotePath`** for Spaceship FTPS is usually **`/`** — not **`/home/...`** and not **`/mystudiochannel.com/`** — or **`PushItUP`** writes under the wrong nested folder (see **Spaceship.md** § FTP). **`npm run verify:ftp-smoke`** must pass before you trust a full **`.next`** upload.
 
 If local is broken, run:
 

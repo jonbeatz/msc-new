@@ -8,7 +8,9 @@ import { handleScroll } from "@/lib/utils"
 
 function scrollToElementId(id: string) {
   if (!id) return
-  handleScroll(`#${id}`)
+  requestAnimationFrame(() => {
+    handleScroll(`#${id}`, { deferFrames: 1 })
+  })
 }
 
 /**
@@ -29,7 +31,7 @@ export function HomeHashScroll() {
       scrollToElementId(id)
     }
 
-    const t = window.setTimeout(run, 80)
+    const t = window.setTimeout(run, 120)
     return () => window.clearTimeout(t)
   }, [pathname])
 

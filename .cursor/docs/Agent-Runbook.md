@@ -537,6 +537,7 @@ Please run these checks in order:
    - `npm run verify:live`
 3) FTP connection check:
    - `npm run test:spaceship-ftp`
+   - Optional path proof: `npm run verify:ftp-smoke` (confirms `ftp-path-smoke-test.txt` exists at configured `remotePath`; see Spaceship.md § FTP — `remotePath` is not the same as cPanel `cd`)
 4) Repo readiness check:
    - `git status --short`
 
@@ -655,7 +656,7 @@ Use these as quick "commands in plain English" for the agent.
     - Alias for running `verify:live` and returning pass/fail only.
 
 29. **`Lets test FTP`**  
-    - Runs `test:spaceship-ftp` for a quick FTPS login/list check and reports ready/not-ready.
+    - Runs `test:spaceship-ftp` for a quick FTPS login/list check and reports ready/not-ready. If deploys hit the wrong directory, follow **Spaceship.md** § FTP (`remotePath` vs shell `cd`) and use **`npm run pushitup:ftp-smoke`** / **`npm run verify:ftp-smoke`**.
 
 30. **`Lets run system check`**  
     - Runs local + live + FTP + repo-status checks and returns one consolidated readiness report.

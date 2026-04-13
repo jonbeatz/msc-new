@@ -67,14 +67,14 @@ try {
   exit 1
 }
 
-# 2) Configured remotePath (PushItUP falls back to / if this fails)
+# 2) Configured remotePath (LIST may fail on chroot; PushItUP still uses this path for STOR)
 $candidate = if ([string]::IsNullOrWhiteSpace($remotePath)) { "/" } else { $remotePath.TrimEnd("/") }
 try {
   Test-FtpList -DirPath $candidate
   Write-Host "OK: remotePath from sftp.json is listable: $candidate"
 } catch {
   Write-Host "WARN: remotePath not listable on FTPS (550 is common): $candidate"
-  Write-Host "      PushItUP will use / as remote base when this happens (see PushItUP.ps1)."
+  Write-Host "      PushItUP still uploads under that path (see PushItUP.ps1); verify with a tiny push + FileZilla."
 }
 Write-Host "Done. You can run: npm run pushitup -- <files>"
 exit 0

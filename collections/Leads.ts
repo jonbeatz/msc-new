@@ -3,24 +3,26 @@ import {
   buildNewLeadAlertAdminHtml,
   buildVerifyLeadEmailHtml,
 } from "../lib/email-templates"
-import { getPublicOrigin } from "../lib/public-origin"
+import { getPublicOrigin, resolvePublicUrl } from "../lib/public-origin"
+import { preflightDeleteAuthUserRows } from "../lib/payload-auth-delete-preflight"
 import { getNotificationConfig } from "../lib/notifications"
 
-const FALLBACK_ORIGIN = getPublicOrigin()
-
 /**
- * Newsletter / interest signups (future: wire a form to POST /api/leads).
+ * Newsletter + contact form: `POST /api/leads` with `email`, `password`, optional `name`, `source`, `message`.
  */
 export const Leads: CollectionConfig = {
   slug: "leads",
+  /** Same as Bookings — document locking can interfere with admin bulk deletes. */
+  lockDocuments: false,
   endpoints: [
     {
       path: "/verify/:token",
       method: "get",
       handler: async (req) => {
+        const base = getPublicOrigin()
         const requestURL = req.url
-          ? new URL(req.url, FALLBACK_ORIGIN)
-          : new URL("/api/leads/verify", FALLBACK_ORIGIN)
+          ? new URL(req.url, base)
+          : new URL("/api/leads/verify", base)
         const tokenFromPath =
           typeof req.routeParams?.token === "string"
             ? req.routeParams.token
@@ -58,7 +60,7 @@ export const Leads: CollectionConfig = {
     verify: {
       generateEmailSubject: () => "Verify your email - My Studio Channel",
       generateEmailHTML: ({ token }) => {
-        const verificationURL = new URL(`/api/leads/verify/${token}`, FALLBACK_ORIGIN).toString()
+        const verificationURL = resolvePublicUrl(`/api/leads/verify/${token}`)
         return buildVerifyLeadEmailHtml(verificationURL)
       },
     },
@@ -74,10 +76,10 @@ export const Leads: CollectionConfig = {
     description: "Captured emails from future landing forms or integrations.",
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req: { user } }) => !!user,
     create: () => true,
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    update: ({ req: { user } }) => !!user,
+    delete: ({ req: { user } }) => !!user,
   },
   fields: [
     {
@@ -103,6 +105,7 @@ export const Leads: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeDelete: [preflightDeleteAuthUserRows],
     afterChange: [
       async ({ doc, operation, req }) => {
         if (operation !== "create") return

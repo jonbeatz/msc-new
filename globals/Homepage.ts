@@ -12,10 +12,11 @@ export const Homepage: GlobalConfig = {
   admin: {
     group: "Site",
     description:
-      "Hero carousel, stat row, and Services section screenshot gallery. Upload images in Media, then select them per slide or gallery row. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta and npm run migrate:sqlite:homepage-services-gallery",
+      "Hero carousel, stat row, Programming Styles image row (7), and Channel preview screenshot gallery (7). Upload images in Media, then select them per row. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta, migrate:sqlite:homepage-programming-styles, and migrate:sqlite:homepage-services-gallery",
   },
   access: {
     read: () => true,
+    update: ({ req }) => Boolean(req.user),
   },
   fields: [
     {
@@ -161,18 +162,49 @@ export const Homepage: GlobalConfig = {
       ],
     },
     {
+      name: "programmingStyles",
+      type: "array",
+      labels: {
+        singular: "Programming style image",
+        plural: "Programming styles (7 images)",
+      },
+      minRows: 0,
+      maxRows: 7,
+      admin: {
+        ...adminRowsStartCollapsed,
+        description:
+          "Images under “Programming Styles We Support” — exactly seven tiles (genre / format). Order left-to-right on desktop; optional label under each image. Alt text comes from each Media entry.",
+      },
+      fields: [
+        {
+          name: "image",
+          type: "upload",
+          relationTo: "media",
+          required: true,
+        },
+        {
+          name: "label",
+          type: "text",
+          admin: {
+            description:
+              "Short caption under the image (e.g. Interview Talk Show).",
+          },
+        },
+      ],
+    },
+    {
       name: "servicesGallery",
       type: "array",
       labels: {
-        singular: "Services gallery image",
-        plural: "Services gallery",
+        singular: "Channel preview image",
+        plural: "Channel preview gallery",
       },
       minRows: 0,
       maxRows: 12,
       admin: {
         ...adminRowsStartCollapsed,
         description:
-          "Homepage “Programming Styles / See What Your Channel Could Look Like” screenshot grid. Upload each file in Media, then add rows in order (first row = large + two smalls, then bottom row of four).",
+          "Homepage “See What Your Channel Could Look Like” bento grid. Upload each file in Media, then add rows in order (first row = large + two smalls, then bottom row of four). Separate from Programming Styles above.",
       },
       fields: [
         {

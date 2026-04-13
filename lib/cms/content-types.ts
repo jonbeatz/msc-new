@@ -24,7 +24,11 @@ export type HeroStatContent = {
   highlight: boolean
 }
 
-/** Homepage Services section screenshot grid (from Site → Homepage → Services gallery). */
+/**
+ * Image + label tile used for:
+ * - Site → Homepage → Programming styles (7)
+ * - Site → Homepage → Channel preview gallery (7 in bento layout)
+ */
 export type ServicesGalleryItem = {
   src: string
   alt: string

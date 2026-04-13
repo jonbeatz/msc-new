@@ -13,6 +13,7 @@ import {
   scrollPropForResolvedNav,
   shouldReplaceHashLink,
 } from "@/lib/hash-nav"
+import { useContactModal } from "@/components/contact-modal-context"
 
 export type HeaderNavItem = {
   label: string
@@ -40,9 +41,12 @@ export function Header({
   const pathname = usePathname()
   const path = pathname ?? "/"
   const ctaDemosHref = resolveNavHashHref(path, "#msc-demos")
-  const ctaContactHref = resolveNavHashHref(path, "#msc-contact")
+  const { openContactModal } = useContactModal()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  /** Desktop flyout only (hover). */
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  /** Mobile accordion: which top-level row is expanded (tap to open). */
+  const [mobileExpandedLabel, setMobileExpandedLabel] = useState<string | null>(null)
   const closeTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
@@ -59,6 +63,12 @@ export function Header({
     }
   }, [])
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      setMobileExpandedLabel(null)
+    }
+  }, [isMobileMenuOpen])
+
   const closeNavDropdowns = () => {
     setOpenSubmenu(null)
     if (closeTimerRef.current) {
@@ -67,10 +77,14 @@ export function Header({
     }
   }
 
-  /** Same-page `#section` links on `/`: smooth scroll + offset + clean URL; closes Services/Resources dropdowns. */
+  /**
+   * Same-page `#section` links on `/`: smooth scroll + offset + clean URL; closes flyouts.
+   * Mobile: pass `deferMs` so the drawer can close before we measure `#msc-header` and scroll.
+   */
   const onHashNavLinkClick = (
     e: MouseEvent<HTMLAnchorElement>,
     resolvedHref: string,
+    scrollOpts?: { deferMs?: number },
   ) => {
     if (path !== "/") return
     const h = resolvedHref.trim()
@@ -81,7 +95,7 @@ export function Header({
     if (!id) return
     e.preventDefault()
     closeNavDropdowns()
-    handleScroll(`#${id}`)
+    handleScroll(`#${id}`, scrollOpts)
   }
 
   return (
@@ -204,16 +218,13 @@ export function Header({
                 View Demos
               </Link>
             </Button>
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm hover:glow-accent transition-all duration-300" asChild>
-              <Link
-                href={ctaContactHref}
-                replace={shouldReplaceHashLink(path, ctaContactHref)}
-                scroll={scrollPropForResolvedNav(path, ctaContactHref)}
-                onClick={(e) => onHashNavLinkClick(e, ctaContactHref)}
-              >
-                Book Consultation
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Link>
+            <Button
+              type="button"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm hover:glow-accent transition-all duration-300"
+              onClick={() => openContactModal()}
+            >
+              Book Consultation
+              <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
 
@@ -238,41 +249,66 @@ export function Header({
           <nav className="flex flex-col px-6 py-6 gap-1">
             {navItems.map((item) => {
               const topHref = resolveNavHashHref(path, item.link)
+              const hasSub = Boolean(item.submenu && item.submenu.length > 0)
               return (
               <div key={`${item.label}-${item.link}`}>
-                <Link
-                  href={topHref}
-                  replace={shouldReplaceHashLink(path, topHref)}
-                  scroll={scrollPropForResolvedNav(path, topHref)}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors py-3 px-4 rounded-lg hover:bg-secondary/50 block"
-                  onClick={(e) => {
-                    onHashNavLinkClick(e, topHref)
-                    setIsMobileMenuOpen(false)
-                  }}
-                >
-                  {item.label}
-                </Link>
-                {item.submenu && item.submenu.length > 0 && (
-                  <div className="pl-4 pb-2">
-                    {item.submenu.map((subItem) => {
-                      const subHref = resolveNavHashHref(path, subItem.link)
-                      return (
-                        <Link
-                          key={`${item.label}-${subItem.label}-${subItem.link}`}
-                          href={subHref}
-                          replace={shouldReplaceHashLink(path, subHref)}
-                          scroll={scrollPropForResolvedNav(path, subHref)}
-                          className="text-xs text-muted-foreground/90 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-secondary/40 block"
-                          onClick={(e) => {
-                            onHashNavLinkClick(e, subHref)
-                            setIsMobileMenuOpen(false)
-                          }}
-                        >
-                          {subItem.label}
-                        </Link>
-                      )
-                    })}
-                  </div>
+                {hasSub ? (
+                  <>
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-2 text-left text-sm text-muted-foreground hover:text-foreground transition-colors py-3 px-4 rounded-lg hover:bg-secondary/50"
+                      aria-expanded={mobileExpandedLabel === item.label}
+                      onClick={() =>
+                        setMobileExpandedLabel((cur) =>
+                          cur === item.label ? null : item.label,
+                        )
+                      }
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 shrink-0 transition-transform duration-200",
+                          mobileExpandedLabel === item.label && "rotate-180",
+                        )}
+                        aria-hidden
+                      />
+                    </button>
+                    {mobileExpandedLabel === item.label && (
+                      <div className="border-l border-border/50 ml-4 pl-3 pb-2 space-y-0.5">
+                        {(item.submenu ?? []).map((subItem) => {
+                          const subHref = resolveNavHashHref(path, subItem.link)
+                          return (
+                            <Link
+                              key={`${item.label}-${subItem.label}-${subItem.link}`}
+                              href={subHref}
+                              replace={shouldReplaceHashLink(path, subHref)}
+                              scroll={scrollPropForResolvedNav(path, subHref)}
+                              className="text-xs text-muted-foreground/90 hover:text-foreground transition-colors py-2.5 px-3 rounded-lg hover:bg-secondary/40 block"
+                              onClick={(e) => {
+                                onHashNavLinkClick(e, subHref, { deferMs: 72 })
+                                setIsMobileMenuOpen(false)
+                              }}
+                            >
+                              {subItem.label}
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href={topHref}
+                    replace={shouldReplaceHashLink(path, topHref)}
+                    scroll={scrollPropForResolvedNav(path, topHref)}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors py-3 px-4 rounded-lg hover:bg-secondary/50 block"
+                    onClick={(e) => {
+                      onHashNavLinkClick(e, topHref, { deferMs: 72 })
+                      setIsMobileMenuOpen(false)
+                    }}
+                  >
+                    {item.label}
+                  </Link>
                 )}
               </div>
               )
@@ -288,26 +324,23 @@ export function Header({
                   replace={shouldReplaceHashLink(path, ctaDemosHref)}
                   scroll={scrollPropForResolvedNav(path, ctaDemosHref)}
                   onClick={(e) => {
-                    onHashNavLinkClick(e, ctaDemosHref)
+                    onHashNavLinkClick(e, ctaDemosHref, { deferMs: 72 })
                     setIsMobileMenuOpen(false)
                   }}
                 >
                   View Demos
                 </Link>
               </Button>
-              <Button className="bg-accent text-accent-foreground hover:bg-accent/90 w-full justify-center glow-accent-sm" asChild>
-                <Link
-                  href={ctaContactHref}
-                  replace={shouldReplaceHashLink(path, ctaContactHref)}
-                  scroll={scrollPropForResolvedNav(path, ctaContactHref)}
-                  onClick={(e) => {
-                    onHashNavLinkClick(e, ctaContactHref)
-                    setIsMobileMenuOpen(false)
-                  }}
-                >
-                  Book Consultation
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Link>
+              <Button
+                type="button"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 w-full justify-center glow-accent-sm"
+                onClick={() => {
+                  openContactModal()
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Book Consultation
+                <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             </div>
           </nav>
