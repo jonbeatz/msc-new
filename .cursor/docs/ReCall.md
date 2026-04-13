@@ -94,7 +94,7 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ### 2026-04-13 — Finish: homepage galleries + closeout (`Lets Finish`)
 
-- **Shipped in commit:** Programming Styles / Services Gallery — **`globals/Homepage`** relationship images with **drawer** admin UI; seed + **`homepage-gallery-hydrate`**; **`components/services-section.tsx`** hybrid CMS/fallback; **`getPublicOrigin()`** for services gallery absolutized fallbacks on **`page.tsx`**; **`v1.0.8`**; **`payload-types`** regen; **Restore-Points** **`RP-2026-04-13-homepage-galleries-drawer-hydrate`**; **ReCall** this block.
+- **Shipped in commit `43fd417` (`mcs-Live-v5-Restore`):** Programming Styles / Services Gallery — **`globals/Homepage`** relationship images with **drawer** admin UI; seed + **`homepage-gallery-hydrate`**; **`components/services-section.tsx`** hybrid CMS/fallback; **`getPublicOrigin()`** for services gallery absolutized fallbacks on **`page.tsx`**; **`v1.0.8`**; **`payload-types`** regen; **Restore-Points** **`RP-2026-04-13-homepage-galleries-drawer-hydrate`**; **ReCall** this block.
 - **Verify:** **`npm run verify:next:safe`** green before commit; ESLint clean on **`lib/cms/homepage.ts`** (removed unused type import).
 - **No deploy** unless you run **`Lets Finish + Deploy`** — production still on prior push until **`npm run pushit:live`** + cPanel Node restart.
 - **Resume:** **`npm run dev:fresh`**, **`npm run verify:local`**; open **Globals → Homepage** to confirm gallery pickers.
