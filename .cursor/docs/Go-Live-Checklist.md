@@ -60,7 +60,7 @@ Wait until build completes successfully.
 | Tier | Name | Command (Local / repo root) | What it ships | When to use |
 |------|------|----------------------------|---------------|-------------|
 | **1** | **Branding — Fast FTP** | `npm run pushitup:admin-branding` | **Only:** `components/msc-payload-graphics.tsx`, `components/msc-payload-admin-enhancements.tsx`, `collections/Users.ts`, `payload.config.ts`, `app/(payload)/custom.scss` | Quick look-and-feel / config / SCSS tweaks; **no** `build` or `.next` in this step. |
-| **2** | **Admin logic / pages — Full build + UI + `.next` + DB + media** | `npm run pushit:live` | **`npm run build`** → **`npm run pushitup:admin-ui`** → **`npm run pushitup -- .next`** → **`npm run pushitup -- payload.sqlite`** → **`npm run pushitup -- public/media`** → **`npm run dev:fresh`** | Default for anything that must match compiled Next output and ship the local SQLite + on-disk **`public/media`** (routes, React admin UI, CMS data, `/media/*` assets). **Master** deploy. |
+| **2** | **Admin logic / pages — Full build + UI + `.next` + DB + media** | `npm run pushit:live` | **`npm run build`** (live **`NEXT_PUBLIC_SERVER_URL`** for that step) → **`npm run pushitup:admin-ui`** → **`npm run pushitup -- .next`** (or manual **FileZilla** full **`.next`** per **Spaceship.md**) → **`npm run pushitup -- payload.sqlite`** → **`npm run pushitup -- public/media`** → optional **`npm run dev:fresh`** only if **`PUSHIT_LIVE_RUN_DEV_FRESH=1`** | Default for anything that must match compiled Next output and ship the local SQLite + on-disk **`public/media`** (routes, React admin UI, CMS data, `/media/*` assets). **Master** deploy. |
 | **3** | **Hosting — server / package config** | `npm run pushitup:server-config` | **`server.js`**, **`package.json`**, **`package-lock.json`**, **`.env.example`** | Deps, lockfile, startup file, or documented env template changed; follow **§5** for **`npm install`** on the host. |
 
 **Tier 2** is the **full** pipeline: it uploads the **admin source bundle**, the **entire `.next`** output, **`payload.sqlite`**, and **`public/media`** so the live app, **`/admin`**, CMS data, and **`/media/...`** files stay consistent.
@@ -73,7 +73,7 @@ Wait until build completes successfully.
 npm run pushit:live
 ```
 
-This is exactly: **`build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`pushitup -- payload.sqlite`** → **`pushitup -- public/media`** → **`dev:fresh`** (see `scripts/pushit-live.ps1`).
+This is exactly: **`build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`pushitup -- payload.sqlite`** → **`pushitup -- public/media`** (see `scripts/pushit-live.ps1`). Local **`dev:fresh`** runs only when **`PUSHIT_LIVE_RUN_DEV_FRESH=1`**. **FTPS:** brief connection errors on 1–2 files during **`.next`** upload are common; **PushItUP** retries once.
 
 **`pushitup:admin-ui`** includes (among others): `middleware.ts`, `lib/msc-admin-version.ts`, `components/msc-payload-nav-dashboard.tsx`, branding components, `collections/Users.ts`, `payload.config.ts`, `app/(payload)/custom.scss`.
 

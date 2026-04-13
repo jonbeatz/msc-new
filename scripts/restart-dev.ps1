@@ -12,5 +12,5 @@ Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | ForEach-Ob
   }
 }
 
-Write-Host "Starting dev on http://localhost:$port (clean runs automatically via npm run dev) ..." -ForegroundColor Cyan
-npm run dev
+Write-Host "Starting dev on http://localhost:$port (full clean + dev via npm run dev:fresh) ..." -ForegroundColor Cyan
+npm run dev:fresh

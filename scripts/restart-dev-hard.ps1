@@ -18,4 +18,4 @@ npm run build
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "Starting dev on http://localhost:$port — wait until the terminal shows 'Compiled' before opening the browser." -ForegroundColor Cyan
-npm run dev
+npm run dev:fresh

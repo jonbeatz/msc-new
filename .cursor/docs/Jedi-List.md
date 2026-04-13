@@ -51,18 +51,19 @@ Fast triage pattern:
 
 | Command | What it does |
 |--------|----------------|
-| **`npm run dev`** | Starts **Next.js 15** in development mode. Same as `dev:payload` in this repo. Site: [http://localhost:3000/](http://localhost:3000/). |
+| **`npm run dev`** | **Daily dev:** **`kill-dev-port`** then **`next dev -p 3000`** (no **`clean:next`** — faster restarts, normal HMR). Same as **`dev:payload`**. Site: [http://localhost:3000/](http://localhost:3000/). |
 | **`npm run dev:payload`** | Same as **`npm run dev`** — marketing site + Payload API + admin. Prefer this name in docs so it’s obvious Payload is included. |
 | **`npm run clean:next`** | Deletes **`.next`** and **`node_modules/.cache`** (fixes missing **`vendor-chunks/date-fns.js`**, blank CSS, broken admin). |
-| **`npm run dev:fresh`** | Same as **`npm run dev`** (**`clean:next`** then **`next dev -p 3000`**) — use after **`npm run build`** or when local dev looks broken. |
+| **`npm run dev:fresh`** | **`kill-dev-port`** → **`clean:next`** → **`next dev -p 3000`** — use after **`npm run build`**, **`pushit:live`**, vendor-chunk **500s**, or when **`dev`** looks corrupted. |
 | **`npm run build`** | Production build (`next build`). Use before `next start` or before zipping `.next` for low-memory hosts. Requires env (see **Run-Next-JS.md**). |
 | **`npm run start`** | Serves the **last build** (`next start`). Use for a local smoke test after `build`. |
 | **`npm run verify:local`** | Local pre-deploy smoke checks for `/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
 | **`npm run verify:live`** | Live smoke checks for `https://mystudiochannel.com/`, `/admin`, and `api/globals/projects-home`; exits non-zero if any check fails. |
 | **`npm run verify:next`** | **`clean:next`** + **`next build`** — production build gate after app/config edits (see **`.cursor/rules/local-runtime-recovery.mdc`**). **Never** run while **`next dev`** is on port **3000** (deletes **`.next`** → **500** + broken **`/_next/static/chunks/fallback/*`**). |
 | **`npm run verify:next:safe`** | Frees port **3000** (stops stray **`next dev`**), then **`verify:next`**. Use whenever you need a build check and are not sure nothing is listening on **3000**. |
-| **`npm run dev:recover`** | Same as **`npm run restart:dev`** — kill **3000**, then **`npm run dev`** (clean is inside **`dev`**). Fast recovery from white screen / chunk errors. |
-| **Build recovery (images/assets look wrong after `build`)** | Run **`npm run clean:next`**, then **`npm run dev:fresh`**. Clears stale **`.next`** so dev serves **`/media/...`** and chunks correctly. |
+| **`npm run dev:recover`** | Same as **`npm run restart:dev`** — kill **3000**, then **`npm run dev:fresh`** (**`clean:next`** + **`next dev`**). Use for white screen / vendor-chunk **500s** / **`/admin`** broken after **`clean:next`** overlapped a running dev server. |
+| **`npm run dev:reset`** | Alias for **`npm run dev:fresh`** (used by **`.cursor/rules/local-runtime-recovery.mdc`** auto-reset playbook). |
+| **Build recovery (images/assets look wrong after `build`)** | **`npm run dev:fresh`** — clears stale **`.next`** so dev serves **`/media/...`** and chunks correctly. |
 
 ---
 
@@ -156,7 +157,7 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 | **`npm run pushitup:admin-ui`** | **Primary MSC PRO ENGINE / Payload admin bundle:** uploads **`middleware.ts`**, **`lib/msc-admin-version.ts`**, **`components/msc-payload-nav-dashboard.tsx`**, **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. Matches **`package.json`**; safe on Windows (no manual quoting for the SCSS path). |
 | **`npm run pushitup:admin-branding`** | **Branding-only subset:** **`components/msc-payload-graphics.tsx`**, **`components/msc-payload-admin-enhancements.tsx`**, **`collections/Users.ts`**, **`payload.config.ts`**, **`app/(payload)/custom.scss`**. Use when you only changed admin look-and-feel sources; you still need **`npm run build`** + **`pushitup -- .next`** if React/admin bundle output must change on the host. Shortcut: **Custom-Prompts.md** → **Push my branding** (item **37**). |
 | **`npm run pushitup:server-config`** | **Tier 3 / hosting:** uploads **`server.js`**, **`package.json`**, **`package-lock.json`**, **`.env.example`**. Then **cPanel → Terminal** → **`npm install --legacy-peer-deps`** if lockfile changed. Shortcut: **Custom-Prompts.md** → **Push server config** (item **39**). Add **`patches/`** or extra paths with **`npm run pushitup -- …`** when needed. |
-| **`npm run pushit:live`** | **`npm run build`** → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`pushitup -- payload.sqlite`** → **`pushitup -- public/media`** → **`npm run dev:fresh`** (resets local dev after deploy), then prints cPanel reminders (sqlite URL fix + **`cd /home/wjehbnzcoy/mystudiochannel.com`**). Say *“push it live”* / *“run pushit live”* in chat to mean this. |
+| **`npm run pushit:live`** | **`npm run build`** (live **`NEXT_PUBLIC_SERVER_URL`** for that step only) → **`pushitup:admin-ui`** → **`pushitup -- .next`** → **`pushitup -- payload.sqlite`** → **`pushitup -- public/media`**. Step **6/6** **`dev:fresh`** runs only if **`PUSHIT_LIVE_RUN_DEV_FRESH=1`** (default: skip — start **`npm run dev`** / **`dev:fresh`** yourself). Prints cPanel reminders. Say *“push it live”* / *“run pushit live”* in chat to mean this. |
 | **`npm run pushit:live:safe`** | Runs **`verify:local`** preflight first; if all checks pass, runs full **`pushit:live`** flow. Use when you want extra guardrails. |
 | **`npm run pushitupzip`** (or **`npm run PushItUPzip`**) | **`scripts/PushItUPzip.ps1`** — zips each target under **`.pushitupzips/`**, then uploads. For **`.next`**, the file is **`next-build.zip`** (not **`.next.zip`**, so cPanel shows it). Remote path: **`.pushitupzips/next-build.zip`** under your FTPS root. Example: `npm run pushitupzip -- .next` |
 | **`npm run test:spaceship-ftp`** | **`scripts/Test-SpaceshipFtp.ps1`** — read-only FTPS check using **`.vscode/sftp.json`** (login + LIST). Does not upload. **PushItUP** uses configured **`remotePath`** even when LIST on that path fails (chroot); see **Spaceship.md**. |
@@ -164,8 +165,12 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 | **`npm run verify:ftp-smoke`** | **`scripts/verify-ftp-smoke-remote.ps1`** — read-only **`LIST`** at configured **`remotePath`** and exits **0** only if **`ftp-path-smoke-test.txt`** is present (same session as **PushItUP**). |
 | **`npm run parity:ftp`** | **`scripts/ftp-parity-check.ps1`** — compares local **`.next`**, **`public/media`**, **`payload.sqlite`** vs FTPS under **`.vscode/sftp.json`** `remotePath`; writes **`parity-ftp-report.md`** at repo root (**gitignored** — open the file locally after the run). Run after a big deploy to spot drift (compare **`.next`** only after **`npm run build`**, not while **`next dev`** owns **`.next`**). Wrong **`remotePath`** makes parity compare the wrong tree — run **`verify:ftp-smoke`** first if unsure. |
 
-Default workflow: **`npm run pushit:live`** (build + admin-ui + full `.next` + **`payload.sqlite`** + **`public/media`** + local `dev:fresh`) then restart Node in cPanel.  
+Default workflow: **`npm run pushit:live`** (build + admin-ui + full `.next` + **`payload.sqlite`** + **`public/media`**; local **`dev:fresh`** only if **`PUSHIT_LIVE_RUN_DEV_FRESH=1`**) then restart Node in cPanel. After Tier 2, run **`npm run dev`** or **`dev:fresh`** locally when you want **localhost** again.  
 Use **`pushitupzip`** only when explicitly needed (bandwidth/workaround scenario documented in **Spaceship.md**).
+
+You may upload the **full** **`.next`** folder with **FileZilla** instead of **`pushitup -- .next`** if you follow **Spaceship.md** → *Manual `.next` upload* (same app root, full tree, preserve **`@`** in **`vendor-chunks`**). You must still ship **admin-ui sources**, **`payload.sqlite`**, and **`public/media`** when those changed.
+
+**Transient FTPS errors:** one or two **“Unable to connect…”** lines mid-upload are common; **PushItUP** retries failed files once. If the log ends with all files uploaded, no action needed (**Spaceship.md** → *FTPS: occasional failed files*).
 
 If `pushitup -- .next` ends with `PushItUP completed with failures`, immediately re-run `pushitup` for failed areas (usually `.next/static/chunks` and `.next/server/chunks`) before restarting app.
 

@@ -30,12 +30,11 @@ const features = [
 export function AboutSection() {
   return (
     <section 
-      id="msc-about" 
       className="py-24 lg:py-32 relative bg-surface-1 msc-section msc-surface-1"
       data-divi-section="about"
       data-divi-modules="text,blurb,image"
     >
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+      <div id="msc-about" className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* What We Do - Main Content */}
         <div className="grid lg:grid-cols-12 gap-4 lg:gap-6 mb-20">
           {/* Main Content Card - spans 7 columns */}

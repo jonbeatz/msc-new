@@ -314,11 +314,10 @@ export function ContactSection() {
       </Suspense>
       {/* ===== CONTACT SECTION ===== */}
       <section
-        id="msc-contact"
         className="py-24 lg:py-32 relative bg-surface-2 msc-section msc-surface-2"
         data-divi-section="contact"
       >
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        <div id="msc-contact" className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-4 lg:gap-6">
             {/* Left card */}
             <div className="lg:col-span-5 bento-card glass-card rounded-3xl border border-border/50 p-6 sm:p-8 lg:p-10">

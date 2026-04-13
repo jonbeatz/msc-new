@@ -72,12 +72,11 @@ const packages: Array<{
 export function PackagesSection() {
   return (
     <section 
-      id="msc-packages" 
       className="py-24 lg:py-32 relative bg-surface-0 msc-section msc-surface-0"
       data-divi-section="packages"
       data-divi-modules="pricing-tables"
     >
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+      <div id="msc-packages" className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-1.5 mb-6">

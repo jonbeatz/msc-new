@@ -37,12 +37,11 @@ const faqs = [
 export function FAQSection() {
   return (
     <section 
-      id="msc-faq" 
       className="py-24 lg:py-32 relative bg-surface-0 msc-section msc-surface-0"
       data-divi-section="faq"
       data-divi-modules="accordion"
     >
-      <div className="relative mx-auto max-w-4xl px-6 lg:px-8">
+      <div id="msc-faq" className="relative mx-auto max-w-4xl px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-1.5 mb-6">

@@ -29,12 +29,11 @@ const recommendations = [
 export function AddonsSection() {
   return (
     <section 
-      id="msc-addons" 
       className="py-24 lg:py-32 relative bg-surface-2 msc-section msc-surface-2"
       data-divi-section="addons"
       data-divi-modules="blurb,text"
     >
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+      <div id="msc-addons" className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-1.5 mb-6">

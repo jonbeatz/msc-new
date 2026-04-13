@@ -192,6 +192,9 @@ From repo root D:\Cursor_Projectz\MSC_Clean_v2\msc-new:
 
 If pushit:live fails, stop and tell me the exact failing step + shortest recovery command.
 If upload finishes with failures, re-run upload for failed paths before restart.
+Default: pushit:live does not auto-start local dev. Optional: PUSHIT_LIVE_RUN_DEV_FRESH=1 (PowerShell) to run dev:fresh after Tier 2 — see Spaceship.md.
+Brief FTPS errors on 1–2 .next files that retry successfully are normal (Spaceship.md).
+cPanel Terminal cd must use /home/<user>/mystudiochannel.com, not /<user>/... (Spaceship.md → Small mistakes).
 ```
 
 ---

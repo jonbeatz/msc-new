@@ -1,7 +1,7 @@
 ﻿# Tier 2 — Full build + FTPS "zero footprint" sync (code + local SQLite → live).
 # Run from repo root: npm run pushit:live
 #
-# Steps: build → admin-ui bundle → .next → payload.sqlite → public/media → dev:fresh (local).
+# Steps: build → admin-ui bundle → .next → payload.sqlite → public/media → optional local dev:fresh (opt-in).
 #
 # Live (cPanel → Terminal), after upload — real shell path (NOT the same as FTPS remotePath in .vscode/sftp.json):
 #   cd /home/wjehbnzcoy/mystudiochannel.com
@@ -25,9 +25,25 @@ if (-not (Test-Path -LiteralPath $dbFile)) {
 }
 
 Write-Host ""
-Write-Host "pushit:live - 1/6 npm run build" -ForegroundColor Yellow
-npm run build
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Host "pushit:live - 1/6 npm run build (NEXT_PUBLIC_SERVER_URL -> live origin for this step only)" -ForegroundColor Yellow
+# `.env.local` usually sets NEXT_PUBLIC_SERVER_URL=http://localhost:3000. Next.js loads dotenv but does not
+# overwrite existing process env — temporarily set the live origin so the production client bundle matches Spaceship.
+$pushitSavedNextPublic = $env:NEXT_PUBLIC_SERVER_URL
+$prodPublicUrl = "https://mystudiochannel.com"
+if ($env:MSC_CANONICAL_SITE_ORIGIN -and $env:MSC_CANONICAL_SITE_ORIGIN.Trim().Length -gt 0) {
+  $prodPublicUrl = $env:MSC_CANONICAL_SITE_ORIGIN.Trim().TrimEnd("/")
+}
+$env:NEXT_PUBLIC_SERVER_URL = $prodPublicUrl
+try {
+  npm run build
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+} finally {
+  if ($null -ne $pushitSavedNextPublic -and $pushitSavedNextPublic.Length -gt 0) {
+    $env:NEXT_PUBLIC_SERVER_URL = $pushitSavedNextPublic
+  } else {
+    Remove-Item Env:\NEXT_PUBLIC_SERVER_URL -ErrorAction SilentlyContinue
+  }
+}
 
 Write-Host ""
 Write-Host "pushit:live - 2/6 npm run pushitup:admin-ui" -ForegroundColor Yellow
@@ -50,12 +66,18 @@ npm run pushitup -- public/media
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host ""
-Write-Host "pushit:live - 6/6 npm run dev:fresh (reset local after production build/upload)" -ForegroundColor Yellow
-npm run dev:fresh
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if ($env:PUSHIT_LIVE_RUN_DEV_FRESH -eq "1") {
+  Write-Host "pushit:live - 6/6 npm run dev:fresh (PUSHIT_LIVE_RUN_DEV_FRESH=1)" -ForegroundColor Yellow
+  npm run dev:fresh
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+} else {
+  Write-Host "pushit:live - 6/6 skipped (default). Local .next is a production build from step 1." -ForegroundColor Yellow
+  Write-Host "  When ready: npm run dev (daily) or npm run dev:fresh (clean + dev — e.g. after deploy or chunk errors)." -ForegroundColor Gray
+  Write-Host "  To auto-start dev after Tier 2 next time: `$env:PUSHIT_LIVE_RUN_DEV_FRESH = '1'; npm run pushit:live" -ForegroundColor Gray
+}
 
 Write-Host ""
-Write-Host "=== Tier 2 upload + local dev:fresh finished. ===" -ForegroundColor Cyan
+Write-Host "=== Tier 2 upload finished. ===" -ForegroundColor Cyan
 Write-Host "Live (cPanel Terminal): cd /home/wjehbnzcoy/mystudiochannel.com" -ForegroundColor Cyan
 # sqlite3 hint: $sqlConcat avoids literal || (PS7+ tokenization); [char]34 is ASCII double-quote.
 $sqlConcat = '||'

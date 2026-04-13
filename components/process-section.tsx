@@ -42,12 +42,11 @@ export function ProcessSection() {
     <>
       {/* How It Works */}
       <section 
-        id="msc-process" 
         className="py-24 lg:py-32 relative bg-surface-1 msc-section msc-surface-1"
         data-divi-section="process"
         data-divi-modules="text,blurb"
       >
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        <div id="msc-process" className="relative mx-auto max-w-7xl px-6 lg:px-8">
           {/* Section Header - centered */}
           <div className="text-center max-w-2xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-1.5 mb-6">
@@ -98,12 +97,11 @@ export function ProcessSection() {
 
       {/* Built on Experience */}
       <section 
-        id="msc-experience" 
         className="py-24 lg:py-32 relative bg-surface-0 msc-section msc-surface-0"
         data-divi-section="experience"
         data-divi-modules="text,image"
       >
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        <div id="msc-experience" className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-center">
 
             {/* Left - images stacked */}

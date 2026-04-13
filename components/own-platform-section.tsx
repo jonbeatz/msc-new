@@ -44,7 +44,6 @@ const ecosystemItems = [
 export function OwnPlatformSection() {
   return (
     <section 
-      id="msc-own-platform" 
       className="py-32 relative overflow-hidden bg-surface-2 msc-section msc-surface-2"
       data-divi-section="own-platform"
       data-divi-modules="text,blurb,image"
@@ -55,7 +54,7 @@ export function OwnPlatformSection() {
         <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-accent/3 rounded-full blur-[100px]" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
+      <div id="msc-own-platform" className="mx-auto max-w-7xl px-6 lg:px-8 relative">
         {/* Section Header with Image */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
           <div>

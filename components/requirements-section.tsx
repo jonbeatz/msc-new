@@ -74,7 +74,6 @@ export function RequirementsSection() {
 
   return (
     <section 
-      id="msc-requirements" 
       className="py-32 relative overflow-hidden bg-surface-1 msc-section msc-surface-1"
       data-divi-section="requirements"
       data-divi-modules="text,blurb,image"
@@ -84,7 +83,7 @@ export function RequirementsSection() {
         <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-accent/3 rounded-full blur-[150px]" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
+      <div id="msc-requirements" className="mx-auto max-w-7xl px-6 lg:px-8 relative">
         {/* Section Header */}
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-border/50 mb-6">

@@ -40,6 +40,7 @@ source ~/nodevenv/mystudiochannel.com/*/bin/activate
 
 ### Small mistakes to avoid
 
+- **Wrong `cd` in cPanel Terminal (`No such file or directory`)** — paths that start with **`/`** are from the **server root**, not your account. Your app lives under **`/home/<username>/`**, not **`/<username>/`**. **Wrong:** `cd /wjehbnzcoy/mystudiochannel.com`. **Right:** `cd /home/wjehbnzcoy/mystudiochannel.com` or `cd ~/mystudiochannel.com`. Confirm the segment with **`whoami`** and **`echo ~`** (this host: user **`wjehbnzcoy`**, home **`/home/wjehbnzcoy`**).
 - **Two commands on one line** — e.g. `.nextnpm run ...` breaks; run **one** command, press **Enter**, then the next.
 - **`rm -rf .next` on the server without re-uploading** — the live site will break until you **`pushitup -- .next`** from the PC again.
 
@@ -61,6 +62,21 @@ source ~/nodevenv/mystudiochannel.com/*/bin/activate
 
 **Rule of thumb:** changed **`.ts` / `.tsx`** that affect the site or admin → **full build + full `.next` upload**.
 
+### Manual `.next` upload (FileZilla or any FTPS client)
+
+You can upload the **entire** **`.next`** tree with **FileZilla** (or another client) instead of **`npm run pushitup -- .next`**, if you mirror the same rules as **PushItUP**:
+
+- Output must come from a **successful `npm run build`** on your PC for this deploy.
+- Upload **every** file under **`.next`** into the **same remote app root** as **`package.json`** / **`server.js`** (not a sibling or nested junk folder — same target **`verify:ftp-smoke`** expects).
+- Do **not** cherry-pick paths inside **`.next`**; **`BUILD_ID`**, manifests, **`server/`**, and **`static/`** must stay in sync or the live app **500s**.
+- Preserve **`@`** in names such as **`.next/server/vendor-chunks/@lexical.js`** — hosts that store **`%40lexical.js`** break Node resolution (see **§ Live 500** above).
+
+**Tier 2** still ships **`pushitup:admin-ui`**, **`payload.sqlite`**, and **`public/media`** — upload those separately if you only manual-upload **`.next`**, or keep using **`npm run pushit:live`** for the full pipeline.
+
+### FTPS: occasional failed files during `.next` upload
+
+Long **`pushitup -- .next`** sessions sometimes hit **one or two** transient errors (**“Unable to connect to the remote server”**, **`GetRequestStream`**, etc.) on **random** chunk files. **PushItUP** **retries failed uploads once**; if the run ends with **“Uploaded N files”** and **no remaining failures**, the deploy is healthy. If retries still fail or many files error, retry the upload, try a stabler network, or re-upload chunk folders as in **§ Live 500 with mixed/missing `.next` chunks**.
+
 ### One command: `npm run pushit:live` (build + admin bundle + `.next` + DB + `public/media`)
 
 From the **repo root** on your PC:
@@ -69,7 +85,16 @@ From the **repo root** on your PC:
 npm run pushit:live
 ```
 
-This runs **`npm run build`**, **`npm run pushitup:admin-ui`**, **`npm run pushitup -- .next`**, **`npm run pushitup -- payload.sqlite`**, **`npm run pushitup -- public/media`**, then **`npm run dev:fresh`** (to reset local dev after deploy), and prints reminders (including **cPanel Terminal** **`cd /home/wjehbnzcoy/mystudiochannel.com`** + sqlite URL fix + **`pkill`**). It does **not** run **`npm install`** on the server or upload **`package.json`** unless you changed deps — add those steps manually when needed.
+This runs **`npm run build`** (with **`NEXT_PUBLIC_SERVER_URL`** temporarily set to the live origin so the production client bundle matches **`https://mystudiochannel.com`** while **`.env.local`** can stay on **`http://localhost:3000`**), then **`npm run pushitup:admin-ui`**, **`npm run pushitup -- .next`**, **`npm run pushitup -- payload.sqlite`**, **`npm run pushitup -- public/media`**. By default it **does not** start local **`next dev`** (step **6/6** skipped) so Tier 2 does not kill your editor workflow or auto-wipe **`.next`** for dev — run **`npm run dev`** or **`npm run dev:fresh`** when you want **localhost:3000** again. After step **1/6**, your PC’s **`.next`** is a **production** build until **`dev:fresh`** (or **`clean:next`** + **`dev`**) runs.
+
+The script **always** prints **cPanel** reminders (**`cd /home/wjehbnzcoy/mystudiochannel.com`**, sqlite media URL line, **`pkill`**). It does **not** run **`npm install`** on the server or upload **`package.json`** unless you changed deps — add those steps manually when needed.
+
+**Opt in to auto-start dev after Tier 2** (PowerShell at repo root — also runs **`npm run dev:fresh`** as step **6/6**):
+
+```powershell
+$env:PUSHIT_LIVE_RUN_DEV_FRESH = "1"
+npm run pushit:live
+```
 
 ---
 
@@ -419,6 +444,7 @@ At minimum in Node app settings:
 Optional:
 
 - `RESEND_API_KEY=...`
+- **`PAYLOAD_DISABLE_SHARP=true`** — on hosts where native **sharp** / libvips fails to load, disable Payload’s sharp integration. In this repo **`payload.config.ts`** only loads the **sharp** module when this flag is **not** set, so the process can start without touching broken native binaries.
 - **`MSC_CANONICAL_SITE_ORIGIN`** — override the code default fallback domain when both public URL env vars are unset (default **`https://mystudiochannel.com`**).
 - **`PAYLOAD_CSRF_EXTRA_ORIGINS`** — comma-separated extra allowed origins for Payload cookie/CSRF checks (e.g. staging host).
 

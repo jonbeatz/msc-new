@@ -1,11 +1,11 @@
 import path from "path"
+import { createRequire } from "module"
 import type { Field } from "payload"
 import { buildConfig } from "payload"
 import { sqliteAdapter } from "@payloadcms/db-sqlite"
 import { resendAdapter } from "@payloadcms/email-resend"
 import { seoPlugin } from "@payloadcms/plugin-seo"
 import { lexicalEditor } from "@payloadcms/richtext-lexical"
-import sharp from "sharp"
 
 import { Users } from "./collections/Users"
 import { Media } from "./collections/Media"
@@ -17,6 +17,22 @@ import { HeaderGlobal } from "./globals/Header"
 import { ProjectsGlobal } from "./globals/Projects"
 import { SiteSettings } from "./globals/SiteSettings"
 import { buildPayloadCsrfOriginList, getPublicOrigin } from "./lib/public-origin"
+
+const nodeRequire = createRequire(import.meta.url)
+
+type SharpConstructor = typeof import("sharp")
+
+/** Avoid top-level `import "sharp"` so `PAYLOAD_DISABLE_SHARP=true` skips native libvips on thin hosts. */
+function loadOptionalSharp(): SharpConstructor | undefined {
+  if (process.env.PAYLOAD_DISABLE_SHARP === "true") return undefined
+  try {
+    return nodeRequire("sharp") as SharpConstructor
+  } catch {
+    return undefined
+  }
+}
+
+const sharpOptional = loadOptionalSharp()
 
 const sqliteUrl = process.env.DATABASE_URL || "file:./payload.sqlite"
 
@@ -123,7 +139,7 @@ export default buildConfig({
     wal: true,
   }),
   // Spaceship/cPanel: set PAYLOAD_DISABLE_SHARP=true when native sharp binaries are unavailable.
-  ...(process.env.PAYLOAD_DISABLE_SHARP === "true" ? {} : { sharp }),
+  ...(sharpOptional ? { sharp: sharpOptional } : {}),
   plugins: [
     seoPlugin({
       collections: ["pages"],

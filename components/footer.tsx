@@ -40,13 +40,12 @@ export function Footer({ logoSrc, siteName = "My Studio Channel" }: FooterProps)
 
   return (
     <footer 
-      id="msc-footer" 
       className="bg-surface-0 relative msc-section"
       data-divi-section="footer"
       data-divi-modules="footer-widget"
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16">
+        <div id="msc-footer" className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-6 group">

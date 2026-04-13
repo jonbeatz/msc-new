@@ -79,12 +79,12 @@ If an agent over-reads history/planning docs, tell it:
 ### Start work (local)
 
 1. Open terminal in repo root.
-2. Run `npm run dev:fresh`
+2. Run **`npm run dev`** (frees port **3000**, then **`next dev`** — no full **`.next`** wipe on every start).
 3. Verify:
    - `http://localhost:3000/`
    - `http://localhost:3000/admin`
 
-If local breaks with missing vendor chunks (`date-fns`, etc.), run `npm run dev:fresh` again.
+If local breaks with missing vendor chunks (`date-fns`, etc.), after **`pushit:live`**, or when **`/admin`** **500s** after a bad overlap, run **`npm run dev:fresh`** or **`npm run dev:recover`** (both **clean** **`.next`** then dev).
 
 ### Public site URL (`.env.local` + production)
 
@@ -103,12 +103,12 @@ That pattern almost always means **`.next` was deleted or overwritten while `nex
 
 From repo root on PC:
 
-1. Run `npm run pushit:live` (ships **`.next`**, **`payload.sqlite`**, and **`public/media`** per **Spaceship.md**).
-2. Wait for build/upload completion.
-3. In cPanel, run any **Terminal** steps the script printed (sqlite URL fix / `pkill` if applicable), then restart the Node app (Stop → wait → Start).
+1. Run `npm run pushit:live` (ships **admin-ui sources**, **`.next`**, **`payload.sqlite`**, and **`public/media`** per **Spaceship.md**; build step uses live public URL briefly). By default it **does not** auto-start local dev — run **`npm run dev`** or **`npm run dev:fresh`** afterward. To **auto-run** **`dev:fresh`** after upload, set **`PUSHIT_LIVE_RUN_DEV_FRESH=1`** first (**Spaceship.md**).
+2. Wait for build/upload completion. **One or two FTPS errors** on random `.next` chunks with **retry OK** at the end is normal.
+3. In cPanel, run any **Terminal** steps the script printed (sqlite URL fix / `pkill` if applicable), then restart the Node app (Stop → wait → Start). **Terminal `cd`:** **`/home/<username>/mystudiochannel.com`**, not **`/<username>/...`**.
 4. Validate live in Incognito.
 
-Important: `pushitup` runs on PC, not cPanel Terminal.
+Important: `pushitup` runs on PC, not cPanel Terminal. You may upload **`.next`** with **FileZilla** instead if you follow **Spaceship.md** → *Manual `.next` upload* and still deploy the rest of Tier 2 when needed.
 
 **FTPS target folder:** **`.vscode/sftp.json`** **`remotePath`** must match **Spaceship.md** (this host: **`/`**). The shell path **`cd /home/wjehbnzcoy/mystudiochannel.com`** is only for **cPanel Terminal**, not for **`remotePath`**. After any **`remotePath`** edit, run **`npm run verify:ftp-smoke`** (or **`pushitup:ftp-smoke`** + check FileZilla) so **`.next`** does not upload into a nested junk tree.
 
