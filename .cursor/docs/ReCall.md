@@ -81,15 +81,23 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Current focus
 
-- **Payload CMS:** **`globals/Homepage`** + **Media**; **`globals/Site settings`**; **Leads** / **Bookings** (delete preflight for auth **`leads`** + Resend); static **Pages** under **`app/(site)/pages/`**; legal **`/privacy-policy`**, **`/terms-of-service`**.
+- **Payload CMS:** **`globals/Homepage`** + **Media** (hero + **Programming Styles** / **Services Gallery** seven-slot rows, relationship **`appearance: 'drawer'`**, optional clear slot → static fallback); **`globals/Site settings`**; **Leads** / **Bookings**; static **Pages**; legal **`/privacy-policy`**, **`/terms-of-service`**.
+- **Gallery hydration:** **`lib/cms/homepage-gallery-seed.ts`**, **`lib/cms/homepage-gallery-hydrate.ts`** (`afterRead` → full Media shape for admin + site).
 - **Public URLs:** **`lib/public-origin.ts`** + **`lib/site-origin-defaults.ts`** — **`PAYLOAD_PUBLIC_SERVER_URL`** / **`NEXT_PUBLIC_SERVER_URL`** / **`MSC_CANONICAL_SITE_ORIGIN`**; **`getPublicOriginClient()`** for admin Client Components; **`payload.config.ts`** **`serverURL`** + env-built **CSRF**.
 - **Marketing site:** Header/footer in-page hash scroll (mobile drawer defer); **`HomeHashScroll`**; **`middleware`** pathname-only rewrites (host-agnostic).
-- **Version:** **`v1.0.7`** — bump **`lib/msc-admin-version.ts`** when shipping more admin-facing changes.
-- **Next ideas:** **`pushit:live`** to refresh production with this checkpoint; optional Postgres / API hardening later.
+- **Version:** **`v1.0.8`** — bump **`lib/msc-admin-version.ts`** when shipping more admin-facing changes.
+- **Next ideas:** **`pushit:live`** when you want production on this line; optional Postgres / API hardening later.
 
 ---
 
 ## Recent changes (latest first)
+
+### 2026-04-13 — Finish: homepage galleries + closeout (`Lets Finish`)
+
+- **Shipped in commit:** Programming Styles / Services Gallery — **`globals/Homepage`** relationship images with **drawer** admin UI; seed + **`homepage-gallery-hydrate`**; **`components/services-section.tsx`** hybrid CMS/fallback; **`getPublicOrigin()`** for services gallery absolutized fallbacks on **`page.tsx`**; **`v1.0.8`**; **`payload-types`** regen; **Restore-Points** **`RP-2026-04-13-homepage-galleries-drawer-hydrate`**; **ReCall** this block.
+- **Verify:** **`npm run verify:next:safe`** green before commit; ESLint clean on **`lib/cms/homepage.ts`** (removed unused type import).
+- **No deploy** unless you run **`Lets Finish + Deploy`** — production still on prior push until **`npm run pushit:live`** + cPanel Node restart.
+- **Resume:** **`npm run dev:fresh`**, **`npm run verify:local`**; open **Globals → Homepage** to confirm gallery pickers.
 
 ### 2026-04-13 — Checkpoint: docs + commit (`Lets Checkpoint Docs + Commit`)
 

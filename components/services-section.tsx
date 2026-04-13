@@ -3,7 +3,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import Image from "next/image"
 import { Check, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
-import type { ServicesGalleryItem } from "@/lib/cms/content-types"
+import type { ServicesGalleryItem, ServicesGallerySlot } from "@/lib/cms/content-types"
+import {
+  HOMEPAGE_PROGRAMMING_STYLES_SEED,
+  HOMEPAGE_SERVICES_GALLERY_SEED,
+} from "@/lib/cms/homepage-gallery-seed"
 
 /** Root-relative URL for files in `public/media` (handles spaces in filenames). */
 function mediaPublicSrc(filename: string): string {
@@ -12,61 +16,25 @@ function mediaPublicSrc(filename: string): string {
 
 const PROGRAMMING_STYLE_COUNT = 7
 
-/**
- * Fallback when Site → Homepage → Programming styles has no rows yet (or partial).
- * Genre-forward stills from `public/media` — replace by uploading in Payload → Homepage.
- */
-const PROGRAMMING_STYLES_FALLBACK: ServicesGalleryItem[] = [
-  {
-    src: mediaPublicSrc("demo-talkshow.jpg"),
-    alt: "Talk show programming style",
-    label: "Talk Show",
-  },
-  {
-    src: mediaPublicSrc("demo-podcast.jpg"),
-    alt: "Podcast programming style",
-    label: "Podcast",
-  },
-  {
-    src: mediaPublicSrc("demo-cooking.jpg"),
-    alt: "Cooking show programming style",
-    label: "Cooking",
-  },
-  {
-    src: mediaPublicSrc("demo-documentary.jpg"),
-    alt: "Documentary programming style",
-    label: "Documentary",
-  },
-  {
-    src: mediaPublicSrc("show-cards.jpg"),
-    alt: "Network-style programming grid",
-    label: "Network Style",
-  },
-  {
-    src: mediaPublicSrc("on-air.jpg"),
-    alt: "Live studio programming",
-    label: "Live & Studio",
-  },
-  {
-    src: mediaPublicSrc("camera-crew.jpg"),
-    alt: "Production programming",
-    label: "Production",
-  },
-]
+/** Fallback when a programming-style slot is null / empty — matches `HOMEPAGE_PROGRAMMING_STYLES_SEED`. */
+const PROGRAMMING_STYLES_FALLBACK: ServicesGalleryItem[] =
+  HOMEPAGE_PROGRAMMING_STYLES_SEED.map(({ filename, label, alt }) => ({
+    src: mediaPublicSrc(filename),
+    alt,
+    label,
+  }))
 
+/** Per-index hybrid: empty CMS slot → static fallback for that tile (7 slots). */
 function mergeProgrammingStyles(
-  cms: ServicesGalleryItem[] | null | undefined,
+  cms: ServicesGallerySlot[] | null | undefined,
 ): ServicesGalleryItem[] {
-  if (cms && cms.length >= PROGRAMMING_STYLE_COUNT) {
-    return cms.slice(0, PROGRAMMING_STYLE_COUNT)
+  if (!cms || cms.length === 0) {
+    return PROGRAMMING_STYLES_FALLBACK
   }
-  if (cms && cms.length > 0) {
-    return [
-      ...cms,
-      ...PROGRAMMING_STYLES_FALLBACK.slice(cms.length),
-    ].slice(0, PROGRAMMING_STYLE_COUNT)
-  }
-  return PROGRAMMING_STYLES_FALLBACK
+  return Array.from({ length: PROGRAMMING_STYLE_COUNT }, (_, i) => {
+    const row = cms[i]
+    return row ?? PROGRAMMING_STYLES_FALLBACK[i]!
+  })
 }
 
 const platformFeatures = [
@@ -81,64 +49,58 @@ const platformFeatures = [
  * Matches synced Media files under `public/media` — prefer configuring the Homepage global in Payload.
  * Order: [0] = large featured, [1–2] = stacked smalls, [3–6] = bottom row (see grid layout below).
  */
-const SERVICES_GALLERY_FALLBACK: ServicesGalleryItem[] = [
-  {
-    src: mediaPublicSrc("Screenshot 2026-04-06 123304.jpg"),
-    alt: "MSC Engine — main workspace view",
-    label: "Workspace",
-  },
-  {
-    src: mediaPublicSrc("Screenshot 2026-04-06 123343.jpg"),
-    alt: "MSC Engine — Data and migration",
-    label: "Data & migration",
-  },
-  {
-    src: mediaPublicSrc("Screenshot 2026-04-06 123438.jpg"),
-    alt: "MSC Engine — layout options",
-    label: "Layout",
-  },
-  {
-    src: mediaPublicSrc("Screenshot 2026-04-06 123623.jpg"),
-    alt: "MSC Engine — system status",
-    label: "System status",
-  },
-  {
-    src: mediaPublicSrc("Screenshot 2026-04-06 123829.jpg"),
-    alt: "MSC Engine — tutorials",
-    label: "Tutorials",
-  },
-  {
-    src: mediaPublicSrc("Screenshot 2026-04-06 123858.jpg"),
-    alt: "MSC Engine — tools and export",
-    label: "Tools",
-  },
-  {
-    src: mediaPublicSrc("Screenshot 2026-04-06 123929.jpg"),
-    alt: "MSC Engine — operations",
-    label: "Operations",
-  },
-]
+const SERVICES_GALLERY_COUNT = 7
 
-function mergeServicesGallery(
-  cms: ServicesGalleryItem[] | null | undefined,
+/** Fallback when a channel-preview slot is null / empty — matches `HOMEPAGE_SERVICES_GALLERY_SEED`. */
+const SERVICES_GALLERY_FALLBACK: ServicesGalleryItem[] =
+  HOMEPAGE_SERVICES_GALLERY_SEED.map(({ filename, label, alt }) => ({
+    src: mediaPublicSrc(filename),
+    alt,
+    label,
+  }))
+
+/** Build absolute URL for static fallbacks using the same origin as {@link getPublicOrigin} on the server. */
+function servicesGalleryAbsoluteSrc(path: string, origin: string): string {
+  if (/^https?:\/\//i.test(path)) return path
+  const base = origin.replace(/\/+$/, "")
+  const p = path.startsWith("/") ? path : `/${path}`
+  return `${base}${p}`
+}
+
+/**
+ * Per-index hybrid: empty CMS slot → static fallback for that bento cell (7 slots).
+ * CMS `src` values are already absolute from the server (`resolvePublicUrl` / getPublicOrigin).
+ */
+function mergeServicesGalleryHybrid(
+  cms: ServicesGallerySlot[] | null | undefined,
+  origin: string,
 ): ServicesGalleryItem[] {
-  if (cms && cms.length > 0) {
-    if (cms.length >= SERVICES_GALLERY_FALLBACK.length) return cms
-    return [...cms, ...SERVICES_GALLERY_FALLBACK.slice(cms.length)]
+  const fallbackAbs = SERVICES_GALLERY_FALLBACK.map((item) => ({
+    ...item,
+    src: servicesGalleryAbsoluteSrc(item.src, origin),
+  }))
+  if (!cms || cms.length === 0) {
+    return fallbackAbs
   }
-  return SERVICES_GALLERY_FALLBACK
+  return Array.from({ length: SERVICES_GALLERY_COUNT }, (_, i) => {
+    const row = cms[i]
+    return row ?? fallbackAbs[i]!
+  })
 }
 
 type ServicesSectionProps = {
-  /** Site → Homepage → Programming styles (7 images). */
-  cmsProgrammingStyles?: ServicesGalleryItem[] | null
-  /** Site → Homepage → Channel preview bento (7 images in layout). */
-  cmsGallery?: ServicesGalleryItem[] | null
+  /** Site → Homepage → Programming styles (7 slots; null entry = fallback for that index). */
+  cmsProgrammingStyles?: ServicesGallerySlot[] | null
+  /** Site → Homepage → Channel preview bento (7 slots; null entry = fallback for that index). */
+  cmsGallery?: ServicesGallerySlot[] | null
+  /** From server `getPublicOrigin()` — absolutizes fallback `/media/*` paths for Next/Image. */
+  servicesGalleryPublicOrigin: string
 }
 
 export function ServicesSection({
   cmsProgrammingStyles,
   cmsGallery,
+  servicesGalleryPublicOrigin,
 }: ServicesSectionProps) {
   const programmingTiles = useMemo(
     () => mergeProgrammingStyles(cmsProgrammingStyles),
@@ -146,8 +108,14 @@ export function ServicesSection({
   )
 
   const galleryImages = useMemo(
-    () => mergeServicesGallery(cmsGallery),
-    [cmsGallery],
+    () =>
+      mergeServicesGalleryHybrid(cmsGallery, servicesGalleryPublicOrigin),
+    [cmsGallery, servicesGalleryPublicOrigin],
+  )
+
+  const bento = useMemo(
+    () => galleryImages.slice(0, SERVICES_GALLERY_COUNT),
+    [galleryImages],
   )
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -239,14 +207,14 @@ export function ServicesSection({
             <div className="aspect-[4/3] sm:aspect-video lg:aspect-auto lg:h-full bg-card relative p-3 sm:p-4 lg:p-5 flex flex-col gap-2 sm:gap-3">
               {/* Top row: large featured + 2 stacked small */}
               <div className="flex-1 grid grid-cols-3 gap-2 sm:gap-3 min-h-0">
-                {/* Large featured - index 0 */}
                 <button
+                  type="button"
                   onClick={() => openLightbox(0)}
                   className="col-span-2 rounded-xl overflow-hidden relative border border-border/30 group/thumb cursor-zoom-in"
                 >
                   <Image
-                    src={galleryImages[0].src}
-                    alt={galleryImages[0].alt}
+                    src={bento[0]!.src}
+                    alt={bento[0]!.alt}
                     fill
                     className="object-cover object-top transition-transform duration-300 group-hover/thumb:scale-105"
                   />
@@ -254,47 +222,53 @@ export function ServicesSection({
                     <ZoomIn className="h-6 w-6 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
                   </div>
                 </button>
-                {/* 2 stacked - index 1 & 2 */}
                 <div className="flex flex-col gap-2 sm:gap-3">
-                  {[1, 2].map((i) => (
+                  {bento.slice(1, 3).map((tile, j) => {
+                    const i = j + 1
+                    return (
+                      <button
+                        type="button"
+                        key={`${tile.src}-${i}`}
+                        onClick={() => openLightbox(i)}
+                        className="flex-1 rounded-lg overflow-hidden relative border border-border/30 group/thumb cursor-zoom-in"
+                      >
+                        <Image
+                          src={tile.src}
+                          alt={tile.alt}
+                          fill
+                          className="object-cover object-top transition-transform duration-300 group-hover/thumb:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                          <ZoomIn className="h-5 w-5 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2 sm:gap-3">
+                {bento.slice(3, 7).map((tile, j) => {
+                  const i = j + 3
+                  return (
                     <button
-                      key={i}
+                      type="button"
+                      key={`${tile.src}-${i}`}
                       onClick={() => openLightbox(i)}
-                      className="flex-1 rounded-lg overflow-hidden relative border border-border/30 group/thumb cursor-zoom-in"
+                      className="h-[60px] sm:h-[90px] rounded-lg overflow-hidden relative border border-border/30 group/thumb cursor-zoom-in"
                     >
                       <Image
-                        src={galleryImages[i].src}
-                        alt={galleryImages[i].alt}
+                        src={tile.src}
+                        alt={tile.alt}
                         fill
                         className="object-cover object-top transition-transform duration-300 group-hover/thumb:scale-105"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                        <ZoomIn className="h-5 w-5 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
+                        <ZoomIn className="h-4 w-4 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
                       </div>
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bottom row: 4 thumbnails - index 3-6 */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-3">
-                {[3, 4, 5, 6].map((i) => (
-                  <button
-                    key={i}
-                    onClick={() => openLightbox(i)}
-                    className="h-[60px] sm:h-[90px] rounded-lg overflow-hidden relative border border-border/30 group/thumb cursor-zoom-in"
-                  >
-                    <Image
-                      src={galleryImages[i].src}
-                      alt={galleryImages[i].alt}
-                      fill
-                      className="object-cover object-top transition-transform duration-300 group-hover/thumb:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                      <ZoomIn className="h-4 w-4 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-300" />
-                    </div>
-                  </button>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>

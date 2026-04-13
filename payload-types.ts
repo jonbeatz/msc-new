@@ -685,7 +685,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Hero carousel, stat row, Programming Styles image row (7), and Channel preview screenshot gallery (7). Upload images in Media, then select them per row. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta, migrate:sqlite:homepage-programming-styles, and migrate:sqlite:homepage-services-gallery
+ * Hero carousel, stat row, Programming Styles (7), and Channel preview gallery (7). Rows default to static /public/media assets (after media:sync); clear an image (null) to use site fallbacks for that slot only. Override any slot via relationship → Choose from existing. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta, migrate:sqlite:homepage-programming-styles, and migrate:sqlite:homepage-services-gallery
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
@@ -745,11 +745,11 @@ export interface Homepage {
       }[]
     | null;
   /**
-   * Images under “Programming Styles We Support” — exactly seven tiles (genre / format). Order left-to-right on desktop; optional label under each image. Alt text comes from each Media entry.
+   * Images under “Programming Styles We Support” — seven tiles (genre / format). Defaults match static fallbacks (demo-talkshow, podcast, …). Clear an image to use the site fallback for that slot. Order left-to-right on desktop. Pick existing Media via relationship (Choose from existing). Alt text comes from each Media entry.
    */
   programmingStyles?:
     | {
-        image: number | Media;
+        image?: (number | null) | Media;
         /**
          * Short caption under the image (e.g. Interview Talk Show).
          */
@@ -758,11 +758,11 @@ export interface Homepage {
       }[]
     | null;
   /**
-   * Homepage “See What Your Channel Could Look Like” bento grid. Upload each file in Media, then add rows in order (first row = large + two smalls, then bottom row of four). Separate from Programming Styles above.
+   * Seven channel preview screenshots (bento layout). Defaults match static fallbacks (Workspace, Data & migration, …). Clear an image to use the site fallback for that slot. Order: first row = large + two stacked smalls, then bottom row of four. Same Media relationship picker as Programming Styles above.
    */
   servicesGallery?:
     | {
-        image: number | Media;
+        image?: (number | null) | Media;
         /**
          * Caption shown under the image in the lightbox (e.g. Data & Migration). Alt text comes from the Media entry.
          */

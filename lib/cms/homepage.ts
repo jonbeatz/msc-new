@@ -2,18 +2,18 @@ import { getPayload } from "payload"
 import config from "@payload-config"
 
 import { toRelativePublicMediaUrl } from "@/lib/media-url"
+import { resolvePublicUrl } from "@/lib/public-origin"
 
-import type {
-  HeroSlideContent,
-  HeroStatContent,
-  ServicesGalleryItem,
-} from "./content-types"
+import type { HeroSlideContent, HeroStatContent, ServicesGallerySlot } from "./content-types"
 
 export type {
   HeroSlideContent,
   HeroStatContent,
   ServicesGalleryItem,
+  ServicesGallerySlot,
 } from "./content-types"
+
+const HOMEPAGE_GALLERY_SLOT_COUNT = 7
 
 export type HomepageActiveSlideSeo = {
   title: string | null
@@ -26,23 +26,45 @@ function normalizeMediaSrc(pathOrUrl: string): string {
   return toRelativePublicMediaUrl(pathOrUrl)
 }
 
-/** Maps Homepage array fields with `image` + optional `label` (programmingStyles, servicesGallery). */
-function mapMediaLabelGallery(
+/**
+ * Maps Homepage `programmingStyles` / `servicesGallery` to **7 fixed indices** so an empty row
+ * lines up with the matching hardcoded fallback tile on the frontend.
+ */
+function mapMediaLabelGallerySlots(
   doc: Record<string, unknown> | null | undefined,
   key: "programmingStyles" | "servicesGallery",
   defaultLabel: string,
-): ServicesGalleryItem[] | null {
+): ServicesGallerySlot[] | null {
   if (!doc) return null
   const raw = doc[key]
   if (!Array.isArray(raw) || raw.length === 0) return null
-  const out: ServicesGalleryItem[] = []
-  for (const row of raw) {
-    if (!row || typeof row !== "object") continue
+  const slots: ServicesGallerySlot[] = []
+  for (let i = 0; i < HOMEPAGE_GALLERY_SLOT_COUNT; i++) {
+    const row = raw[i]
+    if (!row || typeof row !== "object") {
+      slots.push(null)
+      continue
+    }
     const img = (row as { image?: unknown }).image
-    if (typeof img !== "object" || img === null || !("url" in img)) continue
+    if (
+      img === null ||
+      img === undefined ||
+      typeof img === "number" ||
+      typeof img === "string"
+    ) {
+      slots.push(null)
+      continue
+    }
+    if (typeof img !== "object" || !("url" in img)) {
+      slots.push(null)
+      continue
+    }
     const media = img as unknown as { url?: string; alt?: string }
     const url = media.url
-    if (!url) continue
+    if (!url || typeof url !== "string") {
+      slots.push(null)
+      continue
+    }
     const alt =
       typeof media.alt === "string" ? media.alt : "Gallery image"
     const labelRaw = (row as { label?: string }).label
@@ -50,20 +72,19 @@ function mapMediaLabelGallery(
       typeof labelRaw === "string" && labelRaw.trim().length > 0
         ? labelRaw.trim()
         : defaultLabel
-    out.push({
-      src: normalizeMediaSrc(url),
-      alt,
-      label,
-    })
+    const rel = normalizeMediaSrc(url)
+    const src =
+      key === "servicesGallery" ? resolvePublicUrl(rel) : rel
+    slots.push({ src, alt, label })
   }
-  return out.length > 0 ? out : null
+  return slots
 }
 
 export async function getHomepageCmsData(): Promise<{
   heroSlides: HeroSlideContent[] | null
   heroStats: HeroStatContent[] | null
-  programmingStyles: ServicesGalleryItem[] | null
-  servicesGallery: ServicesGalleryItem[] | null
+  programmingStyles: ServicesGallerySlot[] | null
+  servicesGallery: ServicesGallerySlot[] | null
 }> {
   try {
     const payload = await getPayload({ config })
@@ -93,8 +114,16 @@ export async function getHomepageCmsData(): Promise<{
       return {
         heroSlides: null,
         heroStats: heroStatsEarly,
-        programmingStyles: mapMediaLabelGallery(d, "programmingStyles", "Programming style"),
-        servicesGallery: mapMediaLabelGallery(d, "servicesGallery", "Preview"),
+        programmingStyles: mapMediaLabelGallerySlots(
+          d,
+          "programmingStyles",
+          "Programming style",
+        ),
+        servicesGallery: mapMediaLabelGallerySlots(
+          d,
+          "servicesGallery",
+          "Preview",
+        ),
       }
     }
 
@@ -198,12 +227,16 @@ export async function getHomepageCmsData(): Promise<{
     return {
       heroSlides: heroSlides.length > 0 ? heroSlides : null,
       heroStats,
-      programmingStyles: mapMediaLabelGallery(
+      programmingStyles: mapMediaLabelGallerySlots(
         d,
         "programmingStyles",
         "Programming style",
       ),
-      servicesGallery: mapMediaLabelGallery(d, "servicesGallery", "Preview"),
+      servicesGallery: mapMediaLabelGallerySlots(
+        d,
+        "servicesGallery",
+        "Preview",
+      ),
     }
   } catch {
     return {

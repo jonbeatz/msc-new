@@ -35,3 +35,6 @@ export type ServicesGalleryItem = {
   /** Lightbox / UI caption; Media supplies alt for accessibility. */
   label: string
 }
+
+/** One Homepage gallery row: CMS image or empty slot (frontend uses fallback for that index). */
+export type ServicesGallerySlot = ServicesGalleryItem | null

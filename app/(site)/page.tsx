@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from "next/cache"
 import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
 import { getHomepageCmsData } from "@/lib/cms/homepage"
+import { getPublicOrigin } from "@/lib/public-origin"
 import { getHeaderNavItems } from "@/lib/cms/header"
 import { getDemoProjects } from "@/lib/cms/projects"
 import { getSiteSettingsCms } from "@/lib/cms/site-settings"
@@ -25,6 +26,7 @@ export default async function HomePage() {
   noStore()
   const { heroSlides, heroStats, programmingStyles, servicesGallery } =
     await getHomepageCmsData()
+  const servicesGalleryPublicOrigin = getPublicOrigin()
   const navItems = await getHeaderNavItems()
   const demoProjects = await getDemoProjects()
   const settings = await getSiteSettingsCms()
@@ -50,6 +52,7 @@ export default async function HomePage() {
         <ServicesSection
           cmsProgrammingStyles={programmingStyles}
           cmsGallery={servicesGallery}
+          servicesGalleryPublicOrigin={servicesGalleryPublicOrigin}
         />
         <OwnPlatformSection />
         <PackagesSection />
