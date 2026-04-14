@@ -92,6 +92,19 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Recent changes (latest first)
 
+### 2026-04-13 — Live deploy hardening: pre-upload cleanup + media table sync docs
+
+- **Live site was showing fallback Demos data** after `pushit:live` — root causes identified and fixed:
+  1. **Stale `.next` on server** (FTP merges, not replaces) → old `webpack-runtime.js` referenced non-existent `vendor-chunks` → 500. Fix: `rm -rf .next` before every Tier 2 upload.
+  2. **SQLite WAL replay** (`payload.sqlite-wal` / `payload.sqlite-shm`) → SQLite replayed old journal on top of freshly-uploaded DB → stale project data returned. Fix: `rm -f payload.sqlite-wal payload.sqlite-shm` before every DB upload.
+  3. **Missing `media` table rows** → `projects_home_project_items` referenced image IDs 33–37 that didn't exist in server's `media` table → `mapProjectItemsToDemos` filtered all rows → `FALLBACK_DEMOS` rendered. Fix: inserted matching rows via `sqlite3` and re-ran media URL update. Image files (`Demos-1b/2b/3b/4b/5c-preview.jpg`) were present in `public/media` all along.
+- **Docs updated:**
+  - `Spaceship.md` — new **"⚠️ REQUIRED pre-upload cleanup"** section before `npm run pushit:live`; new **§4a** "media table out of sync" troubleshooting entry.
+  - `Custom-Prompts.md` — items **3** and **38** now include the pre-upload cleanup block and media table check.
+  - `scripts/pushit-live.ps1` — already has pre/post reminders as comments and `Write-Host` warnings.
+- **Live site confirmed:** `https://mystudiochannel.com` — Demos section shows Talk Show Land as featured with correct image.
+- **Current version:** `v1.0.8` (no code changes this session — docs + DB surgery only).
+
 ### 2026-04-13 — Finish: homepage galleries + closeout (`Lets Finish`)
 
 - **Shipped in commit `43fd417` (`mcs-Live-v5-Restore`):** Programming Styles / Services Gallery — **`globals/Homepage`** relationship images with **drawer** admin UI; seed + **`homepage-gallery-hydrate`**; **`components/services-section.tsx`** hybrid CMS/fallback; **`getPublicOrigin()`** for services gallery absolutized fallbacks on **`page.tsx`**; **`v1.0.8`**; **`payload-types`** regen; **Restore-Points** **`RP-2026-04-13-homepage-galleries-drawer-hydrate`**; **ReCall** this block.

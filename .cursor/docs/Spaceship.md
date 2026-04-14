@@ -77,6 +77,29 @@ You can upload the **entire** **`.next`** tree with **FileZilla** (or another cl
 
 Long **`pushitup -- .next`** sessions sometimes hit **one or two** transient errors (**“Unable to connect to the remote server”**, **`GetRequestStream`**, etc.) on **random** chunk files. **PushItUP** **retries failed uploads once**; if the run ends with **“Uploaded N files”** and **no remaining failures**, the deploy is healthy. If retries still fail or many files error, retry the upload, try a stabler network, or re-upload chunk folders as in **§ Live 500 with mixed/missing `.next` chunks**.
 
+### ⚠️ REQUIRED pre-upload cleanup (run BEFORE `npm run pushit:live`)
+
+These two terminal steps **must** run before every Tier 2 deploy or data/build problems will persist silently.
+
+**Live (cPanel UI) → STOP APP first**, then in **Live (cPanel → Terminal)**:
+
+```bash
+cd /home/wjehbnzcoy/mystudiochannel.com
+rm -rf .next                              # prevents stale webpack-runtime/vendor-chunks 500
+rm -f payload.sqlite-wal payload.sqlite-shm  # prevents old WAL journal overwriting new DB data
+```
+
+Why each matters:
+
+| Command | Why it's needed |
+|---------|-----------------|
+| `rm -rf .next` | FTP **merges** files — old chunks survive the upload. The old `webpack-runtime.js` references chunk paths from the previous build. New chunks land but the old runtime can't find them → **500 "Cannot find module './vendor-chunks/...'"** on every request. |
+| `rm -f payload.sqlite-wal payload.sqlite-shm` | SQLite WAL journals are tied to the database that created them. If an old WAL exists when the app starts with a freshly-uploaded `payload.sqlite`, SQLite **replays the old WAL on top of the new file**, restoring stale data (old projects, old content). Deleting the WAL first lets the new DB start clean. |
+
+After the cleanup, run `npm run pushit:live` from your PC, then complete the post-upload terminal steps below.
+
+---
+
 ### One command: `npm run pushit:live` (build + admin bundle + `.next` + DB + `public/media`)
 
 From the **repo root** on your PC:
@@ -330,7 +353,30 @@ cPanel reverse proxy can leak internal origin (`0.0.0.0`) unless redirect handli
 
 - Verification redirects were fixed to use relative redirects in `collections/Leads.ts`.
 
-## 4) SQLite: `malformed database schema (bookings_…_idx) - no such table: main.bookings`
+## 4a) SQLite: media table out of sync after DB upload (content shows wrong/fallback data)
+
+**Symptoms:** Site renders fallback demo data (e.g. "MSC Core Pro v1" instead of "Talk Show Land") even after uploading `payload.sqlite`. Admin `/admin` works but the homepage or demos section shows old or placeholder content.
+
+**Cause:** When you push your local `payload.sqlite` to the server, the `media` table on the server may be **missing rows** for recently-uploaded images (IDs that were added locally but never existed on the server). Payload's `mapProjectItemsToDemos` (and similar hydration helpers) filter out any project item whose `image_id` foreign key resolves to a missing `media` row. No image → row silently dropped → all rows drop → fallback renders.
+
+**Fix:**
+
+1. Confirm the image *files* are on the server (`public/media/` in File Manager — they usually are if `pushit:live` ran).
+2. Identify which `media` IDs are missing on the server:
+   - **Local (Cursor):** `sqlite3 payload.sqlite "SELECT id, filename FROM media ORDER BY id DESC LIMIT 10;"`
+   - **Live (cPanel → Terminal):** same query against `./payload.sqlite`
+3. For each missing row, insert it **Live (cPanel → Terminal)**:
+   ```sql
+   sqlite3 ./payload.sqlite "INSERT OR IGNORE INTO media(id,alt,updated_at,created_at,url,thumbnail_u_r_l,filename,mime_type,filesize,width,height,focal_x,focal_y) VALUES(<id>,'<alt>','<ts>','<ts>','/media/<filename>',NULL,'<filename>','image/jpeg',<size>,<w>,<h>,50,50);"
+   ```
+4. Run the media URL fix: `sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"`
+5. **Restart** the Node.js app.
+
+**Prevention:** The `rm -f payload.sqlite-wal payload.sqlite-shm` pre-upload step and uploading `payload.sqlite` + `public/media` together (as `npm run pushit:live` does) should keep DB and files in sync. If you ever manually add media locally after the last upload, run `npm run pushit:live` again to push the full DB + media folder, not just individual files.
+
+---
+
+## 4b) SQLite: `malformed database schema (bookings_…_idx) - no such table: main.bookings`
 
 **Symptoms:** **`sqlite3`** fails on **`payload.sqlite`**; **`/admin`** shows a Next.js server exception; **`/`** may still render from cache or routes that avoid that table.
 

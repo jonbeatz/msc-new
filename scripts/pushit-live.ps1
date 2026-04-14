@@ -3,15 +3,30 @@
 #
 # Steps: build → admin-ui bundle → .next → payload.sqlite → public/media → optional local dev:fresh (opt-in).
 #
-# Live (cPanel → Terminal), after upload — real shell path (NOT the same as FTPS remotePath in .vscode/sftp.json):
-#   cd /home/wjehbnzcoy/mystudiochannel.com
-#   sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"
-#   pkill -u $(whoami) node
-# Live (cPanel UI): Node.js Selector → RESTART mystudiochannel.com
+# ── REQUIRED cPanel steps (run IN THIS ORDER) ───────────────────────────────
+#
+# BEFORE running this script:
+#   Live (cPanel UI): Node.js Selector → STOP APP
+#   Live (cPanel → Terminal):
+#     cd /home/wjehbnzcoy/mystudiochannel.com
+#     rm -rf .next                              ← prevents stale webpack-runtime/vendor-chunks
+#                                                  (FTP merges — old chunks survive without this)
+#     rm -f payload.sqlite-wal payload.sqlite-shm  ← prevents old WAL journal overwriting new DB
+#                                                     (SQLite replays WAL on open; skip this and
+#                                                      the old data comes back after every upload)
+#
+# AFTER this script finishes uploading:
+#   Live (cPanel → Terminal):
+#     cd /home/wjehbnzcoy/mystudiochannel.com
+#     sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"
+#     pkill -u $(whoami) node    ← stops any lingering Node process
+#   Live (cPanel UI): Node.js Selector → START APP (wait 20-30 s)
 # Verify: https://mystudiochannel.com/admin in Incognito (media library parity with local).
 #
+# ─────────────────────────────────────────────────────────────────────────────
+#
 # Warning: replacing payload.sqlite while Node still has the DB open can corrupt data.
-# Prefer stopping the Node app in cPanel before the new DB is read, or restart immediately after upload.
+# Stop the Node app in cPanel BEFORE this script runs, restart after upload completes.
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
@@ -78,13 +93,21 @@ if ($env:PUSHIT_LIVE_RUN_DEV_FRESH -eq "1") {
 
 Write-Host ""
 Write-Host "=== Tier 2 upload finished. ===" -ForegroundColor Cyan
-Write-Host "Live (cPanel Terminal): cd /home/wjehbnzcoy/mystudiochannel.com" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Next steps — Live (cPanel → Terminal):" -ForegroundColor Cyan
+Write-Host "  cd /home/wjehbnzcoy/mystudiochannel.com" -ForegroundColor Gray
 # sqlite3 hint: $sqlConcat avoids literal || (PS7+ tokenization); [char]34 is ASCII double-quote.
 $sqlConcat = '||'
 $sqlReminderInner = 'UPDATE media SET url = ''/media/'' ' + $sqlConcat + ' filename;'
 $dquote = [char]34
 Write-Host ('  sqlite3 ./payload.sqlite ' + $dquote + $sqlReminderInner + $dquote) -ForegroundColor Gray
 Write-Host '  pkill -u $(whoami) node' -ForegroundColor Gray
-Write-Host 'Live (cPanel UI): Node.js Selector -> RESTART mystudiochannel.com' -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Live (cPanel UI): Node.js Selector -> START APP  (wait 20-30 s)" -ForegroundColor Cyan
 Write-Host 'Verify: https://mystudiochannel.com/admin in Incognito (media / pages parity).' -ForegroundColor Cyan
+Write-Host ""
+Write-Host "NOTE: If the site shows 500 after restart — stale .next on server." -ForegroundColor Yellow
+Write-Host "  Fix: stop app → rm -rf .next → npm run pushitup -- .next → start app." -ForegroundColor Yellow
+Write-Host "NOTE: If DB data looks wrong after restart — stale SQLite WAL on server." -ForegroundColor Yellow
+Write-Host "  Fix: stop app → rm -f payload.sqlite-wal payload.sqlite-shm → npm run pushitup -- payload.sqlite → start app." -ForegroundColor Yellow
 Write-Host ""
