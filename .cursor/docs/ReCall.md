@@ -92,6 +92,14 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Recent changes (latest first)
 
+### 2026-04-14 — Session closeout (I'm done for today)
+
+- **Live recovered and verified:** `https://mystudiochannel.com` homepage demos now match local (`Talk Show Land` featured), and `https://mystudiochannel.com/admin/msc-homepage` loads successfully.
+- **Root issue resolved:** live had stale/undersized `payload.sqlite` plus `.next` upload path confusion during recovery; fixed with full rebuild + full `.next` upload + DB/media re-sync + WAL cleanup + app restart.
+- **Docs/governance synced:** added guardrails and post-upload sanity checks across `Spaceship.md`, `Custom-Prompts.md`, `Go-Live-Checklist.md`, `ReCall.md`, and `Restore-Points.md`; checkpoint commit `58c47d4`.
+- **Snapshot branch created:** `snapshot/2026-04-14-live-parity-playbook` (restore line for this known-good state).
+- **Local closeout:** dev listener on port 3000 stopped; working tree clean on `feature/projects-admin-polish`.
+
 ### 2026-04-14 — Live parity restored: admin homepage + demos corrected
 
 - **Issue observed:** live showed stale demos (`MSC Core Pro v1`) and `https://mystudiochannel.com/admin/msc-homepage` 404 while local worked.
