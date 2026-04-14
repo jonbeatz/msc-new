@@ -31,19 +31,7 @@ export const ProjectsGlobal: GlobalConfig = {
       labels: { singular: "Project", plural: "Projects" },
       admin: {
         ...adminRowsStartCollapsed,
-        rowLabel: ({ data, index }: { data?: Record<string, unknown>; index?: number }) => {
-          const title =
-            typeof data?.title === "string" && data.title.trim()
-              ? data.title.trim()
-              : `Project ${(index ?? 0) + 1}`
-          const category =
-            typeof data?.category === "string" && data.category.trim()
-              ? ` — ${data.category.trim()}`
-              : ""
-          const featured = data?.isFeatured ? "  ★ FEATURED" : ""
-          const hidden = data?.isVisible === false ? "  · HIDDEN" : ""
-          return `${title}${category}${featured}${hidden}`
-        },
+        rowLabel: "title",
       },
       fields: [
         // Status row — visible immediately when a row is expanded
