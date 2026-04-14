@@ -92,6 +92,22 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Recent changes (latest first)
 
+### 2026-04-14 — Live parity restored: admin homepage + demos corrected
+
+- **Issue observed:** live showed stale demos (`MSC Core Pro v1`) and `https://mystudiochannel.com/admin/msc-homepage` 404 while local worked.
+- **Root causes (confirmed):**
+  1. **Live DB drift:** live `payload.sqlite` was tiny/old (~57 KB) while local was current (~540 KB) and included `homepage.is_styles_visible`.
+  2. **`.next` path confusion during recovery:** one upload pass landed a too-small `.next` set; recovery required a clean rebuild + full `.next` upload.
+  3. **WAL sidecars reintroduced risk** until removed before restart.
+- **Recovery runbook that worked:**
+  - Stop app; `rm -rf .next`; `rm -f payload.sqlite-wal payload.sqlite-shm`
+  - Local: `npm run build` then `npm run pushitup -- .next` (full prod bundle), `npm run pushitup -- payload.sqlite`, `npm run pushitup -- public/media`
+  - Live terminal: `sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"` then `pkill -u $(whoami) node`
+  - Start app in Node.js Selector
+- **Result:** live site now matches local (`Talk Show Land` featured) and `/admin/msc-homepage` loads correctly.
+- **Docs hardening:** added FileZilla nested `.next` trap + post-upload sanity checks (Custom-Prompts item 38, Spaceship manual upload section).
+- **Code line in this session:** `97f4421` (Projects admin polish), `327d843` and `68e1f3e` (rowLabel serialization/type fixes for stable build).
+
 ### 2026-04-13 — Live deploy hardening: pre-upload cleanup + media table sync docs
 
 - **Live site was showing fallback Demos data** after `pushit:live` — root causes identified and fixed:

@@ -167,7 +167,11 @@ Use these as quick "commands in plain English" for the agent.
    - **Live (cPanel → Terminal) after upload:** **`cd /home/wjehbnzcoy/mystudiochannel.com`** — must be **`/home/<user>/...`**, not **`/<user>/...`** (see **Spaceship.md** → *Small mistakes*); **`sqlite3 ./payload.sqlite "UPDATE media SET url = '/media/' || filename;"`**; **`pkill -u $(whoami) node`** if needed.  
    - **Live (cPanel UI):** **Node.js Selector → Start** `mystudiochannel.com` (wait 20—30 s). **Verification:** **`/`** and **`/admin`** in **Incognito**; Demos section and Media should match local. Same intent as **item 3** above.  
    - **If Demos section shows wrong/fallback content after restart:** `media` table may be missing rows for recently-added images — see **Spaceship.md §4a** for the fix.  
-   - **Before** trusting a big **`.next`** upload, ensure **`.vscode/sftp.json`** **`remotePath`** matches **Spaceship.md** (usually **`/`** for FTPS — not the same string as the **`cd`** line above); **`npm run verify:ftp-smoke`** should pass. **Optional:** upload **`.next`** only via **FileZilla** if you follow **Spaceship.md** → *Manual `.next` upload* and still ship the other Tier 2 artifacts.
+  - **Before** trusting a big **`.next`** upload, ensure **`.vscode/sftp.json`** **`remotePath`** matches **Spaceship.md** (usually **`/`** for FTPS — not the same string as the **`cd`** line above); **`npm run verify:ftp-smoke`** should pass. **Optional:** upload **`.next`** only via **FileZilla** if you follow **Spaceship.md** → *Manual `.next` upload* and still ship the other Tier 2 artifacts.
+  - **Post-upload sanity checks (required):**
+    1) `.next` must not be nested (`/.next/.next` is wrong).  
+    2) `payload.sqlite` size on live should be close to local (if live is tiny/old, demos/admin content will regress).  
+    3) If `pushitup -- .next` reports a very small file count after a deploy reset, run a fresh **`npm run build`** and re-upload `.next` immediately.
 
 39. **`Push server config`**  
    - **Tier 3 — Hosting / Node runtime contract.** **Local (Cursor / repo root):** runs **`npm run pushitup:server-config`** — FTPS **`server.js`**, **`package.json`**, **`package-lock.json`**, and **`.env.example`**. Use when dependencies, engine constraints, or startup wiring changed; then **Live (cPanel → Terminal)** — `source` nodevenv, **`cd`** app root, **`npm install --legacy-peer-deps`**, then **Restart** the Node app (see **Go-Live-Checklist.md** §5). Do **not** run **`pushitup`** on the host.

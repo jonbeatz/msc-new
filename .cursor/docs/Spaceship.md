@@ -73,6 +73,23 @@ You can upload the **entire** **`.next`** tree with **FileZilla** (or another cl
 
 **Tier 2** still ships **`pushitup:admin-ui`**, **`payload.sqlite`**, and **`public/media`** — upload those separately if you only manual-upload **`.next`**, or keep using **`npm run pushit:live`** for the full pipeline.
 
+### Critical FileZilla path trap (causes nested `.next` and stale runtime)
+
+If FileZilla is pointed at **local `.next`** while remote is also **`/.next`**, it can create a broken nested tree like:
+
+- remote: `/.next/.next/...`
+- plus source folders at the wrong level (`/.next/app`, `/.next/collections`, etc.)
+
+That layout breaks runtime resolution and can produce **503** or admin route 404s after restart.
+
+Correct pattern:
+
+1. **Local pane** points to repo root (`.../msc-new`) when using `pushitup`, or to the `.next` folder only when manually uploading into **app root**.
+2. **Remote app root** should contain exactly one `.next` directory next to `package.json` / `server.js`.
+3. After upload, open remote `.next` and confirm expected production structure (`server/`, `static/`, `BUILD_ID`, manifests) with fresh timestamps.
+
+If you ever see nested `.next`, stop app, `rm -rf .next`, then re-upload a fresh production `.next`.
+
 ### FTPS: occasional failed files during `.next` upload
 
 Long **`pushitup -- .next`** sessions sometimes hit **one or two** transient errors (**“Unable to connect to the remote server”**, **`GetRequestStream`**, etc.) on **random** chunk files. **PushItUP** **retries failed uploads once**; if the run ends with **“Uploaded N files”** and **no remaining failures**, the deploy is healthy. If retries still fail or many files error, retry the upload, try a stabler network, or re-upload chunk folders as in **§ Live 500 with mixed/missing `.next` chunks**.

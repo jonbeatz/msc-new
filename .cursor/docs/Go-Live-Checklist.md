@@ -26,6 +26,11 @@ npm run verify:ftp-smoke
 
 **FTPS path sanity:** **`cd /home/wjehbnzcoy/mystudiochannel.com`** (cPanel Terminal) is correct for shell commands only. **`.vscode/sftp.json`** **`remotePath`** for Spaceship FTPS is usually **`/`** — not **`/home/...`** and not **`/mystudiochannel.com/`** — or **`PushItUP`** writes under the wrong nested folder (see **Spaceship.md** § FTP). **`npm run verify:ftp-smoke`** must pass before you trust a full **`.next`** upload.
 
+**Post-upload sanity checks (do not skip):**
+- Live app root should contain **one** `.next` folder (not `/.next/.next` nesting).
+- Live `payload.sqlite` size should be roughly in the same range as local; if live is far smaller/older, CMS content will drift (wrong demos, admin route issues).
+- If `.next` upload reports unexpectedly tiny file counts after a recovery reset, run `npm run build` again and re-upload full `.next`.
+
 If local is broken, run:
 
 ```bash
