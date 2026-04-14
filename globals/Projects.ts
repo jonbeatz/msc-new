@@ -31,7 +31,6 @@ export const ProjectsGlobal: GlobalConfig = {
       labels: { singular: "Project", plural: "Projects" },
       admin: {
         ...adminRowsStartCollapsed,
-        rowLabel: "title",
       },
       fields: [
         // Status row — visible immediately when a row is expanded
