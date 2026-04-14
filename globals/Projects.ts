@@ -15,7 +15,7 @@ export const ProjectsGlobal: GlobalConfig = {
   admin: {
     group: "Site",
     description:
-      "Manage demo projects in one draggable row list, similar to Homepage hero slides.",
+      "Manage demo projects shown in the Demos section. Drag rows to reorder. The first visible row is shown in the large featured card unless one row has ★ Featured checked. Only visible rows appear on the live site.",
   },
   access: {
     read: () => true,
@@ -31,22 +31,68 @@ export const ProjectsGlobal: GlobalConfig = {
       labels: { singular: "Project", plural: "Projects" },
       admin: {
         ...adminRowsStartCollapsed,
+        rowLabel: ({ data, index }: { data?: Record<string, unknown>; index?: number }) => {
+          const title =
+            typeof data?.title === "string" && data.title.trim()
+              ? data.title.trim()
+              : `Project ${(index ?? 0) + 1}`
+          const category =
+            typeof data?.category === "string" && data.category.trim()
+              ? ` — ${data.category.trim()}`
+              : ""
+          const featured = data?.isFeatured ? "  ★ FEATURED" : ""
+          const hidden = data?.isVisible === false ? "  · HIDDEN" : ""
+          return `${title}${category}${featured}${hidden}`
+        },
       },
       fields: [
+        // Status row — visible immediately when a row is expanded
+        {
+          name: "isFeatured",
+          type: "checkbox",
+          defaultValue: false,
+          admin: {
+            width: "50%",
+            description:
+              "★ Shows this project in the large featured card (Demos section). Only one row is featured at a time — the hook clears duplicates on save.",
+          },
+        },
+        {
+          name: "isVisible",
+          type: "checkbox",
+          defaultValue: true,
+          admin: {
+            width: "50%",
+            description:
+              "Visible on live site. Uncheck to hide this project without deleting it — useful for work-in-progress entries.",
+          },
+        },
+        // Core content fields
         {
           name: "title",
           type: "text",
           required: true,
-        },
-        {
-          name: "subtitle",
-          type: "textarea",
-          required: true,
+          admin: {
+            description: "Short project name shown in the demos rail and featured card heading.",
+          },
         },
         {
           name: "category",
           type: "text",
           required: true,
+          admin: {
+            description:
+              'Category badge displayed above the title (e.g. "MSC-Platform", "E-Commerce", "Podcast Platform").',
+          },
+        },
+        {
+          name: "subtitle",
+          type: "textarea",
+          required: true,
+          admin: {
+            description:
+              "One or two sentences describing the project. Shown under the title in the featured card and demos list.",
+          },
         },
         {
           name: "image",
@@ -56,7 +102,7 @@ export const ProjectsGlobal: GlobalConfig = {
           admin: {
             ...projectItemImageRelationshipAdmin,
             description:
-              "Preview for this project row only. Pick or create Media per slot (independent of other rows).",
+              "Preview image for this project. Pick from Media library or upload a new file — each row uses its own image independently.",
           },
         },
         {
@@ -64,25 +110,8 @@ export const ProjectsGlobal: GlobalConfig = {
           type: "text",
           required: true,
           admin: {
-            description: "Live demo URL (https://...) or anchor (#msc-demos).",
-          },
-        },
-        {
-          name: "isFeatured",
-          type: "checkbox",
-          defaultValue: false,
-          admin: {
             description:
-              "Shows this project in the large featured card on the public homepage (Demos section). Only one row should be featured.",
-          },
-        },
-        {
-          name: "isVisible",
-          type: "checkbox",
-          defaultValue: true,
-          admin: {
-            description:
-              "Must be ON for this project to appear on the live site. When OFF, saves in admin still work but the homepage ignores this row.",
+              'Full URL to the live demo (https://...) or an in-page anchor like "#msc-demos". Shown on the "View Live Demo" button.',
           },
         },
       ],
