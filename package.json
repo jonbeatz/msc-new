@@ -1,6 +1,6 @@
 {
   "name": "my-project",
-  "version": "1.0.8",
+    "version": "1.0.24",
   "private": true,
   "scripts": {
     "dev": "node scripts/kill-dev-port.mjs && next dev -p 3000",
@@ -12,7 +12,7 @@
     "restart:dev": "powershell -ExecutionPolicy Bypass -File scripts/restart-dev.ps1",
     "repair:dev": "powershell -ExecutionPolicy Bypass -File scripts/restart-dev-hard.ps1",
     "build": "next build",
-    "verify:next": "npm run clean:next && npm run build",
+    "verify:next": "npm run clean:next && node scripts/assert-homepage-global-config.mjs && npm run build",
     "verify:next:safe": "powershell -ExecutionPolicy Bypass -File scripts/verify-next-safe.ps1",
     "dev:recover": "powershell -ExecutionPolicy Bypass -File scripts/restart-dev.ps1",
     "start": "next start",
@@ -29,6 +29,7 @@
     "verify:ftp-smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-ftp-smoke-remote.ps1",
     "test:spaceship-ftp": "powershell -ExecutionPolicy Bypass -File scripts/Test-SpaceshipFtp.ps1",
     "parity:ftp": "powershell -ExecutionPolicy Bypass -File scripts/ftp-parity-check.ps1",
+    "verify:media:blank-alt": "node scripts/verify-media-blank-alt.mjs",
     "verify:local": "powershell -ExecutionPolicy Bypass -File scripts/verify-local.ps1",
     "verify:live": "powershell -ExecutionPolicy Bypass -File scripts/verify-live.ps1",
     "lint": "next lint",
@@ -51,6 +52,7 @@
     "migrate:sqlite:locked-docs-hero-slides-fk": "python scripts/migrate-sqlite-locked-docs-hero-slides-fk.py",
     "migrate:sqlite:blocks-id-to-text": "python scripts/migrate-sqlite-blocks-id-to-text.py",
     "migrate:sqlite:fix-bookings-table": "python scripts/fix-sqlite-bookings-table.py",
+    "migrate:sqlite:homepage-is-styles-visible": "python scripts/migrate-sqlite-homepage-is-styles-visible.py",
     "postinstall": "patch-package"
   },
   "dependencies": {

@@ -11,7 +11,11 @@ import { ContactMessageForm } from "@/components/contact-message-form"
 import { useContactModal } from "@/components/contact-modal-context"
 
 export function ContactModal() {
-  const { isOpen, closeContactModal } = useContactModal()
+  const { isOpen, closeContactModal, packageInquiry } = useContactModal()
+
+  const packageRequestNote = packageInquiry
+    ? `${packageInquiry.price} package was requested — ${packageInquiry.name}.`
+    : null
 
   return (
     <Dialog open={isOpen} onOpenChange={(next) => !next && closeContactModal()}>
@@ -25,7 +29,23 @@ export function ContactModal() {
             We&apos;ll get back to you within 24 hours.
           </DialogDescription>
         </DialogHeader>
-        <ContactMessageForm idPrefix="contact-modal" className="pt-2" />
+        <ContactMessageForm
+          key={
+            packageInquiry
+              ? `pkg:${packageInquiry.name}:${packageInquiry.price}`
+              : "contact-modal-general"
+          }
+          idPrefix="contact-modal"
+          className="pt-2"
+          initialSubject={
+            packageInquiry
+              ? `${packageInquiry.name} (${packageInquiry.price})`
+              : undefined
+          }
+          packageRequestNote={packageRequestNote}
+          leadSource={packageInquiry ? "packages" : "contact"}
+          onSuccess={closeContactModal}
+        />
       </DialogContent>
     </Dialog>
   )

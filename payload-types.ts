@@ -185,7 +185,10 @@ export interface User {
  */
 export interface Media {
   id: number;
-  alt: string;
+  /**
+   * Screen readers and SEO. Empty is OK — it is auto-filled from the file name before save.
+   */
+  alt?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -227,7 +230,7 @@ export interface Booking {
 export interface Lead {
   id: number;
   name?: string | null;
-  source?: ('homepage' | 'contact' | 'other') | null;
+  source?: ('homepage' | 'contact' | 'packages' | 'other') | null;
   /**
    * Optional note from the visitor.
    */
@@ -745,7 +748,11 @@ export interface Homepage {
       }[]
     | null;
   /**
-   * Images under “Programming Styles We Support” — seven tiles (genre / format). Defaults match static fallbacks (demo-talkshow, podcast, …). Clear an image to use the site fallback for that slot. Order left-to-right on desktop. Pick existing Media via relationship (Choose from existing). Alt text comes from each Media entry.
+   * Uncheck to hide the Programming Styles field group below and the “Programming Styles We Support” block on the site. Channel preview gallery is unchanged.
+   */
+  isStylesVisible?: boolean | null;
+  /**
+   * Images under “Programming Styles We Support” — seven tiles (genre / format). Defaults match static fallbacks (demo-talkshow, podcast, …). Clear an image to use the site fallback for that slot. Order left-to-right on desktop. Pick existing Media via relationship (Choose from existing). Alt text comes from each Media entry. Rows load collapsed by default (`admin.initCollapsed` + patched Payload form state).
    */
   programmingStyles?:
     | {
@@ -758,7 +765,7 @@ export interface Homepage {
       }[]
     | null;
   /**
-   * Seven channel preview screenshots (bento layout). Defaults match static fallbacks (Workspace, Data & migration, …). Clear an image to use the site fallback for that slot. Order: first row = large + two stacked smalls, then bottom row of four. Same Media relationship picker as Programming Styles above.
+   * Seven channel preview screenshots (bento layout). Defaults match static fallbacks (Workspace, Data & migration, …). Clear an image to use the site fallback for that slot. Order: first row = large + two stacked smalls, then bottom row of four. Same Media relationship picker as Programming Styles above. Rows load collapsed by default (`admin.initCollapsed` + patched Payload form state).
    */
   servicesGallery?:
     | {
@@ -817,6 +824,9 @@ export interface ProjectsHome {
         title: string;
         subtitle: string;
         category: string;
+        /**
+         * Preview for this project row only. Pick or create Media per slot (independent of other rows).
+         */
         image: number | Media;
         /**
          * Live demo URL (https://...) or anchor (#msc-demos).
@@ -928,6 +938,7 @@ export interface HomepageSelect<T extends boolean = true> {
         highlight?: T;
         id?: T;
       };
+  isStylesVisible?: T;
   programmingStyles?:
     | T
     | {

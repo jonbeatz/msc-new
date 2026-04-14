@@ -15,6 +15,39 @@ import { toRelativePublicMediaUrl } from "@/lib/media-url"
  * - Hero, header/footer logo, Services gallery, Pages, and Projects consume Media relationships elsewhere.
  */
 
+function filenameToAltText(filename: string): string {
+  return (
+    filename
+      .replace(/\.[^.]+$/i, "")
+      .replace(/[-_]+/g, " ")
+      .trim() || "Image"
+  )
+}
+
+/** Ensures `alt` is non-empty before validation / save (admin can leave it blank). */
+function ensureMediaAlt(
+  data: Record<string, unknown>,
+  originalDoc: unknown,
+): void {
+  const raw =
+    typeof data.alt === "string"
+      ? data.alt.trim()
+      : data.alt != null
+        ? String(data.alt).trim()
+        : ""
+  if (raw.length > 0) return
+
+  const prev =
+    originalDoc && typeof originalDoc === "object"
+      ? (originalDoc as { filename?: string })
+      : null
+  const filename =
+    (typeof data.filename === "string" && data.filename) ||
+    (typeof prev?.filename === "string" && prev.filename) ||
+    ""
+  data.alt = filenameToAltText(filename)
+}
+
 function rewriteMediaDocUrls(doc: Record<string, unknown>): void {
   if (typeof doc.url === "string" && doc.url.length > 0) {
     doc.url = toRelativePublicMediaUrl(doc.url)
@@ -41,6 +74,20 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   hooks: {
+    beforeValidate: [
+      ({ data, originalDoc }) => {
+        if (!data || typeof data !== "object") return
+        ensureMediaAlt(data as Record<string, unknown>, originalDoc)
+      },
+    ],
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        if (!data || typeof data !== "object") return data
+        const next = { ...data } as Record<string, unknown>
+        ensureMediaAlt(next, originalDoc)
+        return next as typeof data
+      },
+    ],
     afterRead: [
       ({ doc }) => {
         if (doc && typeof doc === "object") {
@@ -54,7 +101,13 @@ export const Media: CollectionConfig = {
     {
       name: "alt",
       type: "text",
-      required: true,
+      required: false,
+      label: "Alt (optional)",
+      admin: {
+        placeholder: "Leave blank to use the file name on save",
+        description:
+          "Screen readers and SEO. Empty is OK — it is auto-filled from the file name before save.",
+      },
     },
   ],
   upload: {

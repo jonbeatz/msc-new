@@ -27,7 +27,7 @@ function portInUse(port, host = "127.0.0.1") {
       resolve(true)
     })
     socket.on("error", () => resolve(false))
-    socket.setTimeout(600, () => {
+    socket.setTimeout(1200, () => {
       socket.destroy()
       resolve(false)
     })
@@ -41,6 +41,10 @@ function isNukeCommand(cmd) {
   if (/(\bnpm\s+run\s+verify:next\b|\bverify:next\b)/.test(c) && !/verify:next:safe/.test(c)) return true
   if (/\bnpm\s+run\s+clean:next\b|\bclean:next\b/.test(c)) return true
   if (/clean-next-cache\.mjs/.test(c)) return true
+  // Manual `.next` wipes (same outcome as clean:next for a live dev server).
+  if (/\bnpx\s+rimraf\b.*\.next\b/.test(c)) return true
+  if (/\brimraf\b.*\.next\b/.test(c)) return true
+  if (/\bRemove-Item\b.*\.next\b/.test(c)) return true
   return false
 }
 
@@ -84,7 +88,7 @@ async function main() {
   const userMsg =
     "Port 3000 is in use (next dev is probably running). This command deletes `.next` and will corrupt that server — blank page, 500, and broken `/_next/static/chunks/fallback/*`. Stop dev first (Ctrl+C), or run: npm run verify:next:safe"
   const agentMsg =
-    "Do not run verify:next or clean:next while dev is on 3000. Use npm run verify:next:safe (kills port 3000 then verify) or ask Jon to stop dev, then verify:next."
+    "Do not run verify:next, clean:next, or rimraf/remove of `.next` while dev is on 3000. Use npm run verify:next:safe (kills port 3000 then verify) or stop dev first."
   deny(userMsg, agentMsg)
 }
 

@@ -4,13 +4,15 @@ import type { Metadata } from "next"
 import config from "@payload-config"
 import {
   normalizeAdminSegmentParams,
-  parseAdminRouteSegments,
+  resolvePayloadAdminRouteSegments,
 } from "@/lib/payload-normalize-admin-params"
 import { RootPage, generatePageMetadata } from "@payloadcms/next/views"
 import { importMap } from "../importMap.js"
 
 /** Avoid any static caching oddities for Payload admin sub-routes (e.g. globals). */
 export const dynamic = "force-dynamic"
+
+const configPromise = Promise.resolve(config)
 
 type Args = {
   params: Promise<{
@@ -24,7 +26,7 @@ type Args = {
 export async function generateMetadata(props: Args): Promise<Metadata> {
   const resolvedParams = await props.params
   return generatePageMetadata({
-    config,
+    config: configPromise,
     params: normalizeAdminSegmentParams(resolvedParams),
     searchParams: props.searchParams,
   })
@@ -32,13 +34,9 @@ export async function generateMetadata(props: Args): Promise<Metadata> {
 
 export default async function AdminSegmentsPage(props: Args) {
   const resolvedParams = await props.params
-  console.log("DEBUG ADMIN ROUTE:", resolvedParams.segments)
-  const segments = parseAdminRouteSegments(resolvedParams)
-  if (process.env.NODE_ENV === "development") {
-    console.log("[payload admin] parsed segments:", segments, "| raw params:", resolvedParams)
-  }
+  const segments = await resolvePayloadAdminRouteSegments(resolvedParams)
   return RootPage({
-    config,
+    config: configPromise,
     params: Promise.resolve({ segments }),
     searchParams: props.searchParams,
     importMap,

@@ -135,3 +135,12 @@
   color: #a8a29e;
   text-transform: none;
 }
+
+/* Relationship / drawer fields (e.g. Homepage gallery image slots): clear affordance */
+.field-type-relationship button:not(:disabled),
+.field-type-relationship [role="button"]:not([aria-disabled="true"]),
+.field-type-upload button:not(:disabled),
+[class*="relationship"] button:not(:disabled),
+[class*="relationship"] [type="button"]:not(:disabled) {
+  cursor: pointer;
+}

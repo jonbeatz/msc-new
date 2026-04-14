@@ -1,4 +1,5 @@
 import { getPayload } from "payload"
+import type { Payload } from "payload"
 import config from "@payload-config"
 
 import { toRelativePublicMediaUrl } from "@/lib/media-url"
@@ -15,6 +16,13 @@ export type {
 
 const HOMEPAGE_GALLERY_SLOT_COUNT = 7
 
+function readIsStylesVisible(
+  doc: Record<string, unknown> | null | undefined,
+): boolean {
+  if (!doc) return true
+  return doc.isStylesVisible !== false
+}
+
 export type HomepageActiveSlideSeo = {
   title: string | null
   description: string | null
@@ -24,6 +32,54 @@ export type HomepageActiveSlideSeo = {
 /** Align with Media `afterRead`: always same-origin paths (e.g. `/media/...`). */
 function normalizeMediaSrc(pathOrUrl: string): string {
   return toRelativePublicMediaUrl(pathOrUrl)
+}
+
+/**
+ * Hero slide `image` may be a populated Media doc, a plain id, or `{ id }` when depth is low.
+ * Resolves to a usable `url` so the public hero never receives a bare number/string.
+ */
+async function resolveMediaDocUrl(
+  payload: Payload,
+  raw: unknown,
+): Promise<{ url: string; alt?: string } | null> {
+  if (raw === null || raw === undefined) return null
+  if (typeof raw === "object" && raw !== null && "url" in raw) {
+    const u = (raw as { url?: unknown }).url
+    if (typeof u === "string" && u.length > 0) {
+      const alt = (raw as { alt?: unknown }).alt
+      return {
+        url: u,
+        alt: typeof alt === "string" ? alt : undefined,
+      }
+    }
+  }
+  let id: string | null = null
+  if (typeof raw === "string" || typeof raw === "number") id = String(raw)
+  else if (typeof raw === "object" && raw !== null && "id" in raw) {
+    const i = (raw as { id: unknown }).id
+    if (typeof i === "string" || typeof i === "number") id = String(i)
+  }
+  if (!id) return null
+  try {
+    const doc = await payload.findByID({
+      collection: "media",
+      id,
+      depth: 0,
+    })
+    if (doc && typeof doc === "object" && "url" in doc) {
+      const url = (doc as { url?: unknown }).url
+      if (typeof url === "string" && url.length > 0) {
+        const alt = (doc as { alt?: unknown }).alt
+        return {
+          url,
+          alt: typeof alt === "string" ? alt : undefined,
+        }
+      }
+    }
+  } catch {
+    /* missing or invalid media id */
+  }
+  return null
 }
 
 /**
@@ -83,11 +139,14 @@ function mapMediaLabelGallerySlots(
 export async function getHomepageCmsData(): Promise<{
   heroSlides: HeroSlideContent[] | null
   heroStats: HeroStatContent[] | null
+  /** When false, the public site hides the Programming Styles header + 7 tiles (see `ServicesSection`). */
+  isStylesVisible: boolean
   programmingStyles: ServicesGallerySlot[] | null
   servicesGallery: ServicesGallerySlot[] | null
 }> {
   try {
     const payload = await getPayload({ config })
+    /** Populate hero slide Media + nested `seo.image` (use 1 only if you add manual ID resolution everywhere). */
     const doc = await payload.findGlobal({
       slug: "homepage",
       depth: 2,
@@ -114,6 +173,7 @@ export async function getHomepageCmsData(): Promise<{
       return {
         heroSlides: null,
         heroStats: heroStatsEarly,
+        isStylesVisible: readIsStylesVisible(d),
         programmingStyles: mapMediaLabelGallerySlots(
           d,
           "programmingStyles",
@@ -130,14 +190,10 @@ export async function getHomepageCmsData(): Promise<{
     const heroSlides: HeroSlideContent[] = []
     for (const row of rawSlides) {
       if (!row || typeof row !== "object") continue
-      const img = row.image
-      if (typeof img !== "object" || img === null || !("url" in img)) continue
-      const url = (img as { url?: string }).url
-      if (!url) continue
-      const alt =
-        typeof (img as { alt?: string }).alt === "string"
-          ? (img as { alt: string }).alt
-          : "Hero image"
+      const resolvedImg = await resolveMediaDocUrl(payload, row.image)
+      if (!resolvedImg) continue
+      const url = resolvedImg.url
+      const alt = resolvedImg.alt?.trim() ? resolvedImg.alt.trim() : "Hero image"
       const h1 =
         typeof row.headlineLine1 === "string"
           ? row.headlineLine1
@@ -156,12 +212,12 @@ export async function getHomepageCmsData(): Promise<{
 
       let seoImage: string | undefined
       if (row.seo && typeof row.seo === "object") {
-        const seoImg = (row.seo as { image?: unknown }).image
-        if (seoImg && typeof seoImg === "object" && "url" in seoImg) {
-          const seoImageUrl = (seoImg as { url?: string }).url
-          if (typeof seoImageUrl === "string" && seoImageUrl.length > 0) {
-            seoImage = normalizeMediaSrc(seoImageUrl)
-          }
+        const seoResolved = await resolveMediaDocUrl(
+          payload,
+          (row.seo as { image?: unknown }).image,
+        )
+        if (seoResolved?.url) {
+          seoImage = normalizeMediaSrc(seoResolved.url)
         }
       }
 
@@ -227,6 +283,7 @@ export async function getHomepageCmsData(): Promise<{
     return {
       heroSlides: heroSlides.length > 0 ? heroSlides : null,
       heroStats,
+      isStylesVisible: readIsStylesVisible(d),
       programmingStyles: mapMediaLabelGallerySlots(
         d,
         "programmingStyles",
@@ -242,6 +299,7 @@ export async function getHomepageCmsData(): Promise<{
     return {
       heroSlides: null,
       heroStats: null,
+      isStylesVisible: true,
       programmingStyles: null,
       servicesGallery: null,
     }
@@ -276,17 +334,11 @@ export async function getHomepageActiveSlideSeo(): Promise<HomepageActiveSlideSe
     const fallbackDescription =
       typeof activeSlide.sub === "string" ? activeSlide.sub.trim() : ""
 
-    const seoImageRelation = seo.image
-    const slideImageRelation = activeSlide.image
-
+    const seoResolved = await resolveMediaDocUrl(payload, seo.image)
+    const slideResolved = await resolveMediaDocUrl(payload, activeSlide.image)
     let image: string | null = null
-    if (seoImageRelation && typeof seoImageRelation === "object" && "url" in seoImageRelation) {
-      const url = (seoImageRelation as { url?: string }).url
-      if (typeof url === "string" && url.length > 0) image = normalizeMediaSrc(url)
-    } else if (slideImageRelation && typeof slideImageRelation === "object" && "url" in slideImageRelation) {
-      const url = (slideImageRelation as { url?: string }).url
-      if (typeof url === "string" && url.length > 0) image = normalizeMediaSrc(url)
-    }
+    if (seoResolved?.url) image = normalizeMediaSrc(seoResolved.url)
+    else if (slideResolved?.url) image = normalizeMediaSrc(slideResolved.url)
 
     return {
       title:

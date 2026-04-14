@@ -24,5 +24,11 @@
  * @see `.cursor/docs/Development.md` → “Payload admin authoring (blocks-first)”
  */
 
-/** Spread into `admin` on `array` and `blocks` fields so list rows start collapsed. */
+/**
+ * Spread into `admin` on `array` and `blocks` fields so list rows start collapsed
+ * (same as clicking **Collapse All** on first load).
+ * Stock Payload 3.81 ignored `initCollapsed` when `payload_preferences` stored an
+ * empty `collapsed: []` list, or when prefs used row **indices** instead of ids;
+ * see **`patches/@payloadcms+ui+3.81.0.patch`** (`isRowCollapsed.js` + callers).
+ */
 export const adminRowsStartCollapsed = { initCollapsed: true } as const

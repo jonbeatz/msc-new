@@ -1,4 +1,4 @@
-import { getPublicOrigin } from "@/lib/public-origin"
+import { apiRequestUrl } from "@/lib/same-origin-api"
 
 export type BookingRequestPayload = {
   name: string
@@ -44,8 +44,7 @@ export async function submitBookingRequest(
   }
 
   if (target === "payload") {
-    const base = typeof window !== "undefined" ? "" : getPublicOrigin()
-    const res = await fetch(`${base}/api/bookings`, {
+    const res = await fetch(apiRequestUrl("/api/bookings"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

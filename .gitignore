@@ -27,6 +27,9 @@ payload.sqlite-*
 # vercel
 .vercel
 
+# Cursor stop-hook machine-local HEAD pointer (not source of truth)
+.cursor/.last-stop-hook-commit
+
 # local editor deploy secrets
 .vscode/sftp.json
 .vscode/cpanel-bookmarks.txt

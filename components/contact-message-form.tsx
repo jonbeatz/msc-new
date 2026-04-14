@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react"
 import { ArrowRight } from "lucide-react"
+import { apiRequestUrl } from "@/lib/same-origin-api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -10,9 +11,20 @@ function generateTempPassword(): string {
   return `msc_${Math.random().toString(36).slice(2, 10)}_${Date.now()}`
 }
 
+export type ContactLeadSource = "homepage" | "contact" | "packages" | "other"
+
 export type ContactMessageFormProps = {
   /** Prefix for input ids when multiple instances exist on one page (e.g. `modal` vs `section`). */
   idPrefix?: string
+  /** Initial subject line (e.g. package name + price from pricing cards). */
+  initialSubject?: string
+  /**
+   * Prepended to the stored lead message on submit so admin sees which package was clicked
+   * (e.g. "$5,800 package was requested — Creator Launch.").
+   */
+  packageRequestNote?: string | null
+  /** Stored on the Lead as `source` (Payload select). */
+  leadSource?: ContactLeadSource
   /** Called after a successful submit (e.g. close modal). */
   onSuccess?: () => void
   className?: string
@@ -23,6 +35,9 @@ export type ContactMessageFormProps = {
  */
 export function ContactMessageForm({
   idPrefix = "contact",
+  initialSubject,
+  packageRequestNote = null,
+  leadSource = "contact",
   onSuccess,
   className,
 }: ContactMessageFormProps) {
@@ -31,7 +46,9 @@ export function ContactMessageForm({
   const [contactFirstName, setContactFirstName] = useState("")
   const [contactLastName, setContactLastName] = useState("")
   const [contactEmail, setContactEmail] = useState("")
-  const [contactSubject, setContactSubject] = useState("")
+  const [contactSubject, setContactSubject] = useState(
+    () => initialSubject?.trim() ?? "",
+  )
   const [contactMessage, setContactMessage] = useState("")
   const [contactError, setContactError] = useState<string | null>(null)
   const [contactSuccess, setContactSuccess] = useState<string | null>(null)
@@ -63,21 +80,23 @@ export function ContactMessageForm({
       .trim()
 
     const subjectLine = contactSubject.trim()
+    const note = packageRequestNote?.trim()
+    const bodyWithPackage = note ? `${note}\n\n${bodyText}` : bodyText
     const messageForLead =
       subjectLine.length > 0
-        ? `Subject: ${subjectLine}\n\n${bodyText}`
-        : bodyText
+        ? `Subject: ${subjectLine}\n\n${bodyWithPackage}`
+        : bodyWithPackage
 
     setIsContactSubmitting(true)
     try {
-      const res = await fetch("/api/leads", {
+      const res = await fetch(apiRequestUrl("/api/leads"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           password: generateTempPassword(),
           ...(fullName ? { name: fullName } : {}),
-          source: "contact",
+          source: leadSource,
           message: messageForLead,
         }),
       })

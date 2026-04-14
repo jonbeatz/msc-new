@@ -24,8 +24,13 @@ import { Footer } from "@/components/footer"
 
 export default async function HomePage() {
   noStore()
-  const { heroSlides, heroStats, programmingStyles, servicesGallery } =
-    await getHomepageCmsData()
+  const {
+    heroSlides,
+    heroStats,
+    isStylesVisible,
+    programmingStyles,
+    servicesGallery,
+  } = await getHomepageCmsData()
   const servicesGalleryPublicOrigin = getPublicOrigin()
   const navItems = await getHeaderNavItems()
   const demoProjects = await getDemoProjects()
@@ -50,6 +55,7 @@ export default async function HomePage() {
         />
         <AboutSection />
         <ServicesSection
+          programmingStylesVisible={isStylesVisible}
           cmsProgrammingStyles={programmingStyles}
           cmsGallery={servicesGallery}
           servicesGalleryPublicOrigin={servicesGalleryPublicOrigin}

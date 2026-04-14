@@ -89,6 +89,7 @@ export default function SiteRootLayout({
   return (
     <html lang="en" className={montserrat.variable} suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
+        {/* One client boundary for all marketing routes: contact modal + book-consultation lightbox */}
         <SiteToolingProvider>{children}</SiteToolingProvider>
         <HomeHashScroll />
         <ScrollToTop />

@@ -1,19 +1,19 @@
 /**
- * Cursor `stop` hook: after an agent turn completes, run `npm run verify:next`
- * when runtime-related files changed — but only if port 3000 is free, so we
- * never wipe `.next` while `next dev` is running.
+ * Cursor `stop` hook: after an agent turn completes, if Git shows runtime-related
+ * changes (including **new commits** since the last hook run — not only dirty
+ * files), spawn **`npm run dev`** detached when **port 3000 is free** (same as
+ * local `dev`: free **3000** then **`next dev`** — no **`clean:next`**). If **3000**
+ * is already in use**, emit a follow-up only (do not kill your server). Use
+ * **`npm run dev:fresh`** / **`dev:recover`** manually when chunks are stale.
  *
  * stdin: { status, workspace_roots, ... }
  * stdout: optional JSON { followup_message?: string }
  */
 
-import net from 'node:net'
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
+import net from 'node:net'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function readStdin() {
   return new Promise((resolve, reject) => {
@@ -21,20 +21,6 @@ function readStdin() {
     process.stdin.on('data', (c) => chunks.push(c))
     process.stdin.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
     process.stdin.on('error', reject)
-  })
-}
-
-function portInUse(port, host = '127.0.0.1') {
-  return new Promise((resolve) => {
-    const socket = net.createConnection({ port, host }, () => {
-      socket.destroy()
-      resolve(true)
-    })
-    socket.on('error', () => resolve(false))
-    socket.setTimeout(800, () => {
-      socket.destroy()
-      resolve(false)
-    })
   })
 }
 
@@ -51,14 +37,47 @@ function isRuntimePath(file) {
   return false
 }
 
-function getChangedFiles(repoRoot) {
+const HOOK_HEAD_FILE = '.last-stop-hook-commit'
+
+function hookHeadPath(repoRoot) {
+  return path.join(repoRoot, '.cursor', HOOK_HEAD_FILE)
+}
+
+function readPrevHookHead(repoRoot) {
+  try {
+    const t = fs.readFileSync(hookHeadPath(repoRoot), 'utf8').trim()
+    return t || null
+  } catch {
+    return null
+  }
+}
+
+function writeHookHead(repoRoot, sha) {
+  const dir = path.join(repoRoot, '.cursor')
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(hookHeadPath(repoRoot), `${sha}\n`, 'utf8')
+}
+
+function gitRevParseHead(repoRoot) {
+  const r = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    shell: false,
+  })
+  if (r.status !== 0) return null
+  return (r.stdout || '').trim() || null
+}
+
+function getChangedFiles(repoRoot, prevHookHead) {
+  const names = new Set()
+  const add = (s) => {
+    for (const line of (s || '').split(/\r?\n/)) {
+      if (line) names.add(line)
+    }
+  }
+
   try {
     const diff = spawnSync('git', ['diff', '--name-only', 'HEAD'], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      shell: false,
-    })
-    const untracked = spawnSync('git', ['ls-files', '-o', '--exclude-standard'], {
       cwd: repoRoot,
       encoding: 'utf8',
       shell: false,
@@ -66,17 +85,55 @@ function getChangedFiles(repoRoot) {
     if (diff.status !== 0 && diff.stderr) {
       console.error('[verify-after-agent]', diff.stderr.trim())
     }
-    const a = (diff.stdout || '').split(/\r?\n/).filter(Boolean)
-    const b = (untracked.stdout || '').split(/\r?\n/).filter(Boolean)
-    return [...new Set([...a, ...b])]
+    add(diff.stdout)
+
+    const untracked = spawnSync('git', ['ls-files', '-o', '--exclude-standard'], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      shell: false,
+    })
+    add(untracked.stdout)
+
+    if (prevHookHead) {
+      const curr = gitRevParseHead(repoRoot)
+      if (curr && prevHookHead !== curr) {
+        const range = spawnSync(
+          'git',
+          ['diff', '--name-only', `${prevHookHead}..${curr}`],
+          { cwd: repoRoot, encoding: 'utf8', shell: false },
+        )
+        if (range.status === 0) add(range.stdout)
+      }
+    }
   } catch (e) {
     console.error('[verify-after-agent] git failed:', e.message)
     return null
   }
+
+  return [...names]
 }
 
 function hasGitDir(repoRoot) {
   return fs.existsSync(path.join(repoRoot, '.git'))
+}
+
+function isPort3000InUse() {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ port: 3000, host: '127.0.0.1' })
+    const finish = (v) => {
+      try {
+        socket.removeAllListeners()
+        socket.destroy()
+      } catch {
+        // ignore
+      }
+      resolve(v)
+    }
+    socket.setTimeout(900)
+    socket.once('connect', () => finish(true))
+    socket.once('timeout', () => finish(false))
+    socket.once('error', () => finish(false))
+  })
 }
 
 async function main() {
@@ -99,35 +156,57 @@ async function main() {
     process.exit(0)
   }
 
-  const files = getChangedFiles(repoRoot)
+  const currHead = gitRevParseHead(repoRoot)
+  if (!currHead) {
+    process.exit(0)
+  }
+
+  const prevHookHead = readPrevHookHead(repoRoot)
+  const files = getChangedFiles(repoRoot, prevHookHead)
   if (files === null) {
     process.exit(0)
   }
+
+  /** Always advance so the next run only diffs new commits since this hook. */
+  writeHookHead(repoRoot, currHead)
 
   const touched = files.filter(isRuntimePath)
   if (touched.length === 0) {
     process.exit(0)
   }
 
-  if (await portInUse(3000)) {
-    const msg =
-      'Port 3000 is in use (likely `next dev`). Skipped `npm run verify:next` so `.next` is not deleted under a running server. Stop dev, then run `npm run verify:next`, then `npm run dev`.'
-    console.log(JSON.stringify({ followup_message: msg }))
+  const portBusy = await isPort3000InUse()
+  if (portBusy) {
+    const followup =
+      'Runtime-related files changed since the last Cursor stop hook snapshot, but **port 3000 is already in use** — skipped auto `npm run dev` so your current dev server is not killed. If `/` or `/admin` look stale (500s, missing vendor chunks), run **`npm run dev:fresh`** or **`npm run dev:recover`** from the repo root. Build gate for agents remains **`npm run verify:next`** or **`verify:next:safe`**.'
+    console.error(
+      '[verify-after-agent] Runtime files changed; port 3000 busy — not spawning dev.',
+    )
+    console.log(JSON.stringify({ followup_message: followup }))
     process.exit(0)
   }
 
-  console.error('[verify-after-agent] Runtime files changed; running npm run verify:next …')
-  const r = spawnSync(
-    process.platform === 'win32' ? 'npm.cmd' : 'npm',
-    ['run', 'verify:next'],
-    {
-      cwd: repoRoot,
-      stdio: 'inherit',
-      shell: false,
-      env: { ...process.env },
-    },
+  const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+  console.error(
+    '[verify-after-agent] Runtime files changed; port 3000 free — spawning npm run dev (detached) …',
   )
-  process.exit(typeof r.status === 'number' ? r.status : 1)
+
+  const child = spawn(npmCmd, ['run', 'dev'], {
+    cwd: repoRoot,
+    detached: true,
+    stdio: 'ignore',
+    windowsHide: true,
+    env: { ...process.env },
+  })
+  child.on('error', (err) => {
+    console.error('[verify-after-agent] spawn failed:', err)
+  })
+  child.unref()
+
+  const followup =
+    'Started `npm run dev` in the background (frees port 3000 if needed, then `next dev` — no `clean:next`). When the log shows Ready, open http://127.0.0.1:3000/ — if you see vendor-chunk 500s, run `npm run dev:fresh`. Agents should still run `npm run verify:next` before finishing for a production build gate.'
+  console.log(JSON.stringify({ followup_message: followup }))
+  process.exit(0)
 }
 
 main().catch((e) => {

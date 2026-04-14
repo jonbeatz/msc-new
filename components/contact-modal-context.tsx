@@ -9,9 +9,19 @@ import {
   type ReactNode,
 } from "react"
 
+export type ContactModalPackageInquiry = {
+  name: string
+  price: string
+}
+
+export type OpenContactModalOptions = {
+  fromPackage?: ContactModalPackageInquiry
+}
+
 type ContactModalContextValue = {
   isOpen: boolean
-  openContactModal: () => void
+  packageInquiry: ContactModalPackageInquiry | null
+  openContactModal: (options?: OpenContactModalOptions) => void
   closeContactModal: () => void
 }
 
@@ -21,12 +31,27 @@ const ContactModalContext = createContext<ContactModalContextValue | null>(
 
 export function ContactModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setOpen] = useState(false)
-  const openContactModal = useCallback(() => setOpen(true), [])
-  const closeContactModal = useCallback(() => setOpen(false), [])
+  const [packageInquiry, setPackageInquiry] =
+    useState<ContactModalPackageInquiry | null>(null)
+
+  const openContactModal = useCallback((options?: OpenContactModalOptions) => {
+    setPackageInquiry(options?.fromPackage ?? null)
+    setOpen(true)
+  }, [])
+
+  const closeContactModal = useCallback(() => {
+    setOpen(false)
+    setPackageInquiry(null)
+  }, [])
 
   const value = useMemo(
-    () => ({ isOpen, openContactModal, closeContactModal }),
-    [isOpen, openContactModal, closeContactModal],
+    () => ({
+      isOpen,
+      packageInquiry,
+      openContactModal,
+      closeContactModal,
+    }),
+    [isOpen, packageInquiry, openContactModal, closeContactModal],
   )
 
   return (

@@ -25,12 +25,12 @@ export const HOMEPAGE_PROGRAMMING_STYLES_SEED = [
     alt: "Documentary programming style",
   },
   {
-    filename: "show-cards.jpg",
+    filename: "show-artwork.jpg",
     label: "Network Style",
     alt: "Network-style programming grid",
   },
   {
-    filename: "on-air.jpg",
+    filename: "on-air-bg.jpg",
     label: "Live & Studio",
     alt: "Live studio programming",
   },

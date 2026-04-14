@@ -38,9 +38,11 @@ export function buildPayloadCsrfOriginList(primaryServerUrl: string): string[] {
  *
  * Order (keep in sync with `payload.config.ts`):
  * 1. `PAYLOAD_PUBLIC_SERVER_URL` — runtime on cPanel / Node (often preferred for live email links).
- * 2. `NEXT_PUBLIC_SERVER_URL` — build-time / local `.env.local`.
+ * 2. `NEXT_PUBLIC_SERVER_URL` — build-time / local `.env.local` (set to **`http://localhost:3000`**
+ *    for Cursor dev so metadata and email links match your dev origin).
  * 3. `MSC_CANONICAL_SITE_ORIGIN` or default `https://mystudiochannel.com` — production-safe fallback
- *    when both are unset (no hardcoded localhost in code).
+ *    when both are unset (no hardcoded localhost in code). On Live (cPanel), set
+ *    **`PAYLOAD_PUBLIC_SERVER_URL`** and/or **`NEXT_PUBLIC_SERVER_URL`** to **`https://mystudiochannel.com`**.
  *
  * Client Components: use {@link getPublicOriginClient} so SSR and the browser bundle match.
  */

@@ -447,3 +447,24 @@
     padding-bottom: 3rem;
   }
 }
+
+/* v1.0.9 — global UX: hand cursor on common interactive controls */
+@layer base {
+  button,
+  [role="button"],
+  .btn,
+  input[type="submit"],
+  input[type="button"],
+  label[for],
+  select {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input[type="submit"]:disabled,
+  input[type="button"]:disabled,
+  select:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}

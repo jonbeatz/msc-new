@@ -8,6 +8,8 @@ import config from "@payload-config"
 import { RootPage, generatePageMetadata } from "@payloadcms/next/views"
 import { importMap } from "./importMap.js"
 
+const configPromise = Promise.resolve(config)
+
 type Args = {
   searchParams: Promise<{
     [key: string]: string | string[]
@@ -27,14 +29,14 @@ export const generateMetadata = ({
   searchParams,
 }: Args): Promise<Metadata> =>
   generatePageMetadata({
-    config,
+    config: configPromise,
     params: dashboardParams,
     searchParams,
   })
 
 export default function AdminDashboardPage({ searchParams }: Args) {
   return RootPage({
-    config,
+    config: configPromise,
     params: dashboardParams,
     searchParams,
     importMap,

@@ -20,7 +20,7 @@ const STARTER_PROJECTS: StarterProject[] = [
     subtitle:
       "Professional talk show layout with guest management, episode scheduling, and live audience interaction features.",
     category: "interview-format",
-    preferredImageFilenames: ["demo-talkshow.jpg", "tv-wall.jpg"],
+    preferredImageFilenames: ["demo-talkshow.jpg", "hero-studio.jpg"],
     demoUrl: "#msc-demos",
     isFeatured: true,
   },
@@ -29,7 +29,7 @@ const STARTER_PROJECTS: StarterProject[] = [
     subtitle:
       "Recipe-driven content platform with ingredient lists, step-by-step guides, and meal planning integration.",
     category: "cooking-show",
-    preferredImageFilenames: ["demo-cooking.jpg", "show-cards.jpg"],
+    preferredImageFilenames: ["demo-cooking.jpg", "show-artwork.jpg"],
     demoUrl: "#msc-demos",
     isFeatured: false,
   },
@@ -38,7 +38,7 @@ const STARTER_PROJECTS: StarterProject[] = [
     subtitle:
       "Audio-first streaming experience with playlist support, transcriptions, and subscriber management.",
     category: "podcast-platform",
-    preferredImageFilenames: ["demo-podcast.jpg", "on-air.jpg"],
+    preferredImageFilenames: ["demo-podcast.jpg", "on-air-bg.jpg"],
     demoUrl: "#msc-demos",
     isFeatured: false,
   },
@@ -47,7 +47,7 @@ const STARTER_PROJECTS: StarterProject[] = [
     subtitle:
       "Cinematic storytelling platform with chapter navigation, behind-the-scenes content, and filmmaker profiles.",
     category: "documentary-series",
-    preferredImageFilenames: ["demo-documentary.jpg", "creator-solo.jpg"],
+    preferredImageFilenames: ["demo-documentary.jpg", "creator-in-mind.jpg"],
     demoUrl: "#msc-demos",
     isFeatured: false,
   },

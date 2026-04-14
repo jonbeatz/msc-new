@@ -1,14 +1,16 @@
 import type { CollectionConfig } from "payload"
 import {
   buildNewLeadAlertAdminHtml,
+  buildPackageInquiryAdminEmailHtml,
   buildVerifyLeadEmailHtml,
+  parseLeadPackageDisplayName,
 } from "../lib/email-templates"
 import { getPublicOrigin, resolvePublicUrl } from "../lib/public-origin"
 import { preflightDeleteAuthUserRows } from "../lib/payload-auth-delete-preflight"
 import { getNotificationConfig } from "../lib/notifications"
 
 /**
- * Newsletter + contact form: `POST /api/leads` with `email`, `password`, optional `name`, `source`, `message`.
+ * Newsletter + contact + package inquiries: `POST /api/leads` with `email`, `password`, optional `name`, `source`, `message`.
  */
 export const Leads: CollectionConfig = {
   slug: "leads",
@@ -93,6 +95,7 @@ export const Leads: CollectionConfig = {
       options: [
         { label: "Homepage", value: "homepage" },
         { label: "Contact / schedule", value: "contact" },
+        { label: "Build packages (Get Started)", value: "packages" },
         { label: "Other", value: "other" },
       ],
     },
@@ -113,13 +116,38 @@ export const Leads: CollectionConfig = {
         const notifications = await getNotificationConfig(req)
         if (!notifications.enableAdminNotifications) return
 
-        const adminHTML = buildNewLeadAlertAdminHtml({ email: doc.email })
+        const source = typeof doc.source === "string" ? doc.source : null
+        const message =
+          typeof doc.message === "string" ? doc.message : null
+        const isPackageLead = source === "packages"
+
+        const adminHTML = isPackageLead
+          ? buildPackageInquiryAdminEmailHtml({
+              visitorName:
+                typeof doc.name === "string" && doc.name.trim()
+                  ? doc.name.trim()
+                  : "—",
+              email: doc.email,
+              phone: "Not collected on this form",
+              packageName: parseLeadPackageDisplayName(message),
+              interestMessage: message ?? "",
+            })
+          : buildNewLeadAlertAdminHtml({
+              email: doc.email,
+              source,
+              message,
+            })
+
+        const packageLabel = parseLeadPackageDisplayName(message)
+        const emailSubject = isPackageLead
+          ? `New Consultation Request: ${packageLabel}`
+          : "New Lead Alert - My Studio Channel"
 
         try {
           await req.payload.sendEmail({
             to: notifications.adminRecipients,
             from: notifications.systemFromEmail,
-            subject: "New Lead Alert - My Studio Channel",
+            subject: emailSubject,
             html: adminHTML,
           })
         } catch (error) {

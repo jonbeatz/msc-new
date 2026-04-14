@@ -4,13 +4,13 @@
     "stop": [
       {
         "command": "node .cursor/hooks/verify-after-agent.mjs",
-        "timeout": 600
+        "timeout": 12000
       }
     ],
     "beforeShellExecution": [
       {
         "command": "node .cursor/hooks/guard-clean-while-dev.mjs",
-        "matcher": "verify:next|clean:next|clean-next-cache"
+        "matcher": "verify:next|clean:next|clean-next-cache|rimraf|Remove-Item"
       }
     ]
   }

@@ -92,9 +92,37 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308)
   }
 
-  // Payload admin + API + static: never apply marketing `/{slug}` → `/pages/{slug}` rewrite.
+  // Payload admin: forward the pathname on the request so `admin/[...segments]` can recover
+  // segments if Next ever omits `params.segments` (avoids Payload RootPage `notFound` for globals).
+  // Always derive from `nextUrl` (never omit) — mirrors `request.url` path for proxies.
   if (pathname.startsWith("/admin")) {
-    return nextWithDocumentCacheHeaders(pathname)
+    const requestHeaders = new Headers(request.headers)
+    const pathForPayload =
+      pathname || new URL(request.url).pathname || "/admin"
+    requestHeaders.set("x-msc-request-pathname", pathForPayload)
+    // Explicit slug for `admin/globals/*` — helps `[...segments]` recovery for non-static globals.
+    const globalsSlugMatch = pathForPayload.match(/^\/admin\/globals\/([^/]+)\/?$/i)
+    if (globalsSlugMatch?.[1]) {
+      try {
+        requestHeaders.set(
+          "x-msc-admin-globals-slug",
+          decodeURIComponent(globalsSlugMatch[1].trim()),
+        )
+      } catch {
+        requestHeaders.set("x-msc-admin-globals-slug", globalsSlugMatch[1].trim())
+      }
+    }
+    const res = NextResponse.next({
+      request: { headers: requestHeaders },
+    })
+    if (isDocumentPath(pathname)) {
+      res.headers.set(
+        "Cache-Control",
+        "private, no-cache, no-store, max-age=0, must-revalidate",
+      )
+      res.headers.set("Vary", "Cookie")
+    }
+    return res
   }
 
   if (process.env.MSC_DEBUG_MIDDLEWARE === "1") {

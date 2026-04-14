@@ -149,3 +149,25 @@
     z-index: 0;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Interactive affordance — pointer on controls (v1.0.9, Payload admin)      */
+/* -------------------------------------------------------------------------- */
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+.btn,
+input[type="submit"]:not(:disabled),
+input[type="button"]:not(:disabled),
+label[for],
+select:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled,
+input[type="submit"]:disabled,
+input[type="button"]:disabled,
+select:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}

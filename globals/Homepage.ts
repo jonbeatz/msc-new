@@ -30,7 +30,7 @@ export const Homepage: GlobalConfig = {
   admin: {
     group: "Site",
     description:
-      "Hero carousel, stat row, Programming Styles (7), and Channel preview gallery (7). Rows default to static /public/media assets (after media:sync); clear an image (null) to use site fallbacks for that slot only. Override any slot via relationship → Choose from existing. With SQLite and db.push disabled, if this screen errors run: npm run migrate:sqlite:homepage-hero-secondary-cta, migrate:sqlite:homepage-programming-styles, and migrate:sqlite:homepage-services-gallery",
+      "Hero carousel, stat row, Programming Styles (7), and Channel preview gallery (7). Rows default to static /public/media assets (after media:sync); clear an image (null) to use site fallbacks for that slot only. Override any slot via relationship → Choose from existing. With SQLite and db.push disabled, if this screen errors run: migrate:sqlite:homepage-is-styles-visible, migrate:sqlite:homepage-hero-secondary-cta, migrate:sqlite:homepage-programming-styles, and migrate:sqlite:homepage-services-gallery",
   },
   access: {
     read: () => true,
@@ -83,11 +83,13 @@ export const Homepage: GlobalConfig = {
           type: "checkbox",
           defaultValue: true,
         },
+        /** Relationship → Media (same storage as upload; drawer picker for consistency with gallery rows). */
         {
           name: "image",
-          type: "upload",
+          type: "relationship",
           relationTo: "media",
           required: true,
+          admin: homepageGalleryMediaRelationshipAdmin,
         },
         {
           name: "ctaLink",
@@ -210,6 +212,16 @@ export const Homepage: GlobalConfig = {
       ],
     },
     {
+      name: "isStylesVisible",
+      type: "checkbox",
+      label: "Show Programming Styles Section",
+      defaultValue: true,
+      admin: {
+        description:
+          'Uncheck to hide the Programming Styles field group below and the “Programming Styles We Support” block on the site. Channel preview gallery is unchanged.',
+      },
+    },
+    {
       name: "programmingStyles",
       type: "array",
       labels: {
@@ -222,7 +234,13 @@ export const Homepage: GlobalConfig = {
       admin: {
         ...adminRowsStartCollapsed,
         description:
-          "Images under “Programming Styles We Support” — seven tiles (genre / format). Defaults match static fallbacks (demo-talkshow, podcast, …). Clear an image to use the site fallback for that slot. Order left-to-right on desktop. Pick existing Media via relationship (Choose from existing). Alt text comes from each Media entry.",
+          "Images under “Programming Styles We Support” — seven tiles (genre / format). Defaults match static fallbacks (demo-talkshow, podcast, …). Clear an image to use the site fallback for that slot. Order left-to-right on desktop. Pick existing Media via relationship (Choose from existing). Alt text comes from each Media entry. Rows load collapsed by default (`admin.initCollapsed` + patched Payload form state).",
+        initCollapsed: true,
+        /** Hide the entire array UI when the visibility toggle is off (clean admin). */
+        condition: (data) => {
+          if (!data || typeof data !== "object") return true
+          return (data as Record<string, unknown>).isStylesVisible !== false
+        },
       },
       fields: [
         {
@@ -255,7 +273,8 @@ export const Homepage: GlobalConfig = {
       admin: {
         ...adminRowsStartCollapsed,
         description:
-          "Seven channel preview screenshots (bento layout). Defaults match static fallbacks (Workspace, Data & migration, …). Clear an image to use the site fallback for that slot. Order: first row = large + two stacked smalls, then bottom row of four. Same Media relationship picker as Programming Styles above.",
+          "Seven channel preview screenshots (bento layout). Defaults match static fallbacks (Workspace, Data & migration, …). Clear an image to use the site fallback for that slot. Order: first row = large + two stacked smalls, then bottom row of four. Same Media relationship picker as Programming Styles above. Rows load collapsed by default (`admin.initCollapsed` + patched Payload form state).",
+        initCollapsed: true,
       },
       fields: [
         {

@@ -19,10 +19,10 @@ function heroPrimaryOpensContactModal(href: string): boolean {
   return frag === "#msc-contact"
 }
 
-/** Fallback slides use `public/media` (same paths CMS Media URLs resolve to after `afterRead`). */
+/** Fallback slides use files that exist under `public/media/` (repo may not ship legacy names like tv-wall.jpg). */
 const defaultSlides: HeroSlideContent[] = [
   {
-    image: "/media/tv-wall.jpg",
+    image: "/media/hero-studio.jpg",
     alt: "Professional multi-screen TV studio wall",
     isActive: true,
     eyebrow: "For Creators Who Want More",
@@ -30,7 +30,7 @@ const defaultSlides: HeroSlideContent[] = [
     sub: "We build studio-style websites that give creators the look and structure of a major network — powered by a custom plugin, built once and owned by you.",
   },
   {
-    image: "/media/show-cards.jpg",
+    image: "/media/show-artwork.jpg",
     alt: "Netflix-style show cards",
     isActive: true,
     eyebrow: "Look Like a Real Network",
@@ -38,7 +38,7 @@ const defaultSlides: HeroSlideContent[] = [
     sub: "Your platform can be organized like a professional streaming network — with structured shows, episodes, and categories that rival any major broadcaster.",
   },
   {
-    image: "/media/on-air.jpg",
+    image: "/media/on-air-bg.jpg",
     alt: "Creator on air",
     isActive: true,
     eyebrow: "Podcasters & Talk Show Hosts",
@@ -46,7 +46,7 @@ const defaultSlides: HeroSlideContent[] = [
     sub: "Launch your podcast or talk show with a professional-grade platform that rivals any major network — without monthly platform fees or subscriber charges.",
   },
   {
-    image: "/media/creator-solo.jpg",
+    image: "/media/creator-in-mind.jpg",
     alt: "Creator with professional cinema camera in studio",
     isActive: true,
     eyebrow: "Built for Every Creator",
@@ -74,14 +74,12 @@ export function HeroSection({
   cmsStats,
   stickyHeaderEnabled = true,
 }: HeroSectionProps) {
-  const activeCmsSlides = useMemo(
-    () => (cmsSlides ? cmsSlides.filter((s) => s.isActive) : null),
-    [cmsSlides],
-  )
-  const slides = useMemo(
-    () => (cmsSlides ? activeCmsSlides ?? [] : defaultSlides),
-    [activeCmsSlides, cmsSlides],
-  )
+  const slides = useMemo(() => {
+    if (!cmsSlides || cmsSlides.length === 0) return defaultSlides
+    const active = cmsSlides.filter((s) => s.isActive)
+    if (active.length === 0) return defaultSlides
+    return active
+  }, [cmsSlides])
   const stats = useMemo(
     () =>
       cmsStats && cmsStats.length > 0 ? cmsStats : defaultStats,

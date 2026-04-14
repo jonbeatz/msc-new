@@ -89,6 +89,8 @@ function mergeServicesGalleryHybrid(
 }
 
 type ServicesSectionProps = {
+  /** Site → Homepage → Show Programming Styles block (header + 7 tiles). Default true. */
+  programmingStylesVisible?: boolean
   /** Site → Homepage → Programming styles (7 slots; null entry = fallback for that index). */
   cmsProgrammingStyles?: ServicesGallerySlot[] | null
   /** Site → Homepage → Channel preview bento (7 slots; null entry = fallback for that index). */
@@ -98,6 +100,7 @@ type ServicesSectionProps = {
 }
 
 export function ServicesSection({
+  programmingStylesVisible = true,
   cmsProgrammingStyles,
   cmsGallery,
   servicesGalleryPublicOrigin,
@@ -153,7 +156,7 @@ export function ServicesSection({
       data-divi-modules="text,blurb,gallery,code"
     >
       <div id="msc-services" className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Section Header */}
+        {/* Section Header — Programming Styles (always visible) */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-1.5 mb-6">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -170,35 +173,37 @@ export function ServicesSection({
           </p>
         </div>
 
-        {/* Programming Styles — CMS-driven images; mobile: horizontal snap scroll; xl: single row of 7 */}
-        <div
-          className="mb-20 -mx-6 px-6 md:mx-0 md:px-0"
-          aria-label="Programming styles we support"
-        >
-          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 [-webkit-overflow-scrolling:touch] scrollbar-thin md:grid md:grid-cols-2 md:gap-3 md:overflow-visible md:snap-none md:pb-0 lg:grid-cols-4 xl:grid-cols-7 xl:gap-4">
-            {programmingTiles.map((tile, index) => (
-              <div
-                key={`${tile.src}-${index}`}
-                className="flex w-[min(82vw,18rem)] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/30 md:w-auto"
-              >
-                <div className="relative aspect-[4/3] w-full">
-                  <Image
-                    src={tile.src}
-                    alt={tile.alt}
-                    fill
-                    sizes="(max-width: 768px) 82vw, (max-width: 1024px) 25vw, 12vw"
-                    className="object-cover object-center"
-                  />
+        {/* Programming Styles — 7 image tiles; hidden when isStylesVisible is unchecked in admin */}
+        {programmingStylesVisible && (
+          <div
+            className="mb-20 -mx-6 px-6 md:mx-0 md:px-0"
+            aria-label="Programming styles we support"
+          >
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 [-webkit-overflow-scrolling:touch] scrollbar-thin md:grid md:grid-cols-2 md:gap-3 md:overflow-visible md:snap-none md:pb-0 lg:grid-cols-4 xl:grid-cols-7 xl:gap-4">
+              {programmingTiles.map((tile, index) => (
+                <div
+                  key={`${tile.src}-${index}`}
+                  className="flex w-[min(82vw,18rem)] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/30 md:w-auto"
+                >
+                  <div className="relative aspect-[4/3] w-full">
+                    <Image
+                      src={tile.src}
+                      alt={tile.alt}
+                      fill
+                      sizes="(max-width: 768px) 82vw, (max-width: 1024px) 25vw, 12vw"
+                      className="object-cover object-center"
+                    />
+                  </div>
+                  <div className="border-t border-border/40 bg-black/20 px-2 py-2.5 text-center backdrop-blur-sm">
+                    <span className="text-xs font-medium leading-tight text-foreground sm:text-sm">
+                      {tile.label}
+                    </span>
+                  </div>
                 </div>
-                <div className="border-t border-border/40 bg-black/20 px-2 py-2.5 text-center backdrop-blur-sm">
-                  <span className="text-xs font-medium leading-tight text-foreground sm:text-sm">
-                    {tile.label}
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Platform Preview Section */}
         <div className="grid lg:grid-cols-12 gap-4 lg:gap-6">

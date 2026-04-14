@@ -2,7 +2,7 @@
 
 import { Check, Sparkles, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getPackageCheckoutUrl, type PackageCheckoutKey } from "@/lib/package-paypal-urls"
+import { useContactModal } from "@/components/contact-modal-context"
 
 const packages: Array<{
   name: string
@@ -11,7 +11,6 @@ const packages: Array<{
   bestFor: string
   featured: boolean
   features: string[]
-  checkoutKey: PackageCheckoutKey
 }> = [
   {
     name: "Creator Launch",
@@ -30,7 +29,6 @@ const packages: Array<{
       "Built on WordPress + Divi",
       "Tutorial walkthrough after launch",
     ],
-    checkoutKey: "creator-launch",
   },
   {
     name: "Studio Pro",
@@ -47,7 +45,6 @@ const packages: Array<{
       "Faster streaming performance",
       "Advanced video playback controls",
     ],
-    checkoutKey: "studio-pro",
   },
   {
     name: "Network Platform",
@@ -65,11 +62,12 @@ const packages: Array<{
       "Structured video categories",
       "Scalable platform structure",
     ],
-    checkoutKey: "network-platform",
   },
 ]
 
 export function PackagesSection() {
+  const { openContactModal } = useContactModal()
+
   return (
     <section 
       className="py-24 lg:py-32 relative bg-surface-0 msc-section msc-surface-0"
@@ -153,21 +151,20 @@ export function PackagesSection() {
                   <span className="font-semibold text-foreground">Best For:</span> {pkg.bestFor}
                 </p>
                 <Button
-                  className={`w-full ${
+                  type="button"
+                  className={`w-full cursor-pointer ${
                     pkg.featured
                       ? "bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm"
                       : "bg-secondary/50 text-foreground hover:bg-secondary/80 border border-border/50"
                   }`}
-                  asChild
+                  onClick={() =>
+                    openContactModal({
+                      fromPackage: { name: pkg.name, price: pkg.price },
+                    })
+                  }
                 >
-                  <a
-                    href={getPackageCheckoutUrl(pkg.checkoutKey)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Get Started
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </a>
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>

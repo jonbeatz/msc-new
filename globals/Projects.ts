@@ -2,6 +2,13 @@ import type { GlobalConfig } from "payload"
 
 import { adminRowsStartCollapsed } from "@/lib/payload-admin-defaults"
 
+/** Per-row Media picker (drawer) — avoids shared upload UI state across array rows. */
+const projectItemImageRelationshipAdmin = {
+  appearance: "drawer" as const,
+  allowCreate: true,
+  allowEdit: true,
+}
+
 export const ProjectsGlobal: GlobalConfig = {
   slug: "projects-home",
   label: "Projects",
@@ -43,9 +50,14 @@ export const ProjectsGlobal: GlobalConfig = {
         },
         {
           name: "image",
-          type: "upload",
+          type: "relationship",
           relationTo: "media",
           required: true,
+          admin: {
+            ...projectItemImageRelationshipAdmin,
+            description:
+              "Preview for this project row only. Pick or create Media per slot (independent of other rows).",
+          },
         },
         {
           name: "demoUrl",

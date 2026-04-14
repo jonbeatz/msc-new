@@ -197,7 +197,7 @@ index a2f2c43..62cf2c9 100644
              newState[path].rows[indexInCurrentState] = {
                ...currentState[path].rows[indexInCurrentState],
 diff --git a/node_modules/@payloadcms/ui/dist/forms/Form/rowHelpers.js b/node_modules/@payloadcms/ui/dist/forms/Form/rowHelpers.js
-index 5320d10..ea96f31 100644
+index 5320d10..fbe094f 100644
 --- a/node_modules/@payloadcms/ui/dist/forms/Form/rowHelpers.js
 +++ b/node_modules/@payloadcms/ui/dist/forms/Form/rowHelpers.js
 @@ -2,15 +2,15 @@
@@ -233,3 +233,83 @@ index 5320d10..ea96f31 100644
      }
      acc.updatedRows.push(row);
      return acc;
+diff --git a/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/addFieldStatePromise.js b/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/addFieldStatePromise.js
+index f8a5098..17d3adb 100644
+--- a/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/addFieldStatePromise.js
++++ b/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/addFieldStatePromise.js
+@@ -221,7 +221,8 @@ export const addFieldStatePromise = async args => {
+               collapsedPrefs: preferences?.fields?.[path]?.collapsed,
+               field,
+               previousRow,
+-              row
++              row,
++              rowIndex
+             });
+             if (isCollapsed) {
+               newRow.collapsed = true;
+@@ -382,7 +383,8 @@ export const addFieldStatePromise = async args => {
+                 collapsedPrefs: preferences?.fields?.[path]?.collapsed,
+                 field,
+                 previousRow,
+-                row
++                row,
++                rowIndex: i
+               });
+               if (isCollapsed) {
+                 acc.rowMetadata[acc.rowMetadata.length - 1].collapsed = true;
+diff --git a/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.d.ts b/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.d.ts
+index 38580cf..1db91b3 100644
+--- a/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.d.ts
++++ b/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.d.ts
+@@ -1,8 +1,9 @@
+ import type { ArrayField, BlocksField, CollapsedPreferences, Row } from 'payload';
+-export declare function isRowCollapsed({ collapsedPrefs, field, previousRow, row, }: {
++export declare function isRowCollapsed({ collapsedPrefs, field, previousRow, row, rowIndex, }: {
+     collapsedPrefs: CollapsedPreferences;
+     field: ArrayField | BlocksField;
+     previousRow: Row | undefined;
+     row: Row;
++    rowIndex?: number;
+ }): boolean;
+ //# sourceMappingURL=isRowCollapsed.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.js b/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.js
+index acb4a10..44dffff 100644
+--- a/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.js
++++ b/node_modules/@payloadcms/ui/dist/forms/fieldSchemasToFormState/isRowCollapsed.js
+@@ -2,17 +2,28 @@ export function isRowCollapsed({
+   collapsedPrefs,
+   field,
+   previousRow,
+-  row
++  row,
++  rowIndex
+ }) {
+   if (previousRow && 'collapsed' in previousRow) {
+     return previousRow.collapsed ?? false;
+   }
+-  // If previousFormState is `undefined`, check preferences
+-  if (collapsedPrefs !== undefined) {
+-    return collapsedPrefs.includes(row.id) // Check if collapsed in preferences
+-;
++  const init = Boolean(field?.admin?.initCollapsed);
++  /**
++   * Payload stock behavior: `if (collapsedPrefs !== undefined) return prefs.includes(row.id)`.
++   * That treats `collapsed: []` like "prefs exist" → every row expanded and **never** applies
++   * `admin.initCollapsed`. We treat **empty** lists like "no preference" so `initCollapsed` works.
++   * Also support **numeric row indices** in prefs (some local UI patches store indices, not ids).
++   */
++  if (Array.isArray(collapsedPrefs) && collapsedPrefs.length > 0) {
++    if (collapsedPrefs.includes(row.id)) {
++      return true;
++    }
++    if (typeof rowIndex === 'number' && collapsedPrefs.includes(rowIndex)) {
++      return true;
++    }
++    return false;
+   }
+-  // If neither exists, fallback to `field.admin.initCollapsed`
+-  return field.admin.initCollapsed;
++  return init;
+ }
+ //# sourceMappingURL=isRowCollapsed.js.map
