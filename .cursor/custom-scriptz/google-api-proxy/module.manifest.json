@@ -1,0 +1,48 @@
+{
+  "moduleId": "google-api-proxy",
+  "version": "1.0.0",
+  "description": "LiteLLM + Vertex AI + ngrok for Cursor Cloud Agent",
+  "requires": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0",
+    "python": "pip install litellm[proxy] (first run)"
+  },
+  "install": {
+    "command": ".\\.cursor\\custom-scriptz\\google-api-proxy\\install.ps1",
+    "fromModuleFolder": true
+  },
+  "verifyCommands": [
+    "npm run msc:litellm:preflight",
+    "npm run msc:google-api:start",
+    "npm run msc:litellm:test:ngrok"
+  ],
+  "prerequisites": [
+    "scripts/lib/msc-load-env.mjs",
+    "scripts/msc-kill-dev-port.mjs",
+    "package.json dependency: dotenv"
+  ],
+  "binaryAssets": [
+    {
+      "path": "google-api/ngrok.exe",
+      "gitignored": true,
+      "note": "Copy from module pack on disk; ~31 MB"
+    }
+  ],
+  "neverCommit": [
+    "google-api/ngrok.exe",
+    "google-api/gcp_key.json",
+    "config/gcp-service-account.json",
+    ".env.local"
+  ],
+  "envKeys": [
+    "MSC_LITELLM_PORT",
+    "MSC_LITELLM_MASTER_KEY",
+    "GOOGLE_APPLICATION_CREDENTIALS",
+    "GOOGLE_CLOUD_PROJECT",
+    "GOOGLE_CLOUD_LOCATION",
+    "NGROK_AUTHTOKEN",
+    "MSC_NGROK_BIN"
+  ],
+  "agentDoc": "CURSOR.md",
+  "humanDoc": "README.md"
+}

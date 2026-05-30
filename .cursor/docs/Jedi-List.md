@@ -145,9 +145,9 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 
 ---
 
-## Cursor MCP and GitHub tooling
+## Cursor MCP and GitHub/Google-API tooling
 
-Secrets live in **`.env.local`** only. After changing GitHub, Resend, or WordPress keys, run **`npm run sync:mcp-env`** and reload MCP in Cursor (**Settings → MCP**). Full setup: **[MCP-SETUP.md](./MCP-SETUP.md)**.
+Secrets live in **`.env.local`** only. After changing GitHub, Resend, WordPress, or Google/ngrok keys, run **`npm run sync:mcp-env`** and reload MCP in Cursor (**Settings → MCP**). Full setups: **[MCP-SETUP.md](./MCP-SETUP.md)** and **[Ngrok-SETUP.md](../config/Ngrok-SETUP.md)**.
 
 | Command | What it does |
 |--------|----------------|
@@ -157,6 +157,12 @@ Secrets live in **`.env.local`** only. After changing GitHub, Resend, or WordPre
 | **`npm run test:github-api`** | Verifies **`GITHUB_PERSONAL_ACCESS_TOKEN`** from **`.env.local`** against GitHub REST API. |
 | **`npm run test:tavily-api`** | Verifies **`TAVILY_API_KEY`** from **`.env.local`** against Tavily search API. |
 | **`npm run backup:github-repos`** | Clones + bundles Jon’s GitHub repos to **`.cursor/GitHub-Repo-BackUps/`** (gitignored). |
+| **`npm run msc:litellm:preflight`** | Performs config, Vertex credentials, port, and LiteLLM dependency preflight check. |
+| **`npm run msc:litellm:start`** | Starts LiteLLM Proxy in localhost mode on port **4000**. |
+| **`npm run msc:litellm:start:ngrok`** | Starts LiteLLM on port **4000** and mounts an HTTPS ngrok tunnel. |
+| **`npm run msc:google-api:start`** | Shorthand for stopping active proxy/ngrok + starting them fresh in ngrok mode. |
+| **`npm run msc:litellm:test:ngrok`** | Runs full connection check against local + ngrok remote `/v1/models` endpoints. |
+| **`npm run msc:litellm:stop`** | Gracefully clears LiteLLM, ngrok, and port **4000** / **4040** processes. |
 | **`npm run fix:hero-slide-images`** | Reassigns homepage hero slide **Media** IDs in **`payload.sqlite`** (Python). |
 
 **Project MCP files (committed, placeholders only):** **`.cursor/mcp.json`**, **`.cursor/mcp.json.example`**, **`.cursor/mcp.servers.archived.json`**.

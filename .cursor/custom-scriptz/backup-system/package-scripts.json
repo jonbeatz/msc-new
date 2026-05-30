@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "msc:backup": "node scripts/msc-backup.mjs",
+    "msc:backup:standard": "node scripts/msc-backup.mjs --standard",
+    "msc:backup:full": "node scripts/msc-backup.mjs --full"
+  },
+  "envKeys": ["MSC_BACKUP_ROOT"],
+  "shortcuts": {
+    "backup project": "npm run msc:backup",
+    "create backup": "npm run msc:backup",
+    "backup": "npm run msc:backup"
+  }
+}

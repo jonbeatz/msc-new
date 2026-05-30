@@ -1,0 +1,4 @@
+# Third-party / secret runtime files — operator supplies locally
+ngrok.exe
+ngrok
+gcp_key.json

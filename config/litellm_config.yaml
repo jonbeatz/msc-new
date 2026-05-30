@@ -1,0 +1,34 @@
+# LiteLLM proxy → Google Cloud Vertex AI (Gemini).
+# Canonical runtime config: config/litellm_config.yaml (scripts use that path).
+# Keep this file in sync for google-api/ local reference.
+
+litellm_settings:
+  drop_params: true
+
+model_list:
+  - model_name: vader-3-flash
+    litellm_params:
+      model: vertex_ai/gemini-3-flash-preview
+      vertex_project: "wordpress-map-1492461083797"
+      vertex_location: "global"
+
+  - model_name: vader-3-pro
+    litellm_params:
+      model: vertex_ai/gemini-3-pro-preview
+      vertex_project: "wordpress-map-1492461083797"
+      vertex_location: "global"
+
+  - model_name: vader-31-pro
+    litellm_params:
+      model: vertex_ai/gemini-3.1-pro-preview
+      vertex_project: "wordpress-map-1492461083797"
+      vertex_location: "global"
+
+  - model_name: vader-3.5-flash
+    litellm_params:
+      model: vertex_ai/gemini-3.5-flash
+      vertex_project: "wordpress-map-1492461083797"
+      vertex_location: "global"
+
+general_settings:
+  master_key: sk-vader-protocol-1234

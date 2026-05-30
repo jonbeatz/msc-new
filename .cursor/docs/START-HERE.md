@@ -92,7 +92,14 @@ If local breaks with missing vendor chunks (`date-fns`, etc.), after **`pushit:l
 
 - **Local:** set **`NEXT_PUBLIC_SERVER_URL`** in **`.env.local`** to your dev origin (see **`.env.example`**) so Payload admin **CSRF** and **View site** match what you open in the browser.
 - **Production:** set **`NEXT_PUBLIC_SERVER_URL`** and/or **`PAYLOAD_PUBLIC_SERVER_URL`** on the host (see **Spaceship.md**). If both are missing at build/runtime, the app falls back to **`https://mystudiochannel.com`** (override with **`MSC_CANONICAL_SITE_ORIGIN`**). Details: **`Jedi-List.md`** → *Public site URL*.
-- **MCP secrets:** after changing **`GITHUB_PERSONAL_ACCESS_TOKEN`**, **`RESEND_API_KEY`**, or **`WORDPRESS_*`** in **`.env.local`**, run **`npm run sync:mcp-env`** and reload MCP in Cursor (**`MCP-SETUP.md`**).
+- **MCP secrets:** after changing **`GITHUB_PERSONAL_ACCESS_TOKEN`**, **`RESEND_API_KEY`**, **`TAVILY_API_KEY`**, **`NGROK_AUTHTOKEN`**, or **`WORDPRESS_*`** in **`.env.local`**, run **`npm run sync:mcp-env`** and reload MCP in Cursor (**`MCP-SETUP.md`**).
+
+### Google API Proxy (LiteLLM + ngrok)
+
+For Vertex AI model testing/dev workflows:
+- Run **`npm run msc:google-api:start`** to fire up LiteLLM on port **4000** and mount an active ngrok HTTPS tunnel.
+- Check connections and display Cursor settings via **`npm run msc:litellm:test:ngrok`**.
+- Keep credentials safe; never commit Service Account JSON or raw authtokens. Reference: **`config/Ngrok-SETUP.md`**.
 
 ### Why the browser shows a white page + `/_next/static/chunks/fallback/*` (500)
 

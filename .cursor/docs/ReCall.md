@@ -94,6 +94,17 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Recent changes (latest first)
 
+### 2026-05-29 — LiteLLM (Gemini 3.5 Flash) + ngrok connection verified
+
+- **Feature:** Installed and fully configured `google-api-proxy` portable module.
+- **Port:** LiteLLM proxy runs on port **4000** (Next.js/Payload remains on **3000**).
+- **Authentication:** `NGROK_AUTHTOKEN` added to `.env.local` only (never committed). `google-api/ngrok.exe` is gitignored.
+- **Test results:** Verified with Vertex AI Gemini 3.5 Flash (`vader-3.5-flash`) responding **200 OK** (Capital of France = Paris). 
+- **Cursor Settings:**
+  - Base URL: `https://pushy-water-reformer.ngrok-free.dev/v1`
+  - Key: `MSC_LITELLM_MASTER_KEY` (`sk-vader-protocol-1234`)
+  - Model: `vader-3.5-flash`
+
 ### 2026-05-29 — Tavily MCP re-enabled + docs sync
 
 - **Global MCP:** **`tavily`** restored ([tavily-ai/tavily-mcp](https://github.com/tavily-ai/tavily-mcp)); **`TAVILY_API_KEY`** synced via **`npm run sync:mcp-env`**.

@@ -1,6 +1,6 @@
 {
   "name": "my-project",
-    "version": "1.0.24",
+  "version": "1.0.24",
   "private": true,
   "scripts": {
     "dev": "node scripts/kill-dev-port.mjs && next dev",
@@ -61,7 +61,16 @@
     "sync:github-mcp": "npm run sync:mcp-env",
     "test:tavily-api": "python scripts/test_tavily_api.py",
     "backup:github-repos": "python scripts/backup-github-repos.py",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "msc:litellm:preflight": "node scripts/msc-litellm-preflight.mjs",
+    "msc:litellm:install-deps": "node scripts/msc-litellm-install-deps.mjs",
+    "msc:litellm:start": "node scripts/msc-litellm-start.mjs",
+    "msc:litellm:start:ngrok": "node scripts/msc-litellm-start.mjs --ngrok",
+    "msc:google-api:start": "npm run msc:litellm:stop && npm run msc:litellm:start:ngrok",
+    "msc:litellm:test:ngrok": "node scripts/msc-litellm-test-ngrok.mjs",
+    "msc:litellm:stop": "node scripts/msc-litellm-stop.mjs",
+    "msc:litellm:status": "node scripts/msc-litellm-status.mjs",
+    "msc:litellm:verify": "node scripts/msc-litellm-verify.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -103,6 +112,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.1.1",
     "date-fns": "4.1.0",
+    "dotenv": "^17.0.0",
     "embla-carousel-react": "8.6.0",
     "graphql": "^16.13.2",
     "input-otp": "1.4.2",

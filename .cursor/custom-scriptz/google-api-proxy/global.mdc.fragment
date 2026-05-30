@@ -1,0 +1,7 @@
+<!-- Append rows to .cursor/rules/global.mdc Natural Language Commands table if missing -->
+
+| "start google-api" | Run `npm run msc:google-api:start` (clean stop → LiteLLM → ngrok → READY) |
+| "stop google-api" | Run `npm run msc:litellm:stop` |
+| "status google-api" | Run `npm run msc:litellm:status` |
+| "verify google-api" | Run `npm run msc:litellm:test:ngrok` |
+| "restart google-api" | Run `npm run msc:google-api:start` |

@@ -503,6 +503,7 @@ At minimum in Node app settings:
 - `DATABASE_URL=file:./payload.sqlite` (or production DB when migrated)
 - **`NEXT_PUBLIC_SERVER_URL=https://mystudiochannel.com`** — should match the live marketing origin (baked into client bundles at **build** time on PC).
 - **`PAYLOAD_PUBLIC_SERVER_URL=https://mystudiochannel.com`** (recommended on cPanel) — **runtime** server URL; **first** in **`getPublicOrigin()`** / **`payload.config.ts`** when set, so verification emails track the live host even if **`NEXT_PUBLIC_*`** was wrong at build.
+- **`NGROK_AUTHTOKEN=<token>`** — your ngrok authtoken used to establish public HTTPS endpoints for Vertex model connectivity on local dev (gitignored).
 
 Optional:
 

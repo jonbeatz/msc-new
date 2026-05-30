@@ -1,0 +1,31 @@
+{
+  "scripts": {
+    "msc:litellm:preflight": "node scripts/msc-litellm-preflight.mjs",
+    "msc:litellm:install-deps": "node scripts/msc-litellm-install-deps.mjs",
+    "msc:litellm:start": "node scripts/msc-litellm-start.mjs",
+    "msc:litellm:start:ngrok": "node scripts/msc-litellm-start.mjs --ngrok",
+    "msc:google-api:start": "npm run msc:litellm:stop && npm run msc:litellm:start:ngrok",
+    "msc:litellm:test:ngrok": "node scripts/msc-litellm-test-ngrok.mjs",
+    "msc:litellm:stop": "node scripts/msc-litellm-stop.mjs",
+    "msc:litellm:status": "node scripts/msc-litellm-status.mjs",
+    "msc:litellm:verify": "node scripts/msc-litellm-verify.mjs"
+  },
+  "envKeys": [
+    "MSC_LITELLM_PORT",
+    "MSC_LITELLM_START_NGROK",
+    "MSC_NGROK_BIN",
+    "NGROK_AUTHTOKEN",
+    "GOOGLE_APPLICATION_CREDENTIALS",
+    "GOOGLE_CLOUD_PROJECT",
+    "GOOGLE_CLOUD_LOCATION",
+    "MSC_LITELLM_MASTER_KEY",
+    "MSC_LITELLM_CONFIG"
+  ],
+  "shortcuts": {
+    "start google-api": "npm run msc:google-api:start",
+    "stop google-api": "npm run msc:litellm:stop",
+    "status google-api": "npm run msc:litellm:status",
+    "verify google-api": "npm run msc:litellm:test:ngrok",
+    "restart google-api": "npm run msc:google-api:start"
+  }
+}

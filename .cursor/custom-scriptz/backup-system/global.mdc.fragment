@@ -1,0 +1,8 @@
+<!-- Merge into .cursor/rules/global.mdc if missing (shortcuts + backup ritual reference) -->
+
+| "backup project" | Follow backup-system CURSOR.md § Backup ritual (one question at a time) |
+| "create backup" | Same as **backup project** |
+| "backup" | Same as **backup project** |
+
+<!-- Full 8-step backup ritual: .cursor/custom-scriptz/backup-system/CURSOR.md § Backup ritual -->
+<!-- Run: npm run msc:backup -- --standard [folder] --yes --note "[note]" -->

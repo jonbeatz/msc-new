@@ -1,0 +1,28 @@
+{
+  "moduleId": "backup-system",
+  "version": "1.2.0",
+  "description": "Standard/Full robocopy backups with BackUp-Notez.md and agent note workflow",
+  "install": {
+    "command": ".\\.cursor\\custom-scriptz\\backup-system\\install.ps1"
+  },
+  "verifyCommands": [
+    "npm run msc:backup -- --standard install-smoke-test --yes --note \"module verify\""
+  ],
+  "prerequisites": ["scripts/lib/msc-load-env.mjs"],
+  "envKeys": ["MSC_BACKUP_ROOT"],
+  "defaults": {
+    "MSC_BACKUP_ROOT": "G:\\Cursor_Project_BackUpz"
+  },
+  "standardSkips": ["node_modules", ".next", "logs", "test-results", "vader-site-deploy"],
+  "features": {
+    "backupNotes": {
+      "path": ".cursor/BackUp-Notez.md",
+      "cliFlag": "--note",
+      "writtenAfterRobocopy": true
+    },
+    "agentWorkflowSteps": 8
+  },
+  "fragments": ["global.mdc.fragment"],
+  "agentDoc": "CURSOR.md",
+  "humanDoc": "README.md"
+}

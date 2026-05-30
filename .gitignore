@@ -55,6 +55,13 @@ node_modules.zip
 stderr.log
 .pushitupzips/
 
+# google-api-proxy (never commit service account JSON or ngrok token files)
+config/gcp-service-account.json
+google-api/gcp_key.json
+google-api/ngrok.exe
+**/Ngrok-API.md
+**/gcp-service-account.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
