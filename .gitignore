@@ -16,8 +16,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
+# env files (track .env.example; never commit .env.local)
 .env*
+!.env.example
 
 # Payload / SQLite (track payload.sqlite; ignore WAL sidecars)
 payload.sqlite-*
@@ -28,6 +29,13 @@ payload.sqlite-*
 
 # Cursor stop-hook machine-local HEAD pointer (not source of truth)
 .cursor/.last-stop-hook-commit
+
+# Local GitHub repo backups (large; regenerate with npm run backup:github-repos)
+.cursor/GitHub-Repo-BackUps/
+
+# Python
+__pycache__/
+*.py[cod]
 
 # local editor deploy secrets
 .vscode/sftp.json

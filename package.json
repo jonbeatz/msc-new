@@ -55,6 +55,9 @@
     "migrate:sqlite:fix-bookings-table": "python scripts/fix-sqlite-bookings-table.py",
     "migrate:sqlite:homepage-is-styles-visible": "python scripts/migrate-sqlite-homepage-is-styles-visible.py",
     "fix:hero-slide-images": "python scripts/fix-homepage-hero-slide-images.py",
+    "test:github-api": "python scripts/test_github_api.py",
+    "sync:github-mcp": "python scripts/sync_github_mcp_token.py",
+    "backup:github-repos": "python scripts/backup-github-repos.py",
     "postinstall": "patch-package"
   },
   "dependencies": {

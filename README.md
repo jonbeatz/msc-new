@@ -23,6 +23,8 @@ npm install
 copy .env.example .env.local
 ```
 
+Edit `.env.local` and replace placeholder values. Use **only** `.env.local` on your PC (not `.env`).
+
 3. Start dev server (Webpack mode):
 
 ```bash
