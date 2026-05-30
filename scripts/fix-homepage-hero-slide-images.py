@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 """
-Re-link Homepage heroSlides to canonical hero Media files (not Demos-* previews).
+Re-link Homepage heroSlides to the four canonical hero Media files.
 
-The four active hero slides should use:
-  hero-studio.jpg, show-artwork.jpg, on-air-bg.jpg, creator-in-mind.jpg
+Slides 1–4 (by _order):
+  msc-background.jpg, creator-in-mind.jpg, Demos-4-preview.jpg, camera-crew.jpg
 
-These files already live under public/media/ and are registered in the media table.
 Run from repo root (dev server can stay up):
 
   python scripts/fix-homepage-hero-slide-images.py
-
-Dry run:
-
-  python scripts/fix-homepage-hero-slide-images.py --dry-run
+  npm run fix:hero-slide-images
 """
 from __future__ import annotations
 
@@ -25,18 +21,17 @@ DB = ROOT / "payload.sqlite"
 
 # Match slides by _order (1-based) → target media filename
 SLIDE_ORDER_TO_FILENAME: dict[int, str] = {
-    1: "hero-studio.jpg",
-    2: "show-artwork.jpg",
-    3: "on-air-bg.jpg",
-    4: "creator-in-mind.jpg",
+    1: "msc-background.jpg",
+    2: "creator-in-mind.jpg",
+    3: "Demos-4-preview.jpg",
+    4: "camera-crew.jpg",
 }
 
-# Optional: align Media alt text with hero-section.tsx defaults
 FILENAME_TO_ALT: dict[str, str] = {
-    "hero-studio.jpg": "Professional multi-screen TV studio wall",
-    "show-artwork.jpg": "Netflix-style show cards",
-    "on-air-bg.jpg": "Creator on air",
-    "creator-in-mind.jpg": "Creator with professional cinema camera in studio",
+    "camera-crew.jpg": "Professional film crew with cinema camera on set",
+    "creator-in-mind.jpg": "Creator operating professional cinema camera in studio",
+    "Demos-4-preview.jpg": "Netflix-style show cards and streaming network grid",
+    "msc-background.jpg": "My Studio Channel cinematic studio background",
 }
 
 
