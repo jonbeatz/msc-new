@@ -13,7 +13,7 @@ Cursor can expose MCP tools from **three separate places**. Only the first two u
 | Channel | Config | This project |
 |---------|--------|--------------|
 | **Global manual MCPs** | `C:\Users\JONBEATZ\.cursor\mcp.json` | 8 servers (GitHub, filesystem, Playwright, fetch, **tavily**, terminal, sequential-thinking, desktop-commander) |
-| **Project manual MCPs** | `.cursor/mcp.json` in repo | WordPress (`local-wp`, `mcp-wordpress`) |
+| **Project manual MCPs** | `.cursor/mcp.json` in repo | 6 servers (`local-wp`, `mcp-wordpress`, `browsermcp`, `browserbase`, `21st-dev-magic`, `markdownify`) |
 | **Workspace / plugin MCPs** | Cursor Settings → MCP, extensions, marketplace | **No JSON** — e.g. `user-payload`, Stripe, Vercel, Firebase, Browser DevTools |
 
 **Merge rule:** Cursor loads global + project configs. If the same server name exists in both, **project wins**.
@@ -86,6 +86,10 @@ Global `mcp.json` lives **outside the repo** and is never committed.
 | `browserbase` | Cloud browser automation with Browserbase and Stagehand |
 | `21st-dev-magic` | AI-driven UI component generation with 21st.dev |
 | `markdownify` | Convert web pages, PDFs, and files to Markdown |
+| `browsermcp` | Control your actual open Chrome/Edge browser locally |
+| `browserbase` | Cloud browser automation with Browserbase and Stagehand |
+| `21st-dev-magic` | AI-driven UI component generation with 21st.dev |
+| `markdownify` | Convert web pages, PDFs, and files to Markdown |
 
 ### Workspace / plugins (examples — not in mcp.json)
 
@@ -141,6 +145,12 @@ Prefer **remove + archive** over `"disabled": true` — Cursor may still connect
 |--------|--------|
 | `npm run sync:mcp-env` | Sync `.env.local` → global + project MCP configs |
 | `npm run sync:mcp-all` | Same + confirmation echo |
+| `npm run msc:backup` | Standard project backup following the Ritual |
+| `npm run msc:google-api:start` | Shorthand to stop/start LiteLLM + ngrok on port 4000 |
+| `npm run msc:backup` | Standard project backup (follows Ritual) |
+| `npm run msc:google-api:start` | Start LiteLLM + ngrok proxy on port 4000 |
+| `npm run msc:backup` | Standard project backup following the Ritual |
+| `npm run msc:google-api:start` | Start LiteLLM + ngrok proxy on port 4000 |
 | `npm run sync:github-mcp` | Alias for `sync:mcp-env` |
 | `npm run test:github-api` | Verify GitHub token from `.env.local` |
 | `npm run test:tavily-api` | Verify Tavily token from `.env.local` |

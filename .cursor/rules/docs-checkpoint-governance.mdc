@@ -8,7 +8,13 @@ globs:
 
 # Docs checkpoint governance
 
-When user asks for docs updates/checkpoints:
+When user asks for **"update project"**, **"update docs"**, or **"backup project"**:
+
+1. **Follow the Backup Ritual** ([.cursor/custom-scriptz/backup-system/CURSOR.md](../custom-scriptz/backup-system/CURSOR.md) § Backup ritual) **one question at a time**.
+2. **Do not** automatically run the backup; ask Type, Destination, Folder Name, and Note first.
+3. Once confirmed, run `npm run msc:backup -- --standard [folder] --yes --note "[note]"`.
+
+When user asks for other docs updates/checkpoints:
 
 1. Sync command docs to `package.json` scripts (no guessing).
 2. Prefer minimal edits in:

@@ -94,6 +94,16 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 
 ## Recent changes (latest first)
 
+### 2026-05-30 — MCP additions + Google-API confirmed working
+
+- **Feature:** Added 4 new project-level MCP servers to `.cursor/mcp.json`: `browsermcp`, `browserbase`, `21st-dev-magic`, and `markdownify`.
+- **Governance:** Updated `.cursor/rules/docs-checkpoint-governance.mdc` to enforce the **Backup Ritual** workflow whenever "update project", "update docs", or "backup project" is called.
+- **Service:** Started and verified `google-api` (LiteLLM + ngrok).
+- **Verification:** Successfully tested `vader-3-flash` on port 4000 (Capital of France = Paris).
+- **Docs:** Updated `MCP-SETUP.md` and `START-HERE.md` to reflect the new total of 6 project-level MCPs.
+- **Backups:** Completed two backups to `G:\Cursor_Project_BackUpz\MyStudioChannel` following the new Ritual.
+- **Project Version:** Still at **`v1.0.8`** (admin version).
+
 ### 2026-05-29 — LiteLLM (Gemini 3.5 Flash) + ngrok connection verified
 
 - **Feature:** Installed and fully configured `google-api-proxy` portable module.

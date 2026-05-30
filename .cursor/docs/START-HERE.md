@@ -65,6 +65,8 @@ Project rules layout:
 | `ToDo.md` | Next ideas / tomorrow’s focus (lightweight; not a full backlog) | Optional |
 | `Development.md` | Architecture and deep implementation details | Optional |
 | `MCP-SETUP.md` | Cursor MCP global vs project config, sync:mcp-env | Optional |
+| `markdown-docs/*.md` | Local Markdown copies of external docs/tools | Optional |
+| `markdown-docs/*.md` | Converted Markdown documentation from external links | Optional |
 | `GitHub-Cheat-Sheet.md` | Git quick ref + bundle/archive recovery | Optional |
 | `Run-Next-JS.md` | Local run/build/deploy summary | Optional |
 | `Site-Plans.md` | Product/site planning notes | Archive/Optional |
