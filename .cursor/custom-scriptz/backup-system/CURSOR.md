@@ -27,7 +27,7 @@ Follow this flow **one question at a time**. In Vader Engine, same steps live in
 
 Ask: `What type of backup? (1 = Standard / 2 = Full)`
 
-**Standard skips only** (never list includes in this step): `node_modules`, `.next`, `logs`, `test-results`, `vader-site-deploy`
+**Standard skips only** (never list includes in this step): `node_modules`, `.next`, `logs`, `test-results`
 
 ### Step 2 — Destination
 
@@ -45,7 +45,7 @@ Show (skips only on Type line):
 
 ```text
 Backup Summary:
-- Type: Standard (skips node_modules, .next, logs, test-results, vader-site-deploy)
+- Type: Standard (skips node_modules, .next, logs, test-results)
 - Destination: [path]
 - Folder: [name]
 ```

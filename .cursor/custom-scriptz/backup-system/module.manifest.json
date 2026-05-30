@@ -13,7 +13,7 @@
   "defaults": {
     "MSC_BACKUP_ROOT": "G:\\Cursor_Project_BackUpz"
   },
-  "standardSkips": ["node_modules", ".next", "logs", "test-results", "vader-site-deploy"],
+  "standardSkips": ["node_modules", ".next", "logs", "test-results"],
   "features": {
     "backupNotes": {
       "path": ".cursor/BackUp-Notez.md",

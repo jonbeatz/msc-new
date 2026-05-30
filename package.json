@@ -70,7 +70,10 @@
     "msc:litellm:test:ngrok": "node scripts/msc-litellm-test-ngrok.mjs",
     "msc:litellm:stop": "node scripts/msc-litellm-stop.mjs",
     "msc:litellm:status": "node scripts/msc-litellm-status.mjs",
-    "msc:litellm:verify": "node scripts/msc-litellm-verify.mjs"
+    "msc:litellm:verify": "node scripts/msc-litellm-verify.mjs",
+    "msc:backup": "node scripts/msc-backup.mjs",
+    "msc:backup:standard": "node scripts/msc-backup.mjs --standard",
+    "msc:backup:full": "node scripts/msc-backup.mjs --full"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

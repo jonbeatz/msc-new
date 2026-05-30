@@ -4,7 +4,7 @@ Robocopy-based **Standard** and **Full** project backups to a configurable drive
 
 ## Standard skips
 
-`node_modules`, `.next`, `logs`, `test-results`, `vader-site-deploy`
+`node_modules`, `.next`, `logs`, `test-results`
 
 Summaries should list **skips only** — do not add “includes `.env.local`” or `BackUp-Notez.md` in the type/summary lines. Keep G: backups private.
 
@@ -51,7 +51,7 @@ Each backup writes **`.cursor/BackUp-Notez.md`** inside the backup folder **afte
 - Git branch, commit, message
 - Type, **Excluded** dirs, **Included (secrets)** row (`.env.local` for Standard)
 - **Timestamp** — local machine time (not UTC)
-- **Footer** — `*Backup created by Vader Engine v2.7.0 — includes source code, config, and portable modules.*`
+- **Footer** — `*Backup created — includes source code, config, and portable modules.*`
 
 New entries **prepend** (newest first). Re-backup to the same folder preserves prior note history.
 
