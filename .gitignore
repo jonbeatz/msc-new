@@ -50,10 +50,12 @@ __pycache__/
 
 # local deploy artifacts / logs (keep out of Git; large binaries)
 parity-ftp-report.md
-.next-deploy.zip
-node_modules.zip
 stderr.log
 .pushitupzips/
+# Deployment archives (created by PushItUP scripts)
+*.zip
+!*.example.zip
+!*.template.zip
 
 # google-api-proxy (never commit service account JSON or ngrok token files)
 config/gcp-service-account.json
