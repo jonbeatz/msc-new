@@ -76,12 +76,16 @@ Global `mcp.json` lives **outside the repo** and is never committed.
 | `sequential-thinking` | Structured reasoning helper |
 | `desktop-commander` | Desktop automation |
 
-### Project (2)
+### Project (6)
 
 | Server | Purpose |
 |--------|---------|
 | `local-wp` | Local WP / Flywheel site discovery |
 | `mcp-wordpress` | WordPress REST API for `mscclean.local` |
+| `browsermcp` | Control your actual open Chrome/Edge browser locally |
+| `browserbase` | Cloud browser automation with Browserbase and Stagehand |
+| `21st-dev-magic` | AI-driven UI component generation with 21st.dev |
+| `markdownify` | Convert web pages, PDFs, and files to Markdown |
 
 ### Workspace / plugins (examples — not in mcp.json)
 
