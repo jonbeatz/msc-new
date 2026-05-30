@@ -1,0 +1,116 @@
+{
+  "_meta": {
+    "description": "Archived MCP server recipes removed from global ~/.cursor/mcp.json. Copy an entry back into mcp.json to re-enable.",
+    "archivedOn": "2026-05-29"
+  },
+  "mcpServers": {
+    "payload": {
+      "_comment": "Removed — @govcraft/payload-cms-mcp requires Redis + remote SSE; not stable for local stdio in Cursor. Use workspace user-payload MCP, REST /api/*, or /admin instead.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@govcraft/payload-cms-mcp"]
+    },
+    "playwright-electron": {
+      "_comment": "Removed — duplicate browser MCP; keep global playwright only.",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--cdp-endpoint",
+        "http://127.0.0.1:9227",
+        "--allowed-hosts",
+        "127.0.0.1,localhost",
+        "--caps",
+        "devtools"
+      ]
+    },
+    "browser-tools-mcp": {
+      "_comment": "Removed — duplicate browser MCP; keep global playwright only.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@agentdeskai/browser-tools-mcp@latest"]
+    },
+    "browsermcp": {
+      "_comment": "Removed — duplicate browser MCP; keep global playwright only.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@browsermcp/mcp@latest"]
+    },
+    "mcpterm": {
+      "_comment": "Removed — duplicate terminal MCP; keep terminal-controller only.",
+      "command": "C:\\Users\\JONBEATZ\\.cursor\\tools\\mcpterm\\bin\\mcpterm.exe",
+      "args": []
+    },
+    "postgres": {
+      "_comment": "Removed — msc-new uses SQLite (payload.sqlite), not Postgres.",
+      "command": "C:\\Users\\JONBEATZ\\.cursor\\venvs\\postgres-mcp312\\Scripts\\postgres-mcp.exe",
+      "args": ["--access-mode=unrestricted"],
+      "env": {
+        "DATABASE_URI": "postgresql://username:password@localhost:5432/dbname"
+      }
+    },
+    "neon-postgres": {
+      "_comment": "Removed — msc-new uses SQLite locally; Neon not configured.",
+      "url": "https://mcp.neon.tech/mcp",
+      "transport": "streamableHttp"
+    },
+    "postman": {
+      "_comment": "Removed — placeholder POSTMAN_API_KEY never configured.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@postman/postman-mcp-server@latest", "--full"],
+      "env": {
+        "POSTMAN_API_KEY": "REPLACE_WITH_POSTMAN_API_KEY"
+      }
+    },
+    "tavily": {
+      "_comment": "Removed — placeholder TAVILY_API_KEY never configured.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "tavily-mcp@latest"],
+      "env": {
+        "TAVILY_API_KEY": "YOUR_TAVILY_API_KEY"
+      }
+    },
+    "mcp-vercel": {
+      "_comment": "Removed — placeholder VERCEL_API_TOKEN never configured.",
+      "command": "cmd",
+      "args": ["/c", "node", "C:\\Users\\JONBEATZ\\.cursor\\tools\\mcp-vercel\\build\\index.js"],
+      "env": {
+        "VERCEL_API_TOKEN": "REPLACE_WITH_VERCEL_API_TOKEN"
+      }
+    },
+    "untitledui": {
+      "_comment": "Removed — placeholder UNTITLEDUI_LICENSE_KEY never configured.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "untitledui-mcp"],
+      "env": {
+        "UNTITLEDUI_LICENSE_KEY": "YOUR_UNTITLEDUI_LICENSE_KEY"
+      }
+    },
+    "resend": {
+      "_comment": "Removed — enable on demand; run npm run sync:mcp-env after copying back to global mcp.json.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "resend-mcp"],
+      "env": {
+        "RESEND_API_KEY": "REPLACE_WITH_RESEND_API_KEY"
+      }
+    },
+    "task-master-ai": {
+      "_comment": "Removed — not in lean global MCP set.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "task-master-ai"],
+      "env": {
+        "TASK_MASTER_TOOLS": "core"
+      }
+    },
+    "console-ninja": {
+      "_comment": "Removed — not in lean global MCP set; re-add if Console Ninja MCP is needed daily.",
+      "command": "C:/Program Files/nodejs/node.exe",
+      "args": ["C:/Users/JONBEATZ/.console-ninja/mcp/index.js"]
+    },
+    "cursor-rules-generator": {
+      "_comment": "Removed — not in lean global MCP set.",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "cursor-rules-generator-mcp@latest"],
+      "env": {
+        "TEMPLATE_REPO_URL": "https://github.com/ankitpro/cursor-rules-generator.git"
+      }
+    }
+  }
+}

@@ -25,6 +25,8 @@ Copy **`.env.example`** → **`.env.local`** and set at minimum:
 - `NEXT_PUBLIC_SERVER_URL` -- e.g. `http://localhost:3000`.
 - `NEXT_PUBLIC_MSC_BOOKING_URL=payload` -- Schedule dialog POSTs to **`/api/bookings`**. Leave empty for mock-only; set a full WordPress URL for headless WP instead.
 
+**MCP (Cursor agents):** After editing `.env.local`, run **`npm run sync:mcp-env`** and reload MCP in Cursor. See **[MCP-SETUP.md](./MCP-SETUP.md)** for global vs project servers, Payload MCP skip, and WordPress MCP.
+
 ---
 
 ## Running locally

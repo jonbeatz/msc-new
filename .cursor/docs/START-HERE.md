@@ -64,6 +64,7 @@ Project rules layout:
 | `ReCall.md` | Session history and resume context | Optional |
 | `ToDo.md` | Next ideas / tomorrow’s focus (lightweight; not a full backlog) | Optional |
 | `Development.md` | Architecture and deep implementation details | Optional |
+| `MCP-SETUP.md` | Cursor MCP global vs project config, sync:mcp-env | Optional |
 | `Run-Next-JS.md` | Local run/build/deploy summary | Optional |
 | `Site-Plans.md` | Product/site planning notes | Archive/Optional |
 | `Headless-WP-Backend-Plan.md` | WP integration planning | Archive/Optional |

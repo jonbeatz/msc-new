@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "local-wp": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@verygoodplugins/mcp-local-wp@latest"],
+      "_comment": "Local by Flywheel / Local WP site discovery for mscclean.local"
+    },
+    "mcp-wordpress": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "node",
+        "C:\\Users\\JONBEATZ\\AppData\\Roaming\\npm\\node_modules\\mcp-wordpress\\dist\\index.js"
+      ],
+      "env": {
+        "WORDPRESS_SITE_URL": "REPLACE_WITH_WP_SITE_URL",
+        "WORDPRESS_USERNAME": "REPLACE_WITH_WP_USERNAME",
+        "WORDPRESS_APP_PASSWORD": "REPLACE_WITH_WP_APP_PASSWORD"
+      },
+      "_comment": "WordPress REST MCP — credentials synced from .env.local via npm run sync:mcp-env"
+    }
+  }
+}
