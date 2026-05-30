@@ -157,11 +157,14 @@ export function PackagesSection() {
                       ? "bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm"
                       : "bg-secondary/50 text-foreground hover:bg-secondary/80 border border-border/50"
                   }`}
-                  onClick={() =>
-                    openContactModal({
-                      fromPackage: { name: pkg.name, price: pkg.price },
-                    })
-                  }
+                  // ORIGINAL CODE (commented out for temporary redirect):
+                  // onClick={() =>
+                  //   openContactModal({
+                  //     fromPackage: { name: pkg.name, price: pkg.price },
+                  //   })
+                  // }
+                  // TEMPORARY REDIRECT - Remove when restoring original behavior:
+                  onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSe1xo__uQrR6_T0VNmbP8julRgHRZGHsaoW8xqFbJYVtWV1dQ/viewform', '_blank', 'noopener,noreferrer')}
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />

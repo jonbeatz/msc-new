@@ -197,7 +197,10 @@ export function HeroSection({
                 type="button"
                 size="lg"
                 className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 px-8 text-base font-semibold glow-accent-sm hover:glow-accent transition-all duration-300"
-                onClick={() => openContactModal()}
+                // ORIGINAL CODE (commented out for temporary redirect):
+                // onClick={() => openContactModal()}
+                // TEMPORARY REDIRECT - Remove when restoring original behavior:
+                onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSe1xo__uQrR6_T0VNmbP8julRgHRZGHsaoW8xqFbJYVtWV1dQ/viewform', '_blank', 'noopener,noreferrer')}
               >
                 Start With a Consultation
                 <ArrowRight className="ml-2 h-5 w-5" />

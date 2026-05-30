@@ -212,7 +212,10 @@ export function ContactSection() {
               {/* Schedule CTA */}
               <button
                 type="button"
-                onClick={() => openBookConsultation()}
+                // ORIGINAL CODE (commented out for temporary redirect):
+                // onClick={() => openBookConsultation()}
+                // TEMPORARY REDIRECT - Remove when restoring original behavior:
+                onClick={() => window.open('https://calendar.app.google/TCwBWFrXztqrErDx5', '_blank', 'noopener,noreferrer')}
                 className="mt-6 sm:mt-8 w-full cursor-pointer bg-accent text-black hover:opacity-90 h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 glow-accent-sm"
               >
                 Schedule a Call

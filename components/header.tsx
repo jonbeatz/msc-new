@@ -221,7 +221,10 @@ export function Header({
             <Button
               type="button"
               className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm hover:glow-accent transition-all duration-300"
-              onClick={() => openContactModal()}
+              // ORIGINAL CODE (commented out for temporary redirect):
+              // onClick={() => openContactModal()}
+              // TEMPORARY REDIRECT - Remove when restoring original behavior:
+              onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSe1xo__uQrR6_T0VNmbP8julRgHRZGHsaoW8xqFbJYVtWV1dQ/viewform', '_blank', 'noopener,noreferrer')}
             >
               Book Consultation
               <ChevronRight className="ml-1 h-4 w-4" />
@@ -335,7 +338,10 @@ export function Header({
                 type="button"
                 className="bg-accent text-accent-foreground hover:bg-accent/90 w-full justify-center glow-accent-sm"
                 onClick={() => {
-                  openContactModal()
+                  // ORIGINAL CODE (commented out for temporary redirect):
+                  // openContactModal()
+                  // TEMPORARY REDIRECT - Remove when restoring original behavior:
+                  window.open('https://docs.google.com/forms/d/e/1FAIpQLSe1xo__uQrR6_T0VNmbP8julRgHRZGHsaoW8xqFbJYVtWV1dQ/viewform', '_blank', 'noopener,noreferrer')
                   setIsMobileMenuOpen(false)
                 }}
               >

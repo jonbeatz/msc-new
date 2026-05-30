@@ -89,7 +89,10 @@ export function BuiltForCreatorsSection() {
             <Button
               type="button"
               className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent-sm w-fit"
-              onClick={() => openContactModal()}
+              // ORIGINAL CODE (commented out for temporary redirect):
+              // onClick={() => openContactModal()}
+              // TEMPORARY REDIRECT - Remove when restoring original behavior:
+              onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSe1xo__uQrR6_T0VNmbP8julRgHRZGHsaoW8xqFbJYVtWV1dQ/viewform', '_blank', 'noopener,noreferrer')}
             >
               Start Now
               <ArrowRight className="ml-2 h-4 w-4" />
