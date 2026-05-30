@@ -60,7 +60,7 @@
       }
     },
     "tavily": {
-      "_comment": "Removed — placeholder TAVILY_API_KEY never configured.",
+      "_comment": "Re-enable: add mcpServers.tavily to global mcp.json (see MCP-SETUP.md), then npm run sync:mcp-env",
       "command": "cmd",
       "args": ["/c", "npx", "-y", "tavily-mcp@latest"],
       "env": {

@@ -77,6 +77,8 @@ These four operator docs should match those scripts whenever deploy behavior cha
 
 If **`package.json`** scripts change, update the four docs in the same commit when possible.
 
+**MCP / GitHub tooling scripts** (`sync:mcp-env`, `sync:mcp-all`, `test:github-api`, `test:tavily-api`, `backup:github-repos`): keep **`Jedi-List.md`**, **`MCP-SETUP.md`**, and **`.env.example`** in sync.
+
 ---
 
 ## Current focus
@@ -86,11 +88,29 @@ If **`package.json`** scripts change, update the four docs in the same commit wh
 - **Public URLs:** **`lib/public-origin.ts`** + **`lib/site-origin-defaults.ts`** — **`PAYLOAD_PUBLIC_SERVER_URL`** / **`NEXT_PUBLIC_SERVER_URL`** / **`MSC_CANONICAL_SITE_ORIGIN`**; **`getPublicOriginClient()`** for admin Client Components; **`payload.config.ts`** **`serverURL`** + env-built **CSRF**.
 - **Marketing site:** Header/footer in-page hash scroll (mobile drawer defer); **`HomeHashScroll`**; **`middleware`** pathname-only rewrites (host-agnostic).
 - **Version:** **`v1.0.8`** — bump **`lib/msc-admin-version.ts`** when shipping more admin-facing changes.
-- **Next ideas:** **`pushit:live`** when you want production on this line; optional Postgres / API hardening later.
+- **Next ideas:** **`pushit:live`** when you want production on this line; optional Postgres / API hardening later; add **`WORDPRESS_*`** to **`.env.local`** + **`sync:mcp-env`** when using **`mcp-wordpress`** MCP.
 
 ---
 
 ## Recent changes (latest first)
+
+### 2026-05-29 — Tavily MCP re-enabled + docs sync
+
+- **Global MCP:** **`tavily`** restored ([tavily-ai/tavily-mcp](https://github.com/tavily-ai/tavily-mcp)); **`TAVILY_API_KEY`** synced via **`npm run sync:mcp-env`**.
+- **Scripts:** **`scripts/test_tavily_api.py`** → **`npm run test:tavily-api`**.
+- **Docs:** **`GitHub-Cheat-Sheet.md`** (git + bundle recovery), MCP/Jedi/START-HERE/README updates; global count **8** servers.
+- **Security:** **`.env.example`** uses Tavily placeholder only; real key stays in **`.env.local`**.
+
+### 2026-05-29 — MCP config reorganization (Cursor)
+
+- **Global `~/.cursor/mcp.json`:** trimmed to **7** servers (GitHub, filesystem, Playwright, fetch, terminal-controller, sequential-thinking, desktop-commander). **15** recipes archived to **`.cursor/mcp.servers.archived.json`**.
+- **Project `.cursor/mcp.json`:** WordPress only (**`local-wp`**, **`mcp-wordpress`**). Committed with placeholders; secrets via **`npm run sync:mcp-env`**.
+- **Payload MCP:** **`@govcraft/payload-cms-mcp`** not configured (Redis + SSE; broken local stdio). Use workspace **`user-payload`**, REST **`/api/*`**, or **`/admin`**.
+- **Scripts:** **`scripts/sync-mcp-env.js`**; **`sync:github-mcp`** → alias; Python **`sync_github_mcp_token.py`** deprecated.
+- **Docs:** **`MCP-SETUP.md`**; cross-links in **Development**, **START-HERE**, **Jedi-List**, **Site-Plans**, **Run-Next-JS**, **README**.
+- **Git:** **`4a731a6`** on **`MSC-Site-Updates-v1`**.
+
+---
 
 ### 2026-04-14 — Session closeout (I'm done for today)
 
@@ -516,7 +536,7 @@ That **static `out/`** path is **obsolete** now that Payload needs **`next start
 ### 2026-04-08 — Payload CMS MCP (Cursor)
 
 - **Finding:** npm `payload-cms-mcp` CLI runs `server.js` (Express static app only) — not MCP stdio. Real MCP is `api/server.ts` (SSE + `/message`) and **requires Redis** (`REDIS_URL`); meant for Vercel/Railway deploy, not `npx` in Cursor command mode.
-- **Action:** Removed broken `payload-cms-mcp` entry from user `~/.cursor/mcp.json`. To use upstream: deploy + Redis + remote MCP URL/SSE in Cursor (see project chat log).
+- **Action:** Removed broken `payload-cms-mcp` entry from user `~/.cursor/mcp.json`. To use upstream: deploy + Redis + remote MCP URL/SSE in Cursor (see project chat log). **2026-05-29:** Full MCP reorg documented in **`MCP-SETUP.md`** — use workspace **`user-payload`**, REST, or admin instead.
 
 ### 2026-04-08 — Dev: switch off Turbopack (broken chunks / blank admin)
 

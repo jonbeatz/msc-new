@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+DEPRECATED — use: npm run sync:mcp-env  (scripts/sync-mcp-env.js)
+
 Copy GITHUB_PERSONAL_ACCESS_TOKEN from repo .env into Cursor global MCP config.
 
 Updates: %USERPROFILE%\\.cursor\\mcp.json → mcpServers.github.env

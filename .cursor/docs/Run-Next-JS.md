@@ -23,6 +23,8 @@ http://localhost:3000/
 
 1. Copy **`.env.example`** to **`.env.local`**.
 2. Set **`PAYLOAD_SECRET`**, **`DATABASE_URL`** (default `file:./payload.sqlite`), and **`NEXT_PUBLIC_SERVER_URL`**.
+3. Optional keys: **`GITHUB_PERSONAL_ACCESS_TOKEN`**, **`RESEND_API_KEY`**, **`WORDPRESS_*`** (see **`.env.example`**).
+4. After editing secrets used by Cursor MCP: **`npm run sync:mcp-env`**, then reload MCP in Cursor. Details: **[MCP-SETUP.md](./MCP-SETUP.md)**.
 
 ---
 

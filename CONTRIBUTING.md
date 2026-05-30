@@ -18,6 +18,7 @@
   - `npm run dev:payload`
 - Payload admin/API is embedded in this app (`/admin`, `/api/*`)
 - Do not commit secrets (`.env.local`, credentials)
+- Project **`.cursor/mcp.json`** uses placeholders only — run **`npm run sync:mcp-env`** after setting **`.env.local`**; never commit real tokens
 - Keep docs in `.cursor/docs` updated when architecture or workflow changes
 
 ## Restore checkpoints

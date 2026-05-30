@@ -104,16 +104,28 @@ Remove Payload, restore **`output: 'export'`**, and use **headless WordPress** o
 
 ---
 
-## MCP / tooling (optional)
+## MCP / tooling (Cursor)
 
-- Supabase MCP, Postgres/Neon MCP, Next.js DevTools MCP — useful when those services are in use.
-- Payload-related MCP packages exist; only relevant after Payload is in the project.
+**Canonical doc:** **[MCP-SETUP.md](./MCP-SETUP.md)** — global vs project **`mcp.json`**, env sync, archived servers.
+
+| Layer | What |
+|-------|------|
+| **Global (7)** | GitHub, filesystem, Playwright, fetch, terminal-controller, sequential-thinking, desktop-commander — `~/.cursor/mcp.json` |
+| **Project (2)** | **`local-wp`**, **`mcp-wordpress`** — **`.cursor/mcp.json`** in repo |
+| **Workspace** | **`user-payload`** (schema tools), Stripe/Vercel/Firebase plugins — **no JSON config** |
+
+**Payload:** Do **not** use **`@govcraft/payload-cms-mcp`** locally (Redis + SSE; broken stdio). Use **`user-payload`**, REST, or admin.
+
+**After `.env.local` changes:** **`npm run sync:mcp-env`** → reload MCP in Cursor.
+
+**Not used for this project:** Postgres/Neon MCP (SQLite locally), duplicate browser MCPs (archived in **`.cursor/mcp.servers.archived.json`**).
 
 ---
 
 ## Related docs in this repo
 
 - [Development.md](./Development.md) — stack, Payload, schedule dialog, booking env.
+- [MCP-SETUP.md](./MCP-SETUP.md) — Cursor MCP config and env sync.
 - [ReCall.md](./ReCall.md) — session memory and checkpoints.
 - [Restore-Points.md](./Restore-Points.md) — dated restore checkpoints and `payload.sqlite` backup.
 - [Run-Next-JS.md](./Run-Next-JS.md) — build and serve commands.
@@ -124,6 +136,7 @@ Remove Payload, restore **`output: 'export'`**, and use **headless WordPress** o
 
 | Date | Note |
 |------|------|
+| 2026-05-29 | **MCP reorg:** Global trimmed to 7 servers; WordPress MCPs in project **`.cursor/mcp.json`**; **`npm run sync:mcp-env`**; **MCP-SETUP.md** documents Payload skip + **`user-payload`** workspace MCP. |
 | 2026-04-11 | **Architecture lock-in:** Docs updated to state **full Next.js + Payload** bundle (no static **`out/`** deploy), unified static assets in **`public/media`** / **`/media/...`**, and **`media:sync` / `media:consolidate`** as the operational scripts. Option table and recommendations aligned with **START-HERE** source order. |
 | 2026-04-08 | Created `Site-Plans.md` — consolidates backend/CMS options, static-export vs Payload, headless WP architecture, and phased plan for reference. |
 | 2026-04-08 | **Payload Phase A** — integrated in-repo (`withPayload`, `(payload)` routes, SQLite, `bookings`, booking POST); static export removed. |

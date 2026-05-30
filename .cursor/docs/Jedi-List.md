@@ -145,6 +145,26 @@ These align the **local SQLite** schema with Payload when **`db.push: false`** o
 
 ---
 
+## Cursor MCP and GitHub tooling
+
+Secrets live in **`.env.local`** only. After changing GitHub, Resend, or WordPress keys, run **`npm run sync:mcp-env`** and reload MCP in Cursor (**Settings → MCP**). Full setup: **[MCP-SETUP.md](./MCP-SETUP.md)**.
+
+| Command | What it does |
+|--------|----------------|
+| **`npm run sync:mcp-env`** | Syncs **`.env.local`** → global **`~/.cursor/mcp.json`** (GitHub, Tavily; Resend if enabled) + project **`.cursor/mcp.json`** (WordPress). |
+| **`npm run sync:mcp-all`** | Same as **`sync:mcp-env`** + confirmation echo. |
+| **`npm run sync:github-mcp`** | Alias for **`sync:mcp-env`** (replaces deprecated Python script). |
+| **`npm run test:github-api`** | Verifies **`GITHUB_PERSONAL_ACCESS_TOKEN`** from **`.env.local`** against GitHub REST API. |
+| **`npm run test:tavily-api`** | Verifies **`TAVILY_API_KEY`** from **`.env.local`** against Tavily search API. |
+| **`npm run backup:github-repos`** | Clones + bundles Jon’s GitHub repos to **`.cursor/GitHub-Repo-BackUps/`** (gitignored). |
+| **`npm run fix:hero-slide-images`** | Reassigns homepage hero slide **Media** IDs in **`payload.sqlite`** (Python). |
+
+**Project MCP files (committed, placeholders only):** **`.cursor/mcp.json`**, **`.cursor/mcp.json.example`**, **`.cursor/mcp.servers.archived.json`**.
+
+**Payload CMS MCP:** Do **not** add **`@govcraft/payload-cms-mcp`** to **`mcp.json`**. Use workspace **`user-payload`**, REST **`/api/*`**, or **`/admin`** — see **MCP-SETUP.md**.
+
+---
+
 ## Deploy uploaders (Spaceship / FTPS)
 
 **Windows:** PowerShell with **ExecutionPolicy** satisfied (scripts use **Bypass**). Credentials/target host come from your environment or script config as documented in **Spaceship.md** / **Development.md**.
@@ -182,6 +202,8 @@ If `pushitup -- .next` ends with `PushItUP completed with failures`, immediately
 - **Project rules:** `.cursorrules` (core) + `.cursor/rules/*.mdc` (scoped project rules).
 - **Run-Next-JS.md** — URLs, env, first-time `/admin`.
 - **Development.md** — architecture, Payload quirks, webpack vs Turbopack.
+- **MCP-SETUP.md** — Cursor MCP global vs project config, **`sync:mcp-env`**, Payload skip rationale.
+- **GitHub-Cheat-Sheet.md** — daily git commands + restore from **`.bundle`** backups.
 - **ReCall.md** — session memory and resume checklist.
 - **Restore-Points.md** — checkpoints and DB backups.
 - **Spaceship.md** — production host notes, **cPanel login + how to open Terminal / Node.js** (session `cpsess` links expire; stable links are in that doc).

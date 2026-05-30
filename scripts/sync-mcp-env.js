@@ -5,6 +5,7 @@
  * Targets:
  *   ~/.cursor/mcp.json          → github (GITHUB_PERSONAL_ACCESS_TOKEN)
  *                                 resend (RESEND_API_KEY, if server exists)
+ *                                 tavily (TAVILY_API_KEY, if server exists)
  *   .cursor/mcp.json (project)  → mcp-wordpress (WORDPRESS_*)
  *
  * Run after editing .env.local, then reload MCP in Cursor.
@@ -161,6 +162,21 @@ function main() {
     console.log(
       `${changed ? 'PASS' : 'OK'}: resend key → global (${maskSecret(resendKey)})`,
     );
+  }
+
+  const tavilyKey = env.TAVILY_API_KEY;
+  if (globalConfig.mcpServers?.tavily && tavilyKey) {
+    const changed = setNestedEnv(globalConfig, 'tavily', {
+      TAVILY_API_KEY: tavilyKey,
+    });
+    if (isPlaceholder(tavilyKey)) {
+      console.warn('WARN: TAVILY_API_KEY looks like a placeholder');
+    }
+    console.log(
+      `${changed ? 'PASS' : 'OK'}: tavily key → global (${maskSecret(tavilyKey, tavilyKey.startsWith('tvly-') ? 8 : 4)})`,
+    );
+  } else if (tavilyKey && !globalConfig.mcpServers?.tavily) {
+    console.warn('WARN: TAVILY_API_KEY in .env.local but mcpServers.tavily missing in global mcp.json');
   }
 
   writeJson(GLOBAL_MCP, globalConfig);

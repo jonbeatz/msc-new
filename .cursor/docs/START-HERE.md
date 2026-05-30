@@ -65,6 +65,7 @@ Project rules layout:
 | `ToDo.md` | Next ideas / tomorrow’s focus (lightweight; not a full backlog) | Optional |
 | `Development.md` | Architecture and deep implementation details | Optional |
 | `MCP-SETUP.md` | Cursor MCP global vs project config, sync:mcp-env | Optional |
+| `GitHub-Cheat-Sheet.md` | Git quick ref + bundle/archive recovery | Optional |
 | `Run-Next-JS.md` | Local run/build/deploy summary | Optional |
 | `Site-Plans.md` | Product/site planning notes | Archive/Optional |
 | `Headless-WP-Backend-Plan.md` | WP integration planning | Archive/Optional |
@@ -91,6 +92,7 @@ If local breaks with missing vendor chunks (`date-fns`, etc.), after **`pushit:l
 
 - **Local:** set **`NEXT_PUBLIC_SERVER_URL`** in **`.env.local`** to your dev origin (see **`.env.example`**) so Payload admin **CSRF** and **View site** match what you open in the browser.
 - **Production:** set **`NEXT_PUBLIC_SERVER_URL`** and/or **`PAYLOAD_PUBLIC_SERVER_URL`** on the host (see **Spaceship.md**). If both are missing at build/runtime, the app falls back to **`https://mystudiochannel.com`** (override with **`MSC_CANONICAL_SITE_ORIGIN`**). Details: **`Jedi-List.md`** → *Public site URL*.
+- **MCP secrets:** after changing **`GITHUB_PERSONAL_ACCESS_TOKEN`**, **`RESEND_API_KEY`**, or **`WORDPRESS_*`** in **`.env.local`**, run **`npm run sync:mcp-env`** and reload MCP in Cursor (**`MCP-SETUP.md`**).
 
 ### Why the browser shows a white page + `/_next/static/chunks/fallback/*` (500)
 

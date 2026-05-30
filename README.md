@@ -25,6 +25,14 @@ copy .env.example .env.local
 
 Edit `.env.local` and replace placeholder values. Use **only** `.env.local` on your PC (not `.env`).
 
+Optional — Cursor MCP (after env is set):
+
+```bash
+npm run sync:mcp-env
+```
+
+Then reload MCP in Cursor. See `.cursor/docs/MCP-SETUP.md`.
+
 3. Start dev server (Webpack mode):
 
 ```bash
@@ -75,6 +83,9 @@ If no CMS slides exist, the site falls back to hardcoded defaults in `components
 - Build: `npm run build`
 - Start (prod-like): `npm run start`
 - Lint: `npm run lint`
+- MCP env sync: `npm run sync:mcp-env` (after editing `.env.local`)
+- GitHub API check: `npm run test:github-api`
+- Tavily API check: `npm run test:tavily-api`
 - FTP upload (files/folders): `npm run pushitup -- <target...>`
 - FTP upload (zip-first): `npm run pushitupzip -- <target...>`
 
@@ -92,6 +103,8 @@ Some shared hosts cannot run `next build` due to Wasm memory limits. In that cas
 ## Docs
 
 - `.cursor/docs/Development.md` - implementation notes and architecture (includes marketing header, **`lib/hash-nav.ts`**, and **`HomeHashScroll`** behavior)
+- `.cursor/docs/MCP-SETUP.md` - Cursor MCP global vs project config, **`sync:mcp-env`**, Payload MCP skip
+- `.cursor/docs/GitHub-Cheat-Sheet.md` - git quick reference + recover from GitHub `.bundle` backups
 - `.cursor/docs/Run-Next-JS.md` - run/build instructions
 - `.cursor/docs/Site-Plans.md` - backend/CMS planning notes
 - `.cursor/docs/Restore-Points.md` - restore checkpoints

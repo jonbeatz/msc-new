@@ -2,7 +2,7 @@
 
 Living notes for how this site is wired so humans and agents can find things quickly after gaps or fixes. **Update this file** when you change architecture, URLs, or fix non-obvious bugs.
 
-**Companion:** [Run-Next-JS.md](./Run-Next-JS.md) — install, dev vs production server, env. [Site-Plans.md](./Site-Plans.md) — CMS / backend options. [Restore-Points.md](./Restore-Points.md) — dated checkpoints + how to back up `payload.sqlite`.
+**Companion:** [Run-Next-JS.md](./Run-Next-JS.md) — install, dev vs production server, env. [MCP-SETUP.md](./MCP-SETUP.md) — Cursor MCP config and env sync. [Site-Plans.md](./Site-Plans.md) — CMS / backend options. [Restore-Points.md](./Restore-Points.md) — dated checkpoints + how to back up `payload.sqlite`.
 
 ---
 

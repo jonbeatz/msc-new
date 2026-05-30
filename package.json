@@ -59,6 +59,7 @@
     "sync:mcp-env": "node scripts/sync-mcp-env.js",
     "sync:mcp-all": "npm run sync:mcp-env && echo All MCP configs synced",
     "sync:github-mcp": "npm run sync:mcp-env",
+    "test:tavily-api": "python scripts/test_tavily_api.py",
     "backup:github-repos": "python scripts/backup-github-repos.py",
     "postinstall": "patch-package"
   },

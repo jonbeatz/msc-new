@@ -12,7 +12,7 @@ Cursor can expose MCP tools from **three separate places**. Only the first two u
 
 | Channel | Config | This project |
 |---------|--------|--------------|
-| **Global manual MCPs** | `C:\Users\JONBEATZ\.cursor\mcp.json` | 7 lean servers (GitHub, filesystem, Playwright, fetch, terminal, sequential-thinking, desktop-commander) |
+| **Global manual MCPs** | `C:\Users\JONBEATZ\.cursor\mcp.json` | 8 servers (GitHub, filesystem, Playwright, fetch, **tavily**, terminal, sequential-thinking, desktop-commander) |
 | **Project manual MCPs** | `.cursor/mcp.json` in repo | WordPress (`local-wp`, `mcp-wordpress`) |
 | **Workspace / plugin MCPs** | Cursor Settings → MCP, extensions, marketplace | **No JSON** — e.g. `user-payload`, Stripe, Vercel, Firebase, Browser DevTools |
 
@@ -40,7 +40,7 @@ We **do not** configure `@govcraft/payload-cms-mcp` in any `mcp.json`.
 
 1. Put secrets in **`.env.local`** (gitignored). See **`.env.example`** for keys:
    - `GITHUB_PERSONAL_ACCESS_TOKEN`
-   - `RESEND_API_KEY` (optional, if Resend MCP enabled)
+   - `TAVILY_API_KEY` (Tavily search MCP)
    - `WORDPRESS_SITE_URL`, `WORDPRESS_USERNAME`, `WORDPRESS_APP_PASSWORD`
 2. Sync into MCP configs:
 
@@ -54,7 +54,7 @@ We **do not** configure `@govcraft/payload-cms-mcp` in any `mcp.json`.
 
 The sync script writes to:
 
-- **Global** `~/.cursor/mcp.json` → `github` (and `resend` if that server exists)
+- **Global** `~/.cursor/mcp.json` → `github`, `tavily` (and `resend` if that server exists)
 - **Project** `.cursor/mcp.json` → `mcp-wordpress`
 
 Global `mcp.json` lives **outside the repo** and is never committed.
@@ -63,14 +63,15 @@ Global `mcp.json` lives **outside the repo** and is never committed.
 
 ## Enabled servers (after reorg)
 
-### Global (7)
+### Global (8)
 
 | Server | Purpose |
 |--------|---------|
 | `github` | Repos, issues, PRs (`@modelcontextprotocol/server-github`) |
 | `filesystem` | File access scoped to `D:\Cursor_Projectz` |
 | `playwright` | Single browser MCP (Chrome + devtools) |
-| `fetch` | HTTP fetch via `uvx mcp-server-fetch` |
+| `fetch` | HTTP fetch via `uvx mcp-server-fetch` (known URL → markdown) |
+| `tavily` | Web **search**, extract, map, crawl via [tavily-mcp](https://github.com/tavily-ai/tavily-mcp) |
 | `terminal-controller` | Shell/terminal control |
 | `sequential-thinking` | Structured reasoning helper |
 | `desktop-commander` | Desktop automation |
@@ -96,7 +97,7 @@ Removed from global config (avoids half-configured auth errors). Full recipes:
 
 **[`.cursor/mcp.servers.archived.json`](../mcp.servers.archived.json)**
 
-Includes: `payload`, duplicate browsers, `postgres`, `neon-postgres`, `postman`, `tavily`, `mcp-vercel`, `untitledui`, `resend`, `task-master-ai`, `console-ninja`, `cursor-rules-generator`, `mcpterm`.
+Includes: `payload`, duplicate browsers, `postgres`, `neon-postgres`, `postman`, `mcp-vercel`, `untitledui`, `resend`, `task-master-ai`, `console-ninja`, `cursor-rules-generator`, `mcpterm`. (**`tavily`** re-enabled in global config when `TAVILY_API_KEY` is set.)
 
 **Re-enable Resend MCP:**
 
@@ -138,10 +139,13 @@ Prefer **remove + archive** over `"disabled": true` — Cursor may still connect
 | `npm run sync:mcp-all` | Same + confirmation echo |
 | `npm run sync:github-mcp` | Alias for `sync:mcp-env` |
 | `npm run test:github-api` | Verify GitHub token from `.env.local` |
+| `npm run test:tavily-api` | Verify Tavily token from `.env.local` |
 
 ---
 
 ## Backups
 
 - Global trim backup: `~/.cursor/mcp.json.bak-20260529`
-- Sync script first-run backups: `*.sync-bak` next to each MCP file
+- Sync script first-run backups: `*.sync-bak` next to each MCP file (gitignored)
+
+**Note:** Project **`.cursor/mcp.json`** is committed with placeholders. Global **`~/.cursor/mcp.json`** is outside the repo and receives secrets only via **`sync:mcp-env`**.

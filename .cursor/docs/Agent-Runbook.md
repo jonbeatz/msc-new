@@ -53,7 +53,7 @@ You must actually read these files (not from memory) in this order:
 1) .cursor/docs/START-HERE.md — source-of-truth order, daily rules, Jon’s cPanel session links (Node.js + Terminal), fast workflow.
 2) .cursor/docs/Agent-Runbook.md — operator handshake + command locality (Local Cursor vs Live cPanel).
 3) .cursor/docs/Spaceship.md — deploy protocol: pushitup/pushit:live on PC only; cPanel = restart / optional npm install; never pushitup on host.
-4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, dev:recover, verify:next:safe, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, parity:ftp, test:spaceship-ftp).
+4) .cursor/docs/Jedi-List.md — npm scripts (dev:fresh, dev:recover, verify:next:safe, build, lint, verify:local, verify:live, verify:next, media:sync, media:consolidate, pushit:live, parity:ftp, test:spaceship-ftp, sync:mcp-env, test:github-api, test:tavily-api).
 5) .cursor/docs/ReCall.md — "Current focus" + latest "Recent changes" entry.
 6) Skim .cursor/docs/Restore-Points.md — newest checkpoint row only (if any).
 
