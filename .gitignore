@@ -19,8 +19,7 @@ yarn-error.log*
 # env files
 .env*
 
-# Payload / SQLite local DB
-payload.sqlite
+# Payload / SQLite (track payload.sqlite; ignore WAL sidecars)
 payload.sqlite-*
 .payload
 
