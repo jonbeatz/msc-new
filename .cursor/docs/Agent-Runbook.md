@@ -14,7 +14,7 @@ When starting/resuming from docs, begin with a short handshake line using the op
 
 - Startup: **"Ok Jon - docs loaded, ready."**
 - Continue: **"Ok Jon - context restored from docs."**
-- Finish: **"Great work Jon - all saved, see you later."**
+- Finish: **"Great work Jon - all saved."** (use "see you later" only on "End Project").
 
 This is the confirmation that docs/context were read correctly.
 
@@ -148,7 +148,7 @@ Please do end-of-day safe closeout:
 IMPORTANT:
 - Do NOT deploy to live unless I explicitly say: "Lets Finish + Deploy".
 - Ask me to confirm before final commit and push.
-End with handshake closeout line: "Great work Jon - all saved, see you later."
+End with handshake closeout line: "Great work Jon - all saved." (use "see you later" only on "End Project").
 ```
 
 ---

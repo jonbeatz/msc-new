@@ -11,7 +11,7 @@ Project root: `D:\Cursor_Projectz\MSC_Clean_v2\msc-new`
 - Operator name: **Jon**
 - Handshake rule: when an agent starts or resumes from docs, first line should include the operator name.
   - Startup example: **"Ok Jon - docs loaded, ready to go."**
-  - Closeout example: **"Great work Jon - all saved, see you later."**
+  - Closeout example: **"Great work Jon - all saved."** (use "see you later" only on "End Project").
 
 Use this as a quick confidence signal that docs were read.
 
