@@ -1,0 +1,20 @@
+{
+  "moduleId": "schedule-a-call",
+  "version": "1.0.0",
+  "description": "Premium standalone single-step call scheduling lightbox component with flexible Payload backend options",
+  "install": {
+    "command": ".\\.cursor\\custom-scriptz\\schedule-a-call\\install.ps1"
+  },
+  "envKeys": ["RESEND_API_KEY"],
+  "defaults": {},
+  "dependencies": {
+    "react-day-picker": "^9.0.0",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.460.0"
+  },
+  "fragments": [
+    "env.example.fragment"
+  ],
+  "agentDoc": "CURSOR.md",
+  "humanDoc": "README.md"
+}

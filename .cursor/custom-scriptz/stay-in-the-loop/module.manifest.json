@@ -1,0 +1,18 @@
+{
+  "moduleId": "stay-in-the-loop",
+  "version": "1.0.0",
+  "description": "Double opt-in newsletter and email signup capture module integrated with Payload CMS and Resend verification",
+  "install": {
+    "command": ".\\.cursor\\custom-scriptz\\stay-in-the-loop\\install.ps1"
+  },
+  "envKeys": ["RESEND_API_KEY"],
+  "defaults": {},
+  "dependencies": {
+    "lucide-react": "^0.460.0"
+  },
+  "fragments": [
+    "env.example.fragment"
+  ],
+  "agentDoc": "CURSOR.md",
+  "humanDoc": "README.md"
+}
