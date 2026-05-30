@@ -216,7 +216,10 @@ export function RequirementsSection() {
               <Button
                 type="button"
                 className="inline-flex items-center gap-2 px-6 py-3 h-auto rounded-xl bg-accent text-accent-foreground font-medium hover:bg-accent/90 transition-all duration-300 glow-accent-sm hover:glow-accent"
-                onClick={() => openContactModal()}
+                // ORIGINAL CODE (commented out for temporary redirect):
+                // onClick={() => openContactModal()}
+                // TEMPORARY REDIRECT - Remove when restoring original behavior:
+                onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSe1xo__uQrR6_T0VNmbP8julRgHRZGHsaoW8xqFbJYVtWV1dQ/viewform', '_blank', 'noopener,noreferrer')}
               >
                 Get Started
                 <ArrowRight className="h-4 w-4" />
